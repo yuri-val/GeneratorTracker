@@ -37,9 +37,7 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon focused={focused} color={color} label="⚡" />
-          ),
+          tabBarIcon: () => <TabIcon label="⚡" />,
         }}
       />
       <Tab.Screen
@@ -47,16 +45,14 @@ function MainTabs() {
         component={AnalyticsScreen}
         options={{
           tabBarLabel: 'Analytics',
-          tabBarIcon: ({ focused, color }) => (
-            <TabIcon focused={focused} color={color} label="📊" />
-          ),
+          tabBarIcon: () => <TabIcon label="📊" />,
         }}
       />
     </Tab.Navigator>
   );
 }
 
-function TabIcon({ focused, color, label }: { focused: boolean; color: string; label: string }) {
+function TabIcon({ label }: { label: string }) {
   const Text = require('react-native').Text;
   return <Text style={{ fontSize: 24 }}>{label}</Text>;
 }
