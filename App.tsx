@@ -18,7 +18,8 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 function MainTabs() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const isDark = colorScheme === 'dark';
+  const colors = Colors[isDark ? 'dark' : 'light'];
 
   return (
     <Tab.Navigator
@@ -59,11 +60,12 @@ function TabIcon({ label }: { label: string }) {
 
 export default function App() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
+  const isDark = colorScheme === 'dark';
+  const colors = Colors[isDark ? 'dark' : 'light'];
 
   return (
     <NavigationContainer>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
