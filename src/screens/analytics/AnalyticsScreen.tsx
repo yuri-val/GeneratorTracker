@@ -14,7 +14,7 @@ import { Colors } from '../../constants/colors';
 
 export default function AnalyticsScreen() {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
   const [totalGenerators, setTotalGenerators] = useState(0);
   const [totalHours, setTotalHours] = useState(0);

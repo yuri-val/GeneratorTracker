@@ -25,7 +25,7 @@ type AddGeneratorScreenProps = {
 
 export default function AddGeneratorScreen({ navigation, route }: AddGeneratorScreenProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
   const existingGenerator = route.params?.generator;
   const isEdit = !!existingGenerator;

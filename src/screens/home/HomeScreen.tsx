@@ -24,7 +24,7 @@ type GeneratorWithStats = Generator & { stats: GeneratorStats };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
   const [refreshing, setRefreshing] = useState(false);

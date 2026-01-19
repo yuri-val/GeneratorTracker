@@ -24,7 +24,7 @@ type AddWorkSessionScreenProps = {
 
 export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessionScreenProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
   const { generatorId, sessionId } = route.params;
 

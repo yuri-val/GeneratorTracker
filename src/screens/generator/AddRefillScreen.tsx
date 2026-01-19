@@ -24,7 +24,7 @@ type AddRefillScreenProps = {
 
 export default function AddRefillScreen({ navigation, route }: AddRefillScreenProps) {
   const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme ?? 'light'];
+  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
   const { generatorId } = route.params;
 
