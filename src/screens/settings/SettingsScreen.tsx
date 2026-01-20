@@ -1,0 +1,284 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  useColorScheme,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import * as AuthSession from 'expo-auth-session';
+import { useAuth } from '../../hooks/useAuth';
+import { useSync } from '../../hooks/useSync';
+import { Colors } from '../../constants/colors';
+import {
+  signInWithEmail,
+  signUpWithEmail,
+  signInAnonymouslyUser,
+  signInWithGoogleCredential,
+  useGoogleAuth,
+} from '../../services/auth';
+
+export default function SettingsScreen() {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+  const colors = Colors[isDark ? 'dark' : 'light'];
+
+  const { user, signOut } = useAuth();
+  const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
+
+  const [signingIn, setSigningIn] = useState(false);
+  const { request, response, promptAsync } = useGoogleAuth();
+
+  // Handle Google OAuth response
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
+      handleGoogleSignIn(id_token);
+    }
+  }, [response]);
+
+  const handleGoogleSignIn = async (idToken: string) => {
+    try {
+      setSigningIn(true);
+      await signInWithGoogleCredential(idToken);
+      // Trigger initial sync after sign-in
+      await performInitialSync();
+      Alert.alert('Success', 'Signed in successfully');
+    } catch (error: any) {
+      console.error('Google sign in error:', error);
+      Alert.alert('Error', error.message || 'Failed to sign in with Google');
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  const handleAnonymousSignIn = async () => {
+    try {
+      setSigningIn(true);
+      await signInAnonymouslyUser();
+      await performInitialSync();
+      Alert.alert('Success', 'Signed in anonymously');
+    } catch (error: any) {
+      console.error('Anonymous sign in error:', error);
+      Alert.alert('Error', error.message || 'Failed to sign in anonymously');
+    } finally {
+      setSigningIn(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      Alert.alert('Success', 'Signed out successfully');
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      Alert.alert('Error', error.message || 'Failed to sign out');
+    }
+  };
+
+  const handleManualSync = async () => {
+    try {
+      await performManualSync();
+      Alert.alert('Success', 'Sync completed');
+    } catch (error: any) {
+      console.error('Manual sync error:', error);
+      Alert.alert('Error', error.message || 'Sync failed');
+    }
+  };
+
+  return (
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+
+        {!user ? (
+          <>
+            <Text style={[styles.infoText, { color: colors.tabIconDefault }]}>
+              Sign in to sync your data across devices
+            </Text>
+
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: colors.primary }]}
+              onPress={() => promptAsync()}
+              disabled={!request || signingIn}
+            >
+              {signingIn ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Sign in with Google</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, styles.secondaryButton, { borderColor: colors.primary }]}
+              onPress={handleAnonymousSignIn}
+              disabled={signingIn}
+            >
+              <Text style={[styles.buttonTextSecondary, { color: colors.primary }]}>
+                Sign in Anonymously
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <View style={[styles.userInfo, { backgroundColor: colors.card }]}>
+              <Text style={[styles.userEmail, { color: colors.text }]}>
+                {user.email || 'Anonymous User'}
+              </Text>
+              {user.displayName && (
+                <Text style={[styles.userName, { color: colors.tabIconDefault }]}>
+                  {user.displayName}
+                </Text>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={[styles.button, styles.dangerButton]}
+              onPress={handleSignOut}
+            >
+              <Text style={styles.buttonText}>Sign Out</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
+
+      {user && (
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Sync</Text>
+
+          <View style={[styles.syncInfo, { backgroundColor: colors.card }]}>
+            <View style={styles.syncRow}>
+              <Text style={[styles.syncLabel, { color: colors.tabIconDefault }]}>Status:</Text>
+              <Text style={[styles.syncValue, { color: colors.text }]}>
+                {syncStatus === 'syncing' && '🔄 Syncing...'}
+                {syncStatus === 'synced' && '✓ Synced'}
+                {syncStatus === 'error' && '⚠ Error'}
+                {syncStatus === 'idle' && 'Idle'}
+              </Text>
+            </View>
+
+            {pendingCount > 0 && (
+              <View style={styles.syncRow}>
+                <Text style={[styles.syncLabel, { color: colors.tabIconDefault }]}>
+                  Pending:
+                </Text>
+                <Text style={[styles.syncValue, { color: colors.text }]}>
+                  {pendingCount} items
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: colors.primary }]}
+            onPress={handleManualSync}
+            disabled={syncStatus === 'syncing'}
+          >
+            {syncStatus === 'syncing' ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sync Now</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
+        <View style={[styles.infoBox, { backgroundColor: colors.card }]}>
+          <Text style={[styles.infoLabel, { color: colors.tabIconDefault }]}>
+            Generator Tracker
+          </Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.0.0</Text>
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  infoText: {
+    fontSize: 14,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  button: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+  },
+  dangerButton: {
+    backgroundColor: '#f44336',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonTextSecondary: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  userInfo: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  userEmail: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  userName: {
+    fontSize: 14,
+  },
+  syncInfo: {
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  syncRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  syncLabel: {
+    fontSize: 14,
+  },
+  syncValue: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  infoBox: {
+    padding: 16,
+    borderRadius: 8,
+  },
+  infoLabel: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
