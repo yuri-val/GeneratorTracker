@@ -15,6 +15,7 @@ import { Generator, GeneratorStats } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
 import { calculateGeneratorStats, formatDate } from '../../utils/calculations';
 import { Colors } from '../../constants/colors';
+import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
@@ -106,6 +107,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Generator Tracker</Text>
+        <SyncStatusIndicator />
       </View>
 
       <FlatList
@@ -148,6 +150,9 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 24,

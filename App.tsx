@@ -7,11 +7,13 @@ import { useColorScheme } from 'react-native';
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 import HomeScreen from './src/screens/home/HomeScreen';
 import AnalyticsScreen from './src/screens/analytics/AnalyticsScreen';
+import SettingsScreen from './src/screens/settings/SettingsScreen';
 import GeneratorDetailScreen from './src/screens/generator/GeneratorDetailScreen';
 import AddGeneratorScreen from './src/screens/generator/AddGeneratorScreen';
 import AddWorkSessionScreen from './src/screens/generator/AddWorkSessionScreen';
 import AddRefillScreen from './src/screens/generator/AddRefillScreen';
 import { Colors } from './src/constants/colors';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -49,6 +51,14 @@ function MainTabs() {
           tabBarIcon: () => <TabIcon label="📊" />,
         }}
       />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          tabBarLabel: 'Settings',
+          tabBarIcon: () => <TabIcon label="⚙️" />,
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -64,36 +74,38 @@ export default function App() {
   const colors = Colors[isDark ? 'dark' : 'light'];
 
   return (
-    <NavigationContainer>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      >
-        <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen
-          name="GeneratorDetail"
-          component={GeneratorDetailScreen}
-          options={{ presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="AddGenerator"
-          component={AddGeneratorScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="AddWorkSession"
-          component={AddWorkSessionScreen}
-          options={{ presentation: 'modal' }}
-        />
-        <Stack.Screen
-          name="AddRefill"
-          component={AddRefillScreen}
-          options={{ presentation: 'modal' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+      <NavigationContainer>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen
+            name="GeneratorDetail"
+            component={GeneratorDetailScreen}
+            options={{ presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="AddGenerator"
+            component={AddGeneratorScreen}
+            options={{ presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="AddWorkSession"
+            component={AddWorkSessionScreen}
+            options={{ presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="AddRefill"
+            component={AddRefillScreen}
+            options={{ presentation: 'modal' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
