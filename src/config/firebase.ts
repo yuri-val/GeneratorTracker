@@ -14,12 +14,23 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Validate Firebase configuration
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  console.error('Firebase configuration is missing required fields');
+  throw new Error('Firebase configuration is incomplete. Check your .env file.');
+}
+
 // Initialize Firebase
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
 try {
+  console.log('Initializing Firebase with config:', { 
+    hasApiKey: !!firebaseConfig.apiKey,
+    projectId: firebaseConfig.projectId 
+  });
+  
   app = initializeApp(firebaseConfig);
 
   // Initialize Auth with platform-specific persistence
@@ -34,8 +45,13 @@ try {
   }
 
   db = getFirestore(app);
+  console.log('Firebase initialized successfully');
 } catch (error) {
   console.error('Firebase initialization error:', error);
+  // Re-throw with more context
+  if (error instanceof Error) {
+    throw new Error(`Firebase initialization failed: ${error.message}`);
+  }
   throw error;
 }
 
