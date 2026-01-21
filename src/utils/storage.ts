@@ -24,10 +24,10 @@ export const saveGenerator = async (generator: Generator): Promise<void> => {
     const index = generators.findIndex(g => g.id === generator.id);
     const isUpdate = index >= 0;
 
-    // Add sync metadata if not present
+    // Add sync metadata - preserve existing values or set defaults
     const generatorWithMeta: Generator = {
       ...generator,
-      lastModified: new Date().toISOString(),
+      lastModified: generator.lastModified || new Date().toISOString(),
       syncStatus: generator.syncStatus || 'pending',
     };
 
@@ -39,9 +39,9 @@ export const saveGenerator = async (generator: Generator): Promise<void> => {
 
     await AsyncStorage.setItem(GENERATORS_KEY, JSON.stringify(generators));
 
-    // Queue for sync if user is authenticated
+    // Queue for sync only if status is pending and user is authenticated
     const currentUser = getCurrentUser();
-    if (currentUser) {
+    if (currentUser && generatorWithMeta.syncStatus === 'pending') {
       await syncQueue.addToQueue({
         entityType: 'generator',
         entityId: generator.id,
@@ -110,10 +110,10 @@ export const saveWorkSession = async (session: WorkSession): Promise<void> => {
     const index = sessions.findIndex(s => s.id === session.id);
     const isUpdate = index >= 0;
 
-    // Add sync metadata if not present
+    // Add sync metadata - preserve existing values or set defaults
     const sessionWithMeta: WorkSession = {
       ...session,
-      lastModified: new Date().toISOString(),
+      lastModified: session.lastModified || new Date().toISOString(),
       syncStatus: session.syncStatus || 'pending',
     };
 
@@ -125,9 +125,9 @@ export const saveWorkSession = async (session: WorkSession): Promise<void> => {
 
     await AsyncStorage.setItem(WORK_SESSIONS_KEY, JSON.stringify(sessions));
 
-    // Queue for sync if user is authenticated
+    // Queue for sync only if status is pending and user is authenticated
     const currentUser = getCurrentUser();
-    if (currentUser) {
+    if (currentUser && sessionWithMeta.syncStatus === 'pending') {
       await syncQueue.addToQueue({
         entityType: 'workSession',
         entityId: session.id,
@@ -197,10 +197,10 @@ export const saveRefill = async (refill: Refill): Promise<void> => {
     const index = refills.findIndex(r => r.id === refill.id);
     const isUpdate = index >= 0;
 
-    // Add sync metadata if not present
+    // Add sync metadata - preserve existing values or set defaults
     const refillWithMeta: Refill = {
       ...refill,
-      lastModified: new Date().toISOString(),
+      lastModified: refill.lastModified || new Date().toISOString(),
       syncStatus: refill.syncStatus || 'pending',
     };
 
@@ -212,9 +212,9 @@ export const saveRefill = async (refill: Refill): Promise<void> => {
 
     await AsyncStorage.setItem(REFILLS_KEY, JSON.stringify(refills));
 
-    // Queue for sync if user is authenticated
+    // Queue for sync only if status is pending and user is authenticated
     const currentUser = getCurrentUser();
-    if (currentUser) {
+    if (currentUser && refillWithMeta.syncStatus === 'pending') {
       await syncQueue.addToQueue({
         entityType: 'refill',
         entityId: refill.id,

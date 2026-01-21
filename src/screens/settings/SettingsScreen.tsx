@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import * as AuthSession from 'expo-auth-session';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
@@ -35,8 +36,19 @@ export default function SettingsScreen() {
   // Handle Google OAuth response
   useEffect(() => {
     if (response?.type === 'success') {
-      const { id_token } = response.params;
-      handleGoogleSignIn(id_token);
+      const { id_token, authentication } = response.params;
+      // On web, the token might be in authentication.idToken
+      const idToken = id_token || authentication?.idToken;
+
+      if (idToken) {
+        handleGoogleSignIn(idToken);
+      } else {
+        console.error('No ID token found in OAuth response:', response.params);
+        Alert.alert('Error', 'Failed to get authentication token from Google');
+      }
+    } else if (response?.type === 'error') {
+      console.error('OAuth error:', response.error);
+      Alert.alert('Error', response.error?.message || 'Authentication failed');
     }
   }, [response]);
 
@@ -152,12 +164,27 @@ export default function SettingsScreen() {
           <View style={[styles.syncInfo, { backgroundColor: colors.card }]}>
             <View style={styles.syncRow}>
               <Text style={[styles.syncLabel, { color: colors.tabIconDefault }]}>Status:</Text>
-              <Text style={[styles.syncValue, { color: colors.text }]}>
-                {syncStatus === 'syncing' && '🔄 Syncing...'}
-                {syncStatus === 'synced' && '✓ Synced'}
-                {syncStatus === 'error' && '⚠ Error'}
-                {syncStatus === 'idle' && 'Idle'}
-              </Text>
+              <View style={styles.syncStatusRow}>
+                {syncStatus === 'syncing' && (
+                  <>
+                    <ActivityIndicator size="small" color={colors.primary} style={styles.syncIcon} />
+                    <Text style={[styles.syncValue, { color: colors.text }]}>Syncing...</Text>
+                  </>
+                )}
+                {syncStatus === 'synced' && (
+                  <>
+                    <Ionicons name="checkmark-circle" size={16} color="#4CAF50" style={styles.syncIcon} />
+                    <Text style={[styles.syncValue, { color: colors.text }]}>Synced</Text>
+                  </>
+                )}
+                {syncStatus === 'error' && (
+                  <>
+                    <Ionicons name="alert-circle" size={16} color="#f44336" style={styles.syncIcon} />
+                    <Text style={[styles.syncValue, { color: colors.text }]}>Error</Text>
+                  </>
+                )}
+                {syncStatus === 'idle' && <Text style={[styles.syncValue, { color: colors.text }]}>Idle</Text>}
+              </View>
             </View>
 
             {pendingCount > 0 && (
@@ -260,6 +287,14 @@ const styles = StyleSheet.create({
   syncRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  syncStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  syncIcon: {
+    marginRight: 6,
     marginBottom: 8,
   },
   syncLabel: {

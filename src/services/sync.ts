@@ -152,20 +152,20 @@ export const performInitialSync = async (userId: string): Promise<void> => {
     // 1. Push all local data to Firestore
     const localGenerators = await getGenerators();
     for (const gen of localGenerators) {
-      const genWithUserId = { ...gen, userId, lastModified: new Date().toISOString() };
+      const genWithUserId = { ...gen, userId };
       await saveGeneratorToFirestore(genWithUserId, userId);
 
       // Push related work sessions
       const sessions = (await getWorkSessions(gen.id)).filter(s => s.generatorId === gen.id);
       for (const session of sessions) {
-        const sessionWithUserId = { ...session, userId, lastModified: new Date().toISOString() };
+        const sessionWithUserId = { ...session, userId };
         await saveWorkSessionToFirestore(sessionWithUserId, userId);
       }
 
       // Push related refills
       const refills = (await getRefills(gen.id)).filter(r => r.generatorId === gen.id);
       for (const refill of refills) {
-        const refillWithUserId = { ...refill, userId, lastModified: new Date().toISOString() };
+        const refillWithUserId = { ...refill, userId };
         await saveRefillToFirestore(refillWithUserId, userId);
       }
     }

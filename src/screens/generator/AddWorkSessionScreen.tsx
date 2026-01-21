@@ -8,12 +8,14 @@ import {
   useColorScheme,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { WorkSession } from '../../models/types';
-import { saveWorkSession, getWorkSessions } from '../../utils/storage';
+import { saveWorkSession, getWorkSessions, deleteWorkSession } from '../../utils/storage';
 import { generateId, calculateHours, getCurrentTime } from '../../utils/calculations';
 import { Colors } from '../../constants/colors';
 
@@ -61,6 +63,33 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const hours = endTime ? calculateHours(startTime, endTime) : 0;
   const isEditing = !!existingSession;
   const isActiveSession = existingSession?.isActive;
+
+  const handleDelete = async () => {
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm('Are you sure you want to delete this work session? This cannot be undone.')
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Delete Work Session',
+            'Are you sure you want to delete this work session? This cannot be undone.',
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
+            ]
+          );
+        });
+
+    if (confirmed) {
+      try {
+        if (sessionId) {
+          await deleteWorkSession(sessionId);
+          navigation.goBack();
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete work session');
+        console.error(error);
+      }
+    }
+  };
 
   const handleSave = async () => {
     if (!date.trim()) {
@@ -148,9 +177,12 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
       <ScrollView contentContainerStyle={styles.content}>
         {isActiveSession && (
           <View style={[styles.infoCard, { backgroundColor: colors.success }]}>
-            <Text style={styles.infoText}>
-              💡 Editing active session: Modify start time/date and save to keep it running, or set an end time to complete it.
-            </Text>
+            <View style={styles.infoRow}>
+              <Ionicons name="information-circle" size={20} color="#ffffff" style={styles.infoIcon} />
+              <Text style={styles.infoText}>
+                Editing active session: Modify start time/date and save to keep it running, or set an end time to complete it.
+              </Text>
+            </View>
           </View>
         )}
 
@@ -223,9 +255,12 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
 
         {isActiveSession && !endTime.trim() && (
           <View style={[styles.activeIndicator, { backgroundColor: colors.success }]}>
-            <Text style={styles.activeIndicatorText}>
-              ✓ Session will remain active
-            </Text>
+            <View style={styles.activeIndicatorRow}>
+              <Ionicons name="checkmark-circle" size={20} color="#ffffff" style={styles.activeIndicatorIcon} />
+              <Text style={styles.activeIndicatorText}>
+                Session will remain active
+              </Text>
+            </View>
           </View>
         )}
 
@@ -245,6 +280,15 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
             numberOfLines={4}
           />
         </View>
+
+        {isEditing && (
+          <TouchableOpacity
+            style={[styles.deleteButton, { backgroundColor: colors.error }]}
+            onPress={handleDelete}
+          >
+            <Text style={styles.deleteButtonText}>Delete Work Session</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -281,11 +325,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoIcon: {
+    marginRight: 8,
+  },
   infoText: {
     color: '#ffffff',
     fontSize: 14,
-    textAlign: 'center',
     lineHeight: 20,
+    flex: 1,
   },
   formGroup: {
     marginBottom: 24,
@@ -330,7 +382,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  activeIndicatorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  activeIndicatorIcon: {
+    marginRight: 8,
+  },
   activeIndicatorText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  deleteButton: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  deleteButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',

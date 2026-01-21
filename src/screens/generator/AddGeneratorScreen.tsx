@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator } from '../../models/types';
-import { saveGenerator } from '../../utils/storage';
+import { saveGenerator, getGenerators } from '../../utils/storage';
 import { generateId } from '../../utils/calculations';
 import { Colors } from '../../constants/colors';
 
@@ -27,14 +27,35 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
-  const existingGenerator = route.params?.generator;
-  const isEdit = !!existingGenerator;
+  const { generatorId } = route.params || {};
+  const isEdit = !!generatorId;
 
-  const [name, setName] = useState(existingGenerator?.name || '');
-  const [model, setModel] = useState(existingGenerator?.model || '');
-  const [purchaseDate, setPurchaseDate] = useState(
-    existingGenerator?.purchaseDate || new Date().toISOString().split('T')[0]
-  );
+  const [name, setName] = useState('');
+  const [model, setModel] = useState('');
+  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
+
+  useEffect(() => {
+    if (generatorId) {
+      loadGenerator();
+    }
+  }, [generatorId]);
+
+  const loadGenerator = async () => {
+    try {
+      const generators = await getGenerators();
+      const gen = generators.find(g => g.id === generatorId);
+      if (gen) {
+        setExistingGenerator(gen);
+        setName(gen.name);
+        setModel(gen.model || '');
+        setPurchaseDate(gen.purchaseDate);
+      }
+    } catch (error) {
+      console.error('Error loading generator:', error);
+      Alert.alert('Error', 'Failed to load generator');
+    }
+  };
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -44,11 +65,11 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
 
     try {
       const generator: Generator = {
-        id: existingGenerator?.id || generateId(),
+        id: isEdit && existingGenerator ? existingGenerator.id : generateId(),
         name: name.trim(),
         model: model.trim() || undefined,
         purchaseDate,
-        createdAt: existingGenerator?.createdAt || new Date().toISOString(),
+        createdAt: isEdit && existingGenerator ? existingGenerator.createdAt : new Date().toISOString(),
       };
 
       await saveGenerator(generator);

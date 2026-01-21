@@ -9,6 +9,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -310,7 +311,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         <TouchableOpacity
           style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
           onPress={() => navigation.navigate('AddWorkSession', { generatorId, sessionId: session.id })}
-          onLongPress={() => handleDeleteSession(session.id)}
+          activeOpacity={0.7}
         >
           <View style={styles.itemContent}>
             <Text style={[styles.itemDate, { color: colors.text }]}>{formatDate(session.date)}</Text>
@@ -329,7 +330,8 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
       return (
         <TouchableOpacity
           style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-          onLongPress={() => handleDeleteRefill(refill.id)}
+          onPress={() => navigation.navigate('AddRefill', { generatorId, refillId: refill.id })}
+          activeOpacity={0.7}
         >
           <View style={styles.itemContent}>
             <Text style={[styles.itemDate, { color: colors.text }]}>{formatDate(refill.date)}</Text>
@@ -347,11 +349,17 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary }]}>← Back</Text>
+          <Ionicons name="arrow-back" size={24} color={colors.primary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-          {generator.name}
-        </Text>
+        <TouchableOpacity
+          style={styles.headerTitleContainer}
+          onPress={() => navigation.navigate('AddGenerator', { generatorId })}
+        >
+          <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+            {generator.name}
+          </Text>
+          <Text style={[styles.editHint, { color: colors.textMuted }]}>Tap to edit</Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleDeleteGenerator} style={styles.headerButton}>
           <Text style={[styles.headerButtonText, { color: colors.error }]}>Delete</Text>
         </TouchableOpacity>
@@ -399,11 +407,17 @@ const styles = StyleSheet.create({
   headerButtonText: {
     fontSize: 16,
   },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
-    flex: 1,
-    textAlign: 'center',
+  },
+  editHint: {
+    fontSize: 11,
+    marginTop: 2,
   },
   listContent: {
     paddingBottom: 100,

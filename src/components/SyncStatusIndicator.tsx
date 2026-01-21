@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, useColorScheme } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../hooks/useAuth';
 import { useSync } from '../hooks/useSync';
 import { Colors } from '../constants/colors';
@@ -27,14 +28,14 @@ export const SyncStatusIndicator: React.FC = () => {
 
       {syncStatus === 'synced' && (
         <>
-          <Text style={styles.checkmark}>✓</Text>
+          <Ionicons name="checkmark-circle" size={16} color="#4CAF50" />
           <Text style={[styles.text, { color: colors.text }]}>Synced</Text>
         </>
       )}
 
       {syncStatus === 'error' && (
         <>
-          <Text style={styles.warning}>⚠</Text>
+          <Ionicons name="alert-circle" size={16} color="#f44336" />
           <Text style={[styles.text, { color: '#f44336' }]}>Sync error</Text>
         </>
       )}
@@ -60,14 +61,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 12,
     fontWeight: '500',
-  },
-  checkmark: {
-    fontSize: 14,
-    color: '#4CAF50',
-  },
-  warning: {
-    fontSize: 14,
-    color: '#f44336',
   },
   badge: {
     minWidth: 18,

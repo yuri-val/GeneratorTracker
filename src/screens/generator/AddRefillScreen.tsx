@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,13 @@ import {
   useColorScheme,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Refill } from '../../models/types';
-import { saveRefill } from '../../utils/storage';
+import { saveRefill, getRefills, deleteRefill } from '../../utils/storage';
 import { generateId } from '../../utils/calculations';
 import { Colors } from '../../constants/colors';
 
@@ -26,11 +27,62 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
 
-  const { generatorId } = route.params;
+  const { generatorId, refillId } = route.params;
+  const isEditing = !!refillId;
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
+  const [existingRefill, setExistingRefill] = useState<Refill | null>(null);
+
+  useEffect(() => {
+    if (refillId) {
+      loadRefill();
+    }
+  }, [refillId]);
+
+  const loadRefill = async () => {
+    try {
+      const refills = await getRefills(generatorId);
+      const refill = refills.find(r => r.id === refillId);
+      if (refill) {
+        setExistingRefill(refill);
+        setDate(refill.date);
+        setAmount(refill.amount.toString());
+        setNotes(refill.notes || '');
+      }
+    } catch (error) {
+      console.error('Error loading refill:', error);
+      Alert.alert('Error', 'Failed to load refill');
+    }
+  };
+
+  const handleDelete = async () => {
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm('Are you sure you want to delete this refill? This cannot be undone.')
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Delete Refill',
+            'Are you sure you want to delete this refill? This cannot be undone.',
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
+            ]
+          );
+        });
+
+    if (confirmed) {
+      try {
+        if (refillId) {
+          await deleteRefill(refillId);
+          navigation.goBack();
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Failed to delete refill');
+        console.error(error);
+      }
+    }
+  };
 
   const handleSave = async () => {
     if (!date.trim()) {
@@ -46,12 +98,12 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
 
     try {
       const refill: Refill = {
-        id: generateId(),
+        id: isEditing && existingRefill ? existingRefill.id : generateId(),
         generatorId,
         date,
         amount: amountNum,
         notes: notes.trim() || undefined,
-        createdAt: new Date().toISOString(),
+        createdAt: isEditing && existingRefill ? existingRefill.createdAt : new Date().toISOString(),
       };
 
       await saveRefill(refill);
@@ -68,7 +120,9 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
           <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Add Refill</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          {isEditing ? 'Edit Refill' : 'Add Refill'}
+        </Text>
         <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
           <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '600' }]}>
             Save
@@ -125,6 +179,15 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
             numberOfLines={4}
           />
         </View>
+
+        {isEditing && (
+          <TouchableOpacity
+            style={[styles.deleteButton, { backgroundColor: colors.error }]}
+            onPress={handleDelete}
+          >
+            <Text style={styles.deleteButtonText}>Delete Refill</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -177,5 +240,17 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: 13,
     marginTop: 4,
+  },
+  deleteButton: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  deleteButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

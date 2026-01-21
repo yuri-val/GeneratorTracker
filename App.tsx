@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useColorScheme } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 import HomeScreen from './src/screens/home/HomeScreen';
 import AnalyticsScreen from './src/screens/analytics/AnalyticsScreen';
@@ -40,7 +41,9 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: () => <TabIcon label="⚡" />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="flash" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -48,7 +51,9 @@ function MainTabs() {
         component={AnalyticsScreen}
         options={{
           tabBarLabel: 'Analytics',
-          tabBarIcon: () => <TabIcon label="📊" />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="bar-chart" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -56,16 +61,13 @@ function MainTabs() {
         component={SettingsScreen}
         options={{
           tabBarLabel: 'Settings',
-          tabBarIcon: () => <TabIcon label="⚙️" />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
   );
-}
-
-function TabIcon({ label }: { label: string }) {
-  const Text = require('react-native').Text;
-  return <Text style={{ fontSize: 24 }}>{label}</Text>;
 }
 
 export default function App() {

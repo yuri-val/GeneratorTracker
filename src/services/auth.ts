@@ -81,6 +81,7 @@ export const useGoogleAuth = () => {
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    responseType: 'id_token',  // Request ID token for Firebase Auth
   });
 
   return { request, response, promptAsync };
