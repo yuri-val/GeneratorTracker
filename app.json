@@ -16,20 +16,31 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yuri-val.generatortracker",
-      "buildNumber": "2"
+      "buildNumber": "2",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yuri-val.generatortracker",
+      "package": "com.yurival.GeneratorTracker",
       "versionCode": 2,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "26c15560-de76-4f7c-84d9-819ab9db0a5a"
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
