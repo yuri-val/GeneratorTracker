@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.generatortracker"
+      "bundleIdentifier": "com.yuri-val.generatortracker"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourcompany.generatortracker",
+      "package": "com.yuri-val.generatortracker",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
