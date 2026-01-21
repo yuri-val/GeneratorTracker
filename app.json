@@ -2,7 +2,7 @@
   "expo": {
     "name": "GeneratorTracker",
     "slug": "GeneratorTracker",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,7 +15,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yuri-val.generatortracker"
+      "bundleIdentifier": "com.yuri-val.generatortracker",
+      "buildNumber": "2"
     },
     "android": {
       "adaptiveIcon": {
@@ -23,6 +24,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.yuri-val.generatortracker",
+      "versionCode": 2,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
