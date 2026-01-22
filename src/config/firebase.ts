@@ -26,11 +26,11 @@ let auth: Auth;
 let db: Firestore;
 
 try {
-  console.log('Initializing Firebase with config:', { 
+  console.log('Initializing Firebase with config:', {
     hasApiKey: !!firebaseConfig.apiKey,
-    projectId: firebaseConfig.projectId 
+    projectId: firebaseConfig.projectId
   });
-  
+
   app = initializeApp(firebaseConfig);
 
   // Initialize Auth with platform-specific persistence
