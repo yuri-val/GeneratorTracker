@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  expo:
+    image: expo_builder
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+    container_name: expo_builder
+    mem_limit: 8g
+    mem_reservation: 4g
+    cpus: 4
+    shm_size: 2g
+    volumes:
+      - .:/app/GeneratorTracker
+      - gradle-cache:/root/.gradle
+      - android-sdk-cache:/opt/android-sdk
+    working_dir: /app/GeneratorTracker
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+
+volumes:
+  gradle-cache:
+  android-sdk-cache:

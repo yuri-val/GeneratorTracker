@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as AuthSession from 'expo-auth-session';
@@ -102,9 +103,14 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
 
         {!user ? (
           <>
@@ -112,27 +118,31 @@ export default function SettingsScreen() {
               Sign in to sync your data across devices
             </Text>
 
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: colors.primary }]}
-              onPress={() => promptAsync()}
-              disabled={!request || signingIn}
-            >
-              {signingIn ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Sign in with Google</Text>
-              )}
-            </TouchableOpacity>
+            {Platform.OS !== 'android' && (
+              <TouchableOpacity
+                style={[styles.button, { backgroundColor: colors.primary }]}
+                onPress={() => promptAsync()}
+                disabled={!request || signingIn}
+              >
+                {signingIn ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Sign in with Google</Text>
+                )}
+              </TouchableOpacity>
+            )}
 
-            <TouchableOpacity
-              style={[styles.button, styles.secondaryButton, { borderColor: colors.primary }]}
-              onPress={handleAnonymousSignIn}
-              disabled={signingIn}
-            >
-              <Text style={[styles.buttonTextSecondary, { color: colors.primary }]}>
-                Sign in Anonymously
-              </Text>
-            </TouchableOpacity>
+            {Platform.OS !== 'android' && (
+              <TouchableOpacity
+                style={[styles.button, styles.secondaryButton, { borderColor: colors.primary }]}
+                onPress={handleAnonymousSignIn}
+                disabled={signingIn}
+              >
+                <Text style={[styles.buttonTextSecondary, { color: colors.primary }]}>
+                  Sign in Anonymously
+                </Text>
+              </TouchableOpacity>
+            )}
           </>
         ) : (
           <>
@@ -222,13 +232,26 @@ export default function SettingsScreen() {
           <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.0.0</Text>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    paddingTop: 60,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  content: {
     padding: 16,
   },
   section: {
