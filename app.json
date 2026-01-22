@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.yurival.GeneratorTracker",
-      "versionCode": 3,
+      "versionCode": 4,
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
