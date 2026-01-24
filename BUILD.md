@@ -3,7 +3,12 @@
 ## Local Builds Configuration
 
 ### Output Directory
-All local builds will be saved to the `builds/` directory.
+Local builds are saved in the project root directory by EAS. After building, you can move them to the `builds/` directory for organization:
+```bash
+mkdir -p builds
+mv *.apk builds/ 2>/dev/null || true
+mv *.aab builds/ 2>/dev/null || true
+```
 
 ### Credentials Setup
 

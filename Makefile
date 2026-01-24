@@ -10,9 +10,15 @@ help:
 # Local builds using Docker
 build-preview:
 	docker compose exec expo eas build --platform android --local --profile preview
+	@mkdir -p builds
+	@mv -f *.apk builds/ 2>/dev/null || true
+	@echo "Build saved to builds/"
 
 build-prod:
 	docker compose exec expo eas build --platform android --local --profile production
+	@mkdir -p builds
+	@mv -f *.aab builds/ 2>/dev/null || true
+	@echo "Build saved to builds/"
 
 # Remote builds on EAS
 eas-build-preview:
