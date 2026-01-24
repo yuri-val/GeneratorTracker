@@ -30,11 +30,33 @@ RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools && \
     rm /tmp/cmdline-tools.zip
 
 # Accept licenses and install required SDK packages
+# Expo SDK 54 requires: compileSdk 36, buildTools 36.0.0, NDK 27.1.12297006
 RUN yes | sdkmanager --licenses && \
-    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;25.1.8937393"
+    sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006"
+
+# Set Android NDK environment variable
+ENV ANDROID_NDK_HOME=${ANDROID_SDK_ROOT}/ndk/27.1.12297006
 
 # Install Expo CLI and EAS CLI
 RUN npm install -g expo-cli eas-cli
+
+# Configure Gradle for better memory management
+# - Disable Gradle daemon to avoid "daemon disappeared" crashes
+# - Limit parallel workers to reduce memory pressure
+# - Use G1GC for better memory handling
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=false -Xmx6g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError"
+ENV _JAVA_OPTIONS="-Xmx6g -XX:+UseG1GC"
+
+# Limit CMake parallel jobs to reduce memory usage
+ENV CMAKE_BUILD_PARALLEL_LEVEL=2
+
+# Create gradle.properties with memory settings
+RUN mkdir -p /root/.gradle && \
+    echo "org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.daemon=false" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.parallel=false" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.workers.max=2" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.caching=true" >> /root/.gradle/gradle.properties
 
 # Set working directory
 WORKDIR /app

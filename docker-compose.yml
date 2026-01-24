@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   expo:
     image: expo_builder
@@ -10,10 +8,10 @@ services:
       platforms:
         - linux/amd64
     container_name: expo_builder
-    mem_limit: 8g
-    mem_reservation: 4g
-    cpus: 4
-    shm_size: 2g
+    mem_limit: 16g
+    mem_reservation: 8g
+    cpus: 6
+    shm_size: 4g
     volumes:
       - .:/app/GeneratorTracker
       - gradle-cache:/root/.gradle
