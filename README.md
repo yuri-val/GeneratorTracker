@@ -138,6 +138,29 @@ All data is stored locally on your device using AsyncStorage. Data persists betw
 - Multiple fuel types
 - Cost tracking
 
+## Development
+
+### Building
+
+See [BUILD.md](BUILD.md) for detailed build instructions.
+
+```bash
+make build-preview      # Local preview build
+make build-prod         # Local production build
+make eas-build-preview  # Remote preview build
+make eas-build-prod     # Remote production build
+```
+
+### Versioning
+
+This project follows [Semantic Versioning](https://semver.org/). See [VERSIONING.md](VERSIONING.md) for details.
+
+```bash
+make version-patch  # Bug fixes (x.y.Z)
+make version-minor  # New features (x.Y.0)
+make version-major  # Breaking changes (X.0.0)
+```
+
 ## License
 
 MIT
