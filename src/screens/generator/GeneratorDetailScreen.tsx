@@ -5,11 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   useColorScheme,
-  SectionList,
   Alert,
-  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
@@ -27,7 +26,6 @@ import {
 } from '../../utils/storage';
 import {
   calculateGeneratorStats,
-  formatDate,
   formatTime,
   getCurrentTime,
   getCurrentDate,
@@ -36,17 +34,15 @@ import {
   calculateHours,
 } from '../../utils/calculations';
 import { Colors } from '../../constants/colors';
+import { WorkSessionsList } from '../../components/WorkSessionsList';
+import { RefillsList } from '../../components/RefillsList';
 
 type GeneratorDetailScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'GeneratorDetail'>;
   route: RouteProp<RootStackParamList, 'GeneratorDetail'>;
 };
 
-type SectionData = {
-  title: string;
-  data: (WorkSession | Refill)[];
-  type: 'session' | 'refill';
-};
+const Tab = createMaterialTopTabNavigator();
 
 export default function GeneratorDetailScreen({ navigation, route }: GeneratorDetailScreenProps) {
   const colorScheme = useColorScheme();
@@ -223,14 +219,32 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
     refills
   );
 
-  const sections: SectionData[] = [
-    { title: 'Work Sessions', data: workSessions.filter(s => !s.isActive), type: 'session' },
-    { title: 'Refills', data: refills, type: 'refill' },
-  ];
-
   const activeHours = activeSession
     ? calculateActiveSessionHours(activeSession.startTime, activeSession.date)
     : 0;
+
+  // Tab Screen Components
+  const WorkSessionsTab = () => (
+    <WorkSessionsList
+      sessions={workSessions.filter(s => !s.isActive)}
+      colors={colors}
+      onSessionPress={(sessionId) => navigation.navigate('AddWorkSession', { generatorId, sessionId })}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      onAddPress={() => navigation.navigate('AddWorkSession', { generatorId })}
+    />
+  );
+
+  const RefillsTab = () => (
+    <RefillsList
+      refills={refills}
+      colors={colors}
+      onRefillPress={(refillId) => navigation.navigate('AddRefill', { generatorId, refillId })}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      onAddPress={() => navigation.navigate('AddRefill', { generatorId })}
+    />
+  );
 
   const renderHeader = () => (
     <>
@@ -289,62 +303,6 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
     </>
   );
 
-  const renderSectionHeader = ({ section }: { section: SectionData }) => (
-    <View style={[styles.sectionHeader, { backgroundColor: colors.background }]}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>{section.title}</Text>
-      <TouchableOpacity
-        onPress={() =>
-          section.type === 'session'
-            ? navigation.navigate('AddWorkSession', { generatorId })
-            : navigation.navigate('AddRefill', { generatorId })
-        }
-      >
-        <Text style={[styles.addButton, { color: colors.primary }]}>+ Add</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderItem = ({ item, section }: { item: WorkSession | Refill; section: SectionData }) => {
-    if (section.type === 'session') {
-      const session = item as WorkSession;
-      return (
-        <TouchableOpacity
-          style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-          onPress={() => navigation.navigate('AddWorkSession', { generatorId, sessionId: session.id })}
-          activeOpacity={0.7}
-        >
-          <View style={styles.itemContent}>
-            <Text style={[styles.itemDate, { color: colors.text }]}>{formatDate(session.date)}</Text>
-            <Text style={[styles.itemDetail, { color: colors.textMuted }]}>
-              {formatTime(session.startTime)} - {session.endTime ? formatTime(session.endTime) : 'In Progress'}
-            </Text>
-            {session.notes && (
-              <Text style={[styles.itemNotes, { color: colors.textMuted }]}>{session.notes}</Text>
-            )}
-          </View>
-          <Text style={[styles.itemValue, { color: colors.primary }]}>{session.hours}h</Text>
-        </TouchableOpacity>
-      );
-    } else {
-      const refill = item as Refill;
-      return (
-        <TouchableOpacity
-          style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-          onPress={() => navigation.navigate('AddRefill', { generatorId, refillId: refill.id })}
-          activeOpacity={0.7}
-        >
-          <View style={styles.itemContent}>
-            <Text style={[styles.itemDate, { color: colors.text }]}>{formatDate(refill.date)}</Text>
-            {refill.notes && (
-              <Text style={[styles.itemNotes, { color: colors.textMuted }]}>{refill.notes}</Text>
-            )}
-          </View>
-          <Text style={[styles.itemValue, { color: colors.primary }]}>{refill.amount}L</Text>
-        </TouchableOpacity>
-      );
-    }
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
@@ -365,25 +323,41 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         </TouchableOpacity>
       </View>
 
-      <SectionList
-        sections={sections}
-        renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        ListHeaderComponent={renderHeader}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        stickySectionHeadersEnabled={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-              No work sessions or refills yet
-            </Text>
-          </View>
-        }
-      />
+      <View style={styles.headerContainer}>
+        {renderHeader()}
+      </View>
+
+      <Tab.Navigator
+        screenOptions={{
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textMuted,
+          tabBarStyle: {
+            backgroundColor: colors.card,
+          },
+          tabBarIndicatorStyle: {
+            backgroundColor: colors.primary,
+          },
+          tabBarLabelStyle: {
+            fontWeight: '600',
+            textTransform: 'none',
+          },
+        }}
+      >
+        <Tab.Screen
+          name="Work Sessions"
+          component={WorkSessionsTab}
+          options={{
+            tabBarLabel: `Sessions (${workSessions.filter(s => !s.isActive).length})`,
+          }}
+        />
+        <Tab.Screen
+          name="Refills"
+          component={RefillsTab}
+          options={{
+            tabBarLabel: `Refills (${refills.length})`,
+          }}
+        />
+      </Tab.Navigator>
     </View>
   );
 }
@@ -419,8 +393,8 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
   },
-  listContent: {
-    paddingBottom: 100,
+  headerContainer: {
+    backgroundColor: 'transparent',
   },
   startButton: {
     margin: 16,
@@ -509,60 +483,6 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 13,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  addButton: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  listItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginBottom: 8,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  itemContent: {
-    flex: 1,
-  },
-  itemDate: {
-    fontSize: 15,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  itemDetail: {
-    fontSize: 13,
-    marginBottom: 2,
-  },
-  itemNotes: {
-    fontSize: 12,
-    fontStyle: 'italic',
-  },
-  itemValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 12,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    padding: 40,
-  },
-  emptyText: {
-    fontSize: 15,
-    textAlign: 'center',
   },
   errorText: {
     fontSize: 16,
