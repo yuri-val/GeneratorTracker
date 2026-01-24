@@ -15,6 +15,7 @@ import * as AuthSession from 'expo-auth-session';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
 import { Colors } from '../../constants/colors';
+import { EmailAuthForm } from '../../components/EmailAuthForm';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -102,6 +103,30 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleEmailSignIn = async (email: string, password: string) => {
+    try {
+      await signInWithEmail(email, password);
+      await performInitialSync();
+      Alert.alert('Success', 'Signed in successfully');
+    } catch (error: any) {
+      console.error('Email sign in error:', error);
+      Alert.alert('Error', error.message || 'Failed to sign in');
+      throw error;
+    }
+  };
+
+  const handleEmailSignUp = async (email: string, password: string) => {
+    try {
+      await signUpWithEmail(email, password);
+      await performInitialSync();
+      Alert.alert('Success', 'Account created successfully');
+    } catch (error: any) {
+      console.error('Email sign up error:', error);
+      Alert.alert('Error', error.message || 'Failed to create account');
+      throw error;
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
@@ -117,6 +142,20 @@ export default function SettingsScreen() {
             <Text style={[styles.infoText, { color: colors.tabIconDefault }]}>
               Sign in to sync your data across devices
             </Text>
+
+            <EmailAuthForm
+              colors={colors}
+              onSignIn={handleEmailSignIn}
+              onSignUp={handleEmailSignUp}
+            />
+
+            {Platform.OS !== 'android' && (
+              <View style={styles.divider}>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                <Text style={[styles.dividerText, { color: colors.textMuted }]}>OR</Text>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              </View>
+            )}
 
             {Platform.OS !== 'android' && (
               <TouchableOpacity
@@ -229,7 +268,7 @@ export default function SettingsScreen() {
           <Text style={[styles.infoLabel, { color: colors.tabIconDefault }]}>
             Generator Tracker
           </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.0.0</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.2.1</Text>
         </View>
       </View>
       </ScrollView>
@@ -338,5 +377,19 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    paddingHorizontal: 12,
+    fontSize: 12,
+    fontWeight: '500',
   },
 });
