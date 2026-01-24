@@ -45,3 +45,9 @@ yarn-error.*
 *.apk
 *.aab
 *.ipa
+builds/
+
+# credentials
+credentials.json
+*.keystore
+*.jks
