@@ -1,0 +1,76 @@
+# Generator Tracker - AI Coding Instructions
+
+## Project Overview
+React Native/Expo mobile app for tracking generator operating hours and fuel refills. Uses Firebase for auth/sync and AsyncStorage for offline-first local persistence.
+
+## Architecture
+
+### Data Flow (Offline-First Pattern)
+1. **Local-first**: All data operations go through `src/utils/storage.ts` → AsyncStorage
+2. **Sync queue**: Changes queue in `src/utils/syncQueue.ts` when user is authenticated
+3. **Background sync**: `src/services/sync.ts` pushes queued changes to Firestore
+4. **Conflict resolution**: Last-write-wins using `lastModified` timestamp (see `resolveConflict` in sync.ts)
+
+### Key Layers
+- **Models** (`src/models/types.ts`): All entities extend `SyncMetadata` with `lastModified`, `syncStatus`, `syncedAt`, `userId`
+- **Storage** (`src/utils/storage.ts`): CRUD operations that auto-queue for sync when user authenticated
+- **Firestore** (`src/services/firestore.ts`): Firebase document operations
+- **Sync** (`src/services/sync.ts`): Orchestrates local↔cloud synchronization
+
+### Firestore Structure
+```
+users/{userId}/generators/{generatorId}
+users/{userId}/generators/{generatorId}/workSessions/{sessionId}
+users/{userId}/generators/{generatorId}/refills/{refillId}
+```
+
+## Navigation Structure
+- **Bottom Tabs** (`TabParamList`): Home, Analytics, Settings
+- **Stack Navigator** (`RootStackParamList`): MainTabs → GeneratorDetail → Add screens (modal presentation)
+- Navigation types defined in `src/navigation/types.ts` - update when adding screens
+
+## Conventions
+
+### Theming
+Always use `Colors[colorScheme === 'dark' ? 'dark' : 'light']` from `src/constants/colors.ts`. Access via `useColorScheme()` hook.
+
+### ID Generation
+Use `generateId()` from `src/utils/calculations.ts` - returns `${Date.now()}-${random}` format.
+
+### Date/Time Formats
+- Dates: ISO 8601 date (`YYYY-MM-DD`)
+- Times: ISO 8601 time (`HH:mm`)
+- Timestamps: Full ISO 8601 datetime for `createdAt`, `lastModified`
+
+### Active Sessions Pattern
+Work sessions can be "active" (`isActive: true`, `endTime: undefined`). See `GeneratorDetailScreen.tsx` for start/stop logic and real-time elapsed time display.
+
+### Screen File Organization
+```
+src/screens/{feature}/
+  └── {Feature}Screen.tsx
+```
+
+## Build Commands
+```bash
+npm start              # Dev server (Expo Go)
+make build-preview     # Local APK build via Docker
+make build-prod        # Local production AAB
+make eas-build-preview # Remote build on EAS
+```
+
+## Environment Variables
+Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase.ts`).
+
+## Common Patterns
+
+### Adding New Entity Type
+1. Add interface extending `SyncMetadata` in `src/models/types.ts`
+2. Add CRUD functions in `src/utils/storage.ts` (follow existing pattern for sync queue integration)
+3. Add Firestore operations in `src/services/firestore.ts`
+4. Update sync service in `src/services/sync.ts`
+
+### Adding New Screen
+1. Create in `src/screens/{category}/{Name}Screen.tsx`
+2. Add route to `RootStackParamList` or `TabParamList` in `src/navigation/types.ts`
+3. Register in `App.tsx` Stack or Tab navigator

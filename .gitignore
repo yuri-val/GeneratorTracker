@@ -51,3 +51,6 @@ builds/
 credentials.json
 *.keystore
 *.jks
+
+# gitingest digest
+digest.txt
