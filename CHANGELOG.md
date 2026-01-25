@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-01-25
+
+### Added
+- DESIGN_GUIDE.md - Comprehensive visual design system documentation
+  - Color palette (Orange primary #FF6B35, Blue secondary #0a7ea4, Dark Mode)
+  - Typography hierarchy (H1, H2, H3, Body, Labels)
+  - Component patterns (buttons, cards, navigation)
+  - Layout principles (Z-pattern, spacing system)
+  - Graphic elements (wave gradients, circuit pattern texture)
+  - Accessibility guidelines
+  - Platform-specific considerations
+- Design System section in CLAUDE.md with mandatory UI guidelines
+- Design System reference in .github/copilot-instructions.md
+- Design System section in README.md
+- Updated app icons (adaptive-icon.png, icon.png, favicon.png, splash-icon.png)
+
+### Changed
+- Makefile: Add `docker compose up -d` to build commands for automatic container startup
+- All future UI changes must follow DESIGN_GUIDE.md specifications
+- Establish orange as primary accent for CTAs and energy features
+- Establish blue as secondary accent for time and informational features
+
 ## [1.4.1] - 2026-01-25
 
 ### Fixed

@@ -98,6 +98,27 @@ All data is scoped to the authenticated user.
 
 Navigation types are defined in `src/navigation/types.ts` - **always update this file when adding new screens**.
 
+## Design System
+
+### Visual Design Guide
+**IMPORTANT:** All UI changes MUST follow the comprehensive design guide in `DESIGN_GUIDE.md`.
+
+Key design principles:
+- **Philosophy:** Modern, Reliable, Technological, Dynamic, Energetic
+- **Primary Accent:** Orange (`#FF6B35`) for CTAs and energy-related features
+- **Secondary Accent:** Blue (`#0a7ea4`) for time-related and informational features
+- **Typography:** Bold sans-serif (Montserrat, Poppins, Inter, or system fonts)
+- **Layout:** Z-pattern reading flow, card-based design
+- **Dark Mode First:** Dark backgrounds with bright accents
+
+**Before implementing any UI change:**
+1. Read `DESIGN_GUIDE.md` for complete style specifications
+2. Use defined color palette from the guide
+3. Follow typography hierarchy (H1, H2, Body, Labels)
+4. Apply spacing system (8px base unit)
+5. Use circuit pattern texture for empty states
+6. Maintain card design principles (12-16px radius, proper shadows)
+
 ## Critical Conventions
 
 ### Theming

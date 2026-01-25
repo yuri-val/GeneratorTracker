@@ -29,6 +29,20 @@ users/{userId}/generators/{generatorId}/refills/{refillId}
 - **Stack Navigator** (`RootStackParamList`): MainTabs → GeneratorDetail → Add screens (modal presentation)
 - Navigation types defined in `src/navigation/types.ts` - update when adding screens
 
+## Design System
+
+**CRITICAL:** All UI implementations MUST follow `DESIGN_GUIDE.md`.
+
+Key principles:
+- Orange (#FF6B35) = Primary actions, energy features
+- Blue (#0a7ea4) = Secondary actions, time features
+- Dark Mode first with bright accents
+- Bold sans-serif typography
+- 8px spacing grid system
+- Card-based layout (12-16px radius)
+
+Before UI work: Read `DESIGN_GUIDE.md` for complete specifications.
+
 ## Conventions
 
 ### Theming

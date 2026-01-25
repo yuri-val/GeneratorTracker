@@ -161,6 +161,19 @@ make version-minor  # New features (x.Y.0)
 make version-major  # Breaking changes (X.0.0)
 ```
 
+### Design System
+
+See [DESIGN_GUIDE.md](DESIGN_GUIDE.md) for comprehensive visual design specifications.
+
+The design guide includes:
+- Color palette (Orange primary, Blue secondary, Dark Mode)
+- Typography hierarchy
+- Component patterns
+- Layout principles
+- Iconography standards
+
+**All UI changes must follow the design guide.**
+
 ## License
 
 MIT
