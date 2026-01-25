@@ -268,7 +268,7 @@ export default function SettingsScreen() {
           <Text style={[styles.infoLabel, { color: colors.textMuted }]}>
             Generator Tracker
           </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.5.1</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.6.0</Text>
         </View>
       </View>
       </ScrollView>
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   content: {
     padding: 16,
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 16,
   },
   infoText: {
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   },
   button: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 12,
   },
@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 16,
   },
   userEmail: {
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   syncInfo: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 16,
   },
   syncRow: {
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   infoLabel: {
     fontSize: 14,

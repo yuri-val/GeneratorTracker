@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 16,
   },
   infoRow: {
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     fontSize: 16,
   },
@@ -363,8 +363,8 @@ const styles = StyleSheet.create({
   },
   hoursCard: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     alignItems: 'center',
     marginBottom: 24,
   },
@@ -374,11 +374,11 @@ const styles = StyleSheet.create({
   },
   hoursValue: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   activeIndicator: {
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 24,
   },
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 24,

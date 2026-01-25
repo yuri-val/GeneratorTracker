@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-01-25
+
+### Changed
+**COMPLETE VISUAL REDESIGN** - Applied DESIGN_GUIDE.md specifications across entire app
+
+#### Color Palette (src/constants/colors.ts)
+- **Primary Color**: Changed from Blue (#0a7ea4) → Orange (#FF6B35) for energy theme
+- Added primaryLight (#FF8C42) and primaryDark (#F77F00) variants
+- **Secondary Color**: Blue (#0a7ea4) retained for time-related features
+- Added secondaryLight (#06BEE1) and secondaryDark (#0077B6) variants
+- Added warning color (#F59E0B)
+- Updated notification color to orange (#FF6B35)
+- All CTAs now use energetic orange
+- All time-related stats use technology blue
+
+#### Typography
+- Updated all headings to fontWeight '600' (Semi-Bold)
+- Updated all stat numbers to fontWeight '700' (Bold)
+- Increased consistency across heading sizes (H2: 24px, H3: 20px)
+
+#### Spacing & Layout (8px Grid System)
+- Card padding: 16px → 20-24px
+- Card margins: 12px → 16px
+- Button padding: Standardized to 16px vertical, 24px horizontal
+- All spacing now uses 8px multiples (8, 16, 24, 32)
+
+#### Border Radius (Increased for Modern Look)
+- Cards: 12px → 16px
+- Buttons: 8px → 12px
+- Form inputs: 8px → 12px
+- FAB button: Increased to 32px
+
+#### Screens Redesigned
+- **HomeScreen**: Enhanced generator cards, larger FAB, bold typography
+- **AnalyticsScreen**: Smart color coding (orange for energy stats, blue for time stats)
+- **SettingsScreen**: Updated all buttons and cards with new styling
+- **GeneratorDetailScreen**: Enhanced stat cards, updated action buttons
+- **AddGeneratorScreen**: Modernized form inputs
+- **AddWorkSessionScreen**: Updated info cards, hours display, form inputs
+- **AddRefillScreen**: Modernized form inputs and delete button
+
+#### Components Redesigned
+- **WorkSessionsList**: Enhanced list items, modernized add button with shadow
+- **RefillsList**: Enhanced list items, modernized add button with shadow
+- **EmailAuthForm**: Updated form inputs and submit button
+- **SignInButton**: Updated button styling
+
+#### Visual Enhancements
+- Added shadows to primary action buttons for depth
+- Increased font weights for better hierarchy
+- Improved touch targets (FAB: 56px → 64px)
+- Enhanced visual consistency across all screens
+
+### Technical
+- No functional changes - pure visual redesign
+- No breaking changes to APIs or data structures
+- Maintains backward compatibility
+
 ## [1.5.1] - 2026-01-25
 
 ### Fixed

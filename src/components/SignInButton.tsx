@@ -35,7 +35,7 @@ export const SignInButton: React.FC<SignInButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginVertical: 8,
   },

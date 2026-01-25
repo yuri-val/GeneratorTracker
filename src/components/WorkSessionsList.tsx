@@ -92,8 +92,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 16,
     marginBottom: 8,
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     borderWidth: 1,
   },
   itemContent: {
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   },
   itemValue: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginLeft: 12,
   },
   emptyContainer: {
@@ -130,9 +130,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   addButton: {
-    paddingVertical: 12,
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 8,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   addButtonText: {
     color: '#fff',

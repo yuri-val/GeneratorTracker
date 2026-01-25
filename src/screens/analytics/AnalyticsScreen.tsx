@@ -53,15 +53,21 @@ export default function AnalyticsScreen() {
     }, [])
   );
 
-  const StatCard = ({ title, value, unit }: { title: string; value: number | string; unit?: string }) => (
-    <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <Text style={[styles.statTitle, { color: colors.textMuted }]}>{title}</Text>
-      <View style={styles.statValueContainer}>
-        <Text style={[styles.statValue, { color: colors.primary }]}>{value}</Text>
-        {unit && <Text style={[styles.statUnit, { color: colors.textMuted }]}>{unit}</Text>}
+  const StatCard = ({ title, value, unit }: { title: string; value: number | string; unit?: string }) => {
+    // Use orange for primary stats, blue for time-related stats
+    const isTimeRelated = title.includes('Hours') || title.includes('Average');
+    const statColor = isTimeRelated ? colors.secondary : colors.primary;
+
+    return (
+      <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={[styles.statTitle, { color: colors.textMuted }]}>{title}</Text>
+        <View style={styles.statValueContainer}>
+          <Text style={[styles.statValue, { color: statColor }]}>{value}</Text>
+          {unit && <Text style={[styles.statUnit, { color: colors.textMuted }]}>{unit}</Text>}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -109,7 +115,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
   content: {
     padding: 16,
@@ -121,9 +127,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statCard: {
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 12,
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 16,
     borderWidth: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -141,7 +147,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
   statUnit: {
     fontSize: 16,

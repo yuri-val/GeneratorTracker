@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     fontSize: 16,
   },
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginTop: 8,
     marginBottom: 24,

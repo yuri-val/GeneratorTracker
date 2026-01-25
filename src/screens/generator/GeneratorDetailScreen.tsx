@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#ffffff',
   },
   activeSessionCard: {
@@ -445,17 +445,17 @@ const styles = StyleSheet.create({
   stopButton: {
     paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   editButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 2,
   },
   buttonText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '700',
     color: '#ffffff',
   },
   editButtonText: {
@@ -465,8 +465,8 @@ const styles = StyleSheet.create({
   statsCard: {
     margin: 16,
     marginTop: 0,
-    padding: 16,
-    borderRadius: 12,
+    padding: 20,
+    borderRadius: 16,
     borderWidth: 1,
   },
   statsRow: {
@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 4,
   },
   statLabel: {
