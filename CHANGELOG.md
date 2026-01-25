@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2026-01-25
+
+### Fixed
+- Fix white background in dark mode for tab content in Generator Detail screen
+- Add theme-aware background color to WorkSessionsList component
+- Add theme-aware background color to RefillsList component
+- Tab lists now properly use `colors.background` for dark mode compatibility
+
 ## [1.4.0] - 2026-01-25
 
 ### Added
