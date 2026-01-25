@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-01-25
+
+### Added
+- Google Play Store descriptions directory (`description/`)
+- English app store description (`description/en.md`)
+- Ukrainian app store description (`description/uk.md`)
+- Description README with guidelines (`description/README.md`)
+- Standard workflow rule: Update store descriptions when functional changes occur
+
+### Changed
+- Update CLAUDE.md workflow: Add step 5 for Play Store description updates (6 steps → 7 steps)
+- Update .github/copilot-instructions.md workflow: Add step 5 for description updates
+- Update README.md: Add App Store Descriptions section
+- Workflow now includes description updates for MINOR/MAJOR versions with new features
+
+### Documentation
+- Created comprehensive Play Store listing content in English and Ukrainian
+- Short description (80 chars): "Track generator hours, fuel refills, and analyze performance efficiently"
+- Full description with key features, use cases, and technical details
+- Guidelines for when to update descriptions (new features yes, bug fixes no)
+- Instructions for adding new language translations
+
 ## [1.6.1] - 2026-01-25
 
 ### Fixed

@@ -268,7 +268,7 @@ export default function SettingsScreen() {
           <Text style={[styles.infoLabel, { color: colors.textMuted }]}>
             Generator Tracker
           </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.6.1</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.6.2</Text>
         </View>
       </View>
       </ScrollView>

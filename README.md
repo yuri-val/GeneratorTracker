@@ -174,6 +174,16 @@ The design guide includes:
 
 **All UI changes must follow the design guide.**
 
+### App Store Descriptions
+
+See [description/](description/) for Google Play Store listing content.
+
+Available languages:
+- English (`en.md`)
+- Ukrainian (`uk.md`)
+
+**Update descriptions when adding new features or making significant changes.**
+
 ## License
 
 MIT

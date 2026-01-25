@@ -304,7 +304,23 @@ Follow this workflow for ALL changes to the project:
    - Be specific and clear about what changed
    - Follow [Keep a Changelog](https://keepachangelog.com/) format
 
-5. **Write Commit Message**
+5. **Update Play Store Descriptions (if functional changes)**
+   - **IMPORTANT**: If changes affect app functionality or add/remove features, update store descriptions
+   - Update `description/en.md` (English)
+   - Update `description/uk.md` (Ukrainian)
+   - Key sections to update:
+     - "What's New" section with new version highlights
+     - "Key Features" if new features added
+     - Screenshots references if UI changed significantly
+   - When to update:
+     - ✅ New features (MINOR version)
+     - ✅ Major redesigns (MINOR/MAJOR version)
+     - ✅ Removed features (MAJOR version)
+     - ✅ Significant UX improvements
+     - ❌ Bug fixes without visible changes (PATCH version)
+     - ❌ Code refactoring without user impact
+
+6. **Write Commit Message**
    - Create clear, descriptive commit message
    - Include "what" and "why" of the changes
    - List key modifications and new files
@@ -320,8 +336,8 @@ Follow this workflow for ALL changes to the project:
      Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
      ```
 
-6. **Commit Changes**
-   - Stage all relevant files: `git add [files]` (include CHANGELOG.md!)
+7. **Commit Changes**
+   - Stage all relevant files: `git add [files]` (include CHANGELOG.md and description/*.md if updated!)
    - Commit with the prepared message
    - Verify commit with `git log -1`
    - Push if appropriate: `git push`
@@ -347,8 +363,13 @@ make version-minor
 ### Changed
 - Replace SectionList with Tab.Navigator
 
-# 5 & 6. Commit with changelog
-git add app.json package.json CHANGELOG.md src/screens/settings/SettingsScreen.tsx [other files]
+# 5. Update Play Store descriptions (for new features)
+# Edit description/en.md and description/uk.md:
+# - Add tab navigation to "What's New"
+# - Update "Key Features" if needed
+
+# 6 & 7. Commit with changelog
+git add app.json package.json CHANGELOG.md description/*.md src/screens/settings/SettingsScreen.tsx [other files]
 git commit -m "Version 1.3.0: Add tab navigation to Generator Detail screen
 
 Separate Work Sessions and Refills into individual tabs using Material Top Tabs.
@@ -358,6 +379,7 @@ Changes:
 - Replace SectionList with Tab.Navigator in GeneratorDetailScreen
 - Add Material Top Tabs dependencies
 - Remove unused styles and imports
+- Update Play Store descriptions with new feature
 
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 ```

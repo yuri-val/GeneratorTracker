@@ -115,12 +115,17 @@ Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase
    - Categorize: Added, Changed, Fixed, Removed, etc.
    - Follow [Keep a Changelog](https://keepachangelog.com/) format
 
-5. **Write Commit Message**
+5. **Update Play Store Descriptions** (if functional changes)
+   - For MINOR/MAJOR versions with new features: Update `description/en.md` and `description/uk.md`
+   - Update "What's New" section
+   - Skip for PATCH versions with only bug fixes
+
+6. **Write Commit Message**
    - Clear message with what/why
    - Include detailed list of changes
    - Format: "Version X.Y.Z: Brief summary\n\nDetailed changes...\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
-6. **Commit Changes**
-   - `git add [files]` (include CHANGELOG.md!)
+7. **Commit Changes**
+   - `git add [files]` (include CHANGELOG.md and description/*.md if updated!)
    - `git commit -m "[message]"`
    - Verify with `git log -1`
