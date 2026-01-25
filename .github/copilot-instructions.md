@@ -74,3 +74,34 @@ Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase
 1. Create in `src/screens/{category}/{Name}Screen.tsx`
 2. Add route to `RootStackParamList` or `TabParamList` in `src/navigation/types.ts`
 3. Register in `App.tsx` Stack or Tab navigator
+
+## Standard Change Workflow
+
+**IMPORTANT**: Follow this workflow for ALL changes:
+
+1. **Make Changes**
+   - Implement the requested task
+   - Follow all project conventions and patterns
+
+2. **Discover and Validate**
+   - `git status` - Review all changed files
+   - `git diff` - Review actual changes
+   - `npm start` - Test in dev environment
+   - Verify no errors or regressions
+
+3. **Bump Semantic Version**
+   - PATCH: bug fixes, small improvements
+   - MINOR: new features, new screens
+   - MAJOR: breaking changes
+   - Run: `make version-{patch|minor|major}`
+   - Update: `src/screens/settings/SettingsScreen.tsx` version display
+
+4. **Describe Changelog**
+   - Write clear commit message with what/why
+   - Include detailed list of changes
+   - Format: "Version X.Y.Z: Brief summary\n\nDetailed changes...\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
+
+5. **Commit Changes**
+   - `git add [files]`
+   - `git commit -m "[message]"`
+   - Verify with `git log -1`
