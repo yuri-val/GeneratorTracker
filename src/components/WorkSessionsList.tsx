@@ -54,13 +54,16 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       <Text style={[styles.emptyText, { color: colors.textMuted }]}>
         No work sessions yet
       </Text>
-      <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: colors.primary }]}
-        onPress={onAddPress}
-      >
-        <Text style={styles.addButtonText}>+ Add Work Session</Text>
-      </TouchableOpacity>
     </View>
+  );
+
+  const renderHeader = () => (
+    <TouchableOpacity
+      style={[styles.addButton, { backgroundColor: colors.primary }]}
+      onPress={onAddPress}
+    >
+      <Text style={styles.addButtonText}>+ Add Work Session</Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -73,6 +76,7 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
+      ListHeaderComponent={renderHeader}
       ListEmptyComponent={renderEmpty}
     />
   );

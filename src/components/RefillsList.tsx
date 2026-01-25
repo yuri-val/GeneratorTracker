@@ -51,13 +51,16 @@ export const RefillsList: React.FC<RefillsListProps> = ({
       <Text style={[styles.emptyText, { color: colors.textMuted }]}>
         No refills yet
       </Text>
-      <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: colors.primary }]}
-        onPress={onAddPress}
-      >
-        <Text style={styles.addButtonText}>+ Add Refill</Text>
-      </TouchableOpacity>
     </View>
+  );
+
+  const renderHeader = () => (
+    <TouchableOpacity
+      style={[styles.addButton, { backgroundColor: colors.primary }]}
+      onPress={onAddPress}
+    >
+      <Text style={styles.addButtonText}>+ Add Refill</Text>
+    </TouchableOpacity>
   );
 
   return (
@@ -70,6 +73,7 @@ export const RefillsList: React.FC<RefillsListProps> = ({
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
+      ListHeaderComponent={renderHeader}
       ListEmptyComponent={renderEmpty}
     />
   );

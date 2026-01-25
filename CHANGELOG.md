@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-01-25
+
+### Fixed
+- Fix missing "Add" button after adding first item in Work Sessions and Refills tabs
+- Move "+ Add Work Session" button from ListEmptyComponent to ListHeaderComponent in WorkSessionsList
+- Move "+ Add Refill" button from ListEmptyComponent to ListHeaderComponent in RefillsList
+- Add button now always visible at the top of the list, regardless of content
+
 ## [1.5.0] - 2026-01-25
 
 ### Added
