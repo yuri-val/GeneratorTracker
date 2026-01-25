@@ -268,7 +268,7 @@ export default function SettingsScreen() {
           <Text style={[styles.infoLabel, { color: colors.tabIconDefault }]}>
             Generator Tracker
           </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.3.1</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.3.2</Text>
         </View>
       </View>
       </ScrollView>
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   content: {
