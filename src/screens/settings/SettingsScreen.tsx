@@ -139,7 +139,7 @@ export default function SettingsScreen() {
 
         {!user ? (
           <>
-            <Text style={[styles.infoText, { color: colors.tabIconDefault }]}>
+            <Text style={[styles.infoText, { color: colors.textMuted }]}>
               Sign in to sync your data across devices
             </Text>
 
@@ -190,7 +190,7 @@ export default function SettingsScreen() {
                 {user.email || 'Anonymous User'}
               </Text>
               {user.displayName && (
-                <Text style={[styles.userName, { color: colors.tabIconDefault }]}>
+                <Text style={[styles.userName, { color: colors.textMuted }]}>
                   {user.displayName}
                 </Text>
               )}
@@ -212,7 +212,7 @@ export default function SettingsScreen() {
 
           <View style={[styles.syncInfo, { backgroundColor: colors.card }]}>
             <View style={styles.syncRow}>
-              <Text style={[styles.syncLabel, { color: colors.tabIconDefault }]}>Status:</Text>
+              <Text style={[styles.syncLabel, { color: colors.textMuted }]}>Status:</Text>
               <View style={styles.syncStatusRow}>
                 {syncStatus === 'syncing' && (
                   <>
@@ -238,7 +238,7 @@ export default function SettingsScreen() {
 
             {pendingCount > 0 && (
               <View style={styles.syncRow}>
-                <Text style={[styles.syncLabel, { color: colors.tabIconDefault }]}>
+                <Text style={[styles.syncLabel, { color: colors.textMuted }]}>
                   Pending:
                 </Text>
                 <Text style={[styles.syncValue, { color: colors.text }]}>
@@ -265,10 +265,10 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
         <View style={[styles.infoBox, { backgroundColor: colors.card }]}>
-          <Text style={[styles.infoLabel, { color: colors.tabIconDefault }]}>
+          <Text style={[styles.infoLabel, { color: colors.textMuted }]}>
             Generator Tracker
           </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.3.2</Text>
+          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.3.3</Text>
         </View>
       </View>
       </ScrollView>
