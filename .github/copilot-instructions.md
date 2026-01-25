@@ -96,12 +96,17 @@ Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase
    - Run: `make version-{patch|minor|major}`
    - Update: `src/screens/settings/SettingsScreen.tsx` version display
 
-4. **Describe Changelog**
-   - Write clear commit message with what/why
+4. **Update CHANGELOG.md**
+   - Add new version section: `## [X.Y.Z] - YYYY-MM-DD`
+   - Categorize: Added, Changed, Fixed, Removed, etc.
+   - Follow [Keep a Changelog](https://keepachangelog.com/) format
+
+5. **Write Commit Message**
+   - Clear message with what/why
    - Include detailed list of changes
    - Format: "Version X.Y.Z: Brief summary\n\nDetailed changes...\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
-5. **Commit Changes**
-   - `git add [files]`
+6. **Commit Changes**
+   - `git add [files]` (include CHANGELOG.md!)
    - `git commit -m "[message]"`
    - Verify with `git log -1`

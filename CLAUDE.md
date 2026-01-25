@@ -270,8 +270,21 @@ Follow this workflow for ALL changes to the project:
    - Run: `make version-{patch|minor|major}`
    - Update version display in `src/screens/settings/SettingsScreen.tsx`
 
-4. **Describe Changelog**
-   - Write clear, descriptive commit message
+4. **Update CHANGELOG.md**
+   - Add new version section at the top (after "## [Unreleased]" if it exists)
+   - Use format: `## [X.Y.Z] - YYYY-MM-DD`
+   - Categorize changes:
+     - **Added** for new features
+     - **Changed** for changes in existing functionality
+     - **Deprecated** for soon-to-be removed features
+     - **Removed** for now removed features
+     - **Fixed** for any bug fixes
+     - **Security** for vulnerability fixes
+   - Be specific and clear about what changed
+   - Follow [Keep a Changelog](https://keepachangelog.com/) format
+
+5. **Write Commit Message**
+   - Create clear, descriptive commit message
    - Include "what" and "why" of the changes
    - List key modifications and new files
    - Format:
@@ -286,8 +299,8 @@ Follow this workflow for ALL changes to the project:
      Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
      ```
 
-5. **Commit Changes**
-   - Stage all relevant files: `git add [files]`
+6. **Commit Changes**
+   - Stage all relevant files: `git add [files]` (include CHANGELOG.md!)
    - Commit with the prepared message
    - Verify commit with `git log -1`
    - Push if appropriate: `git push`
@@ -304,8 +317,17 @@ npm start  # Test the app
 # 3. Bump version
 make version-minor
 
-# 4 & 5. Commit with changelog
-git add app.json package.json src/screens/settings/SettingsScreen.tsx [other files]
+# 4. Update CHANGELOG.md
+# Add new section:
+## [1.3.0] - 2026-01-25
+### Added
+- Tab navigation to Generator Detail screen
+- WorkSessionsList and RefillsList components
+### Changed
+- Replace SectionList with Tab.Navigator
+
+# 5 & 6. Commit with changelog
+git add app.json package.json CHANGELOG.md src/screens/settings/SettingsScreen.tsx [other files]
 git commit -m "Version 1.3.0: Add tab navigation to Generator Detail screen
 
 Separate Work Sessions and Refills into individual tabs using Material Top Tabs.
