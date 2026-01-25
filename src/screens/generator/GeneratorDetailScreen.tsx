@@ -284,7 +284,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
       <View style={[styles.statsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={[styles.statValue, { color: colors.primary }]}>{stats.totalHours}h</Text>
+            <Text style={[styles.statValue, { color: colors.primary }]}>{stats.totalHours.toFixed(1)}h</Text>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>Total Hours</Text>
           </View>
           <View style={styles.statItem}>
@@ -295,7 +295,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         {stats.averageFuelPerHour > 0 && (
           <View style={[styles.statsRow, { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }]}>
             <Text style={[styles.statLabel, { color: colors.textMuted }]}>
-              Average: {stats.averageFuelPerHour} L/hour
+              Average: {stats.averageFuelPerHour.toFixed(2)} L/hour
             </Text>
           </View>
         )}

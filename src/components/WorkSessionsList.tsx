@@ -45,7 +45,7 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
           </Text>
         )}
       </View>
-      <Text style={[styles.itemValue, { color: colors.primary }]}>{item.hours}h</Text>
+      <Text style={[styles.itemValue, { color: colors.primary }]}>{item.hours.toFixed(1)}h</Text>
     </TouchableOpacity>
   );
 

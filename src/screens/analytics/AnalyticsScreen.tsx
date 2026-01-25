@@ -58,11 +58,14 @@ export default function AnalyticsScreen() {
     const isTimeRelated = title.includes('Hours') || title.includes('Average');
     const statColor = isTimeRelated ? colors.secondary : colors.primary;
 
+    // Format value to 1 decimal place for numbers
+    const formattedValue = typeof value === 'number' ? value.toFixed(1) : value;
+
     return (
       <View style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Text style={[styles.statTitle, { color: colors.textMuted }]}>{title}</Text>
         <View style={styles.statValueContainer}>
-          <Text style={[styles.statValue, { color: statColor }]}>{value}</Text>
+          <Text style={[styles.statValue, { color: statColor }]}>{formattedValue}</Text>
           {unit && <Text style={[styles.statUnit, { color: colors.textMuted }]}>{unit}</Text>}
         </View>
       </View>

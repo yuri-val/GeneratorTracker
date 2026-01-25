@@ -78,7 +78,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       <View style={styles.cardStats}>
         <View style={styles.statItem}>
           <Text style={[styles.statValue, { color: colors.primary }]}>
-            {item.stats.totalHours}h
+            {item.stats.totalHours.toFixed(1)}h
           </Text>
           <Text style={[styles.statLabel, { color: colors.textMuted }]}>Total Hours</Text>
         </View>

@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-01-25
+
+### Fixed
+- Fix number formatting for hours display across all screens
+- Work session hours now display with 1 decimal place (e.g., "8.0h" instead of "7.98333333333333h")
+- Total hours on Generator Detail screen formatted to 1 decimal place
+- Total hours on Home screen cards formatted to 1 decimal place
+- Analytics screen stats formatted to 1 decimal place
+- Average fuel consumption formatted to 2 decimal places (e.g., "0.03 L/hour")
+
+### Changed
+- WorkSessionsList: Apply toFixed(1) to hours display
+- GeneratorDetailScreen: Apply toFixed(1) to total hours, toFixed(2) to average fuel
+- HomeScreen: Apply toFixed(1) to total hours
+- AnalyticsScreen: Apply toFixed(1) to all numeric stats
+
 ## [1.6.0] - 2026-01-25
 
 ### Changed
