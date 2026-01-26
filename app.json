@@ -34,7 +34,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "privacy": "https://yuri-val.github.io/GeneratorTracker/privacy-policy.html",
     "extra": {
       "eas": {
         "projectId": "26c15560-de76-4f7c-84d9-819ab9db0a5a"

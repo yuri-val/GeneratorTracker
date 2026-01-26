@@ -1,0 +1,122 @@
+name: Build Android (Local)
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        type: choice
+        description: Build type
+        options:
+          - both
+          - apk
+          - aab
+        default: both
+      profile:
+        type: choice
+        description: Build profile
+        options:
+          - preview
+          - production
+        default: preview
+
+jobs:
+  build:
+    name: Build Android ${{ github.event.inputs.build_type }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 🏗 Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 🏗 Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔐 Decode Android Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./credentials/android/keystore.jks
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: 🔐 Create credentials.json
+        run: |
+          cat > credentials.json << 'EOF'
+          {
+            "android": {
+              "keystore": {
+                "keystorePath": "./credentials/android/keystore.jks",
+                "keystorePassword": "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}",
+                "keyAlias": "${{ secrets.ANDROID_KEY_ALIAS }}",
+                "keyPassword": "${{ secrets.ANDROID_KEY_PASSWORD }}"
+              }
+            }
+          }
+          EOF
+
+      - name: 👷 Build APK
+        if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+        run: |
+          eas build --local \
+            --non-interactive \
+            --platform android \
+            --profile preview \
+            --output ./build/app-release.apk
+
+      - name: 👷 Build AAB
+        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
+        run: |
+          eas build --local \
+            --non-interactive \
+            --platform android \
+            --profile production \
+            --output ./build/app-release.aab
+
+      - name: 📤 Upload APK Artifact
+        if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: ./build/app-release.apk
+          retention-days: 14
+
+      - name: 📤 Upload AAB Artifact
+        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: ./build/app-release.aab
+          retention-days: 14
+
+      - name: 📋 Build Summary
+        run: |
+          echo "## 🎉 Build Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Build Details" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Type:** ${{ github.event.inputs.build_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Profile:** ${{ github.event.inputs.profile }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event.inputs.build_type }}" == "apk" || "${{ github.event.inputs.build_type }}" == "both" ]]; then
+            echo "- ✅ APK uploaded as artifact" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [[ "${{ github.event.inputs.build_type }}" == "aab" || "${{ github.event.inputs.build_type }}" == "both" ]]; then
+            echo "- ✅ AAB uploaded as artifact" >> $GITHUB_STEP_SUMMARY
+          fi
