@@ -218,37 +218,55 @@ EOF
 
 echo -e "${GREEN}✅ Created index.html (redirect)${NC}"
 
+# Save current directory and move to repository root
+PRIVACY_POLICY_DIR=$(pwd)
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
+echo -e "${GREEN}📁 Working from repository root: $REPO_ROOT${NC}"
+
 # Get current git branch
 CURRENT_BRANCH=$(git branch --show-current)
 
 # Stash any uncommitted changes in current branch
+STASHED=false
 if ! git diff-index --quiet HEAD --; then
     echo -e "${YELLOW}💾 Stashing uncommitted changes...${NC}"
     git stash push -m "Privacy policy setup: stashed changes from $CURRENT_BRANCH"
+    STASHED=true
 fi
 
 # Check if gh-pages branch exists
 if git rev-parse --verify gh-pages >/dev/null 2>&1; then
     echo -e "${GREEN}📋 gh-pages branch exists, switching to it...${NC}"
     git checkout gh-pages
+    # Remove all tracked files from index
+    git rm -rf . || true
 else
     echo -e "${GREEN}🌿 Creating new gh-pages branch...${NC}"
     git checkout --orphan gh-pages
-    git rm -rf .
+    # Remove everything from the index
+    git rm -rf . || true
 fi
 
-# Copy HTML files to root
-cp "$TEMP_DIR/privacy-policy.html" .
-cp "$TEMP_DIR/privacy-policy-uk.html" .
-cp "$TEMP_DIR/index.html" .
+# Remove all files except .git directory
+find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} \;
 
-echo -e "${GREEN}📋 Copied HTML files to gh-pages branch${NC}"
+# Create privacy_policy directory
+mkdir -p privacy_policy
+
+# Copy HTML files to privacy_policy directory
+cp "$TEMP_DIR/privacy-policy.html" privacy_policy/
+cp "$TEMP_DIR/privacy-policy-uk.html" privacy_policy/
+cp "$TEMP_DIR/index.html" privacy_policy/
+
+echo -e "${GREEN}📋 Copied HTML files to privacy_policy directory${NC}"
 
 # Create .nojekyll file to prevent Jekyll processing
 touch .nojekyll
 
-# Add and commit
-git add privacy-policy.html privacy-policy-uk.html index.html .nojekyll
+# Add only the privacy_policy directory and .nojekyll
+git add privacy_policy/ .nojekyll
 git commit -m "Update privacy policy
 
 Last updated: $(date +"%Y-%m-%d")
@@ -262,18 +280,19 @@ echo -e "${GREEN}✅ Committed to gh-pages branch${NC}"
 
 # Push to GitHub
 echo -e "${YELLOW}📤 Pushing to GitHub...${NC}"
-if git push origin gh-pages; then
+if git push origin gh-pages --force; then
     echo -e "${GREEN}✅ Successfully pushed to gh-pages branch${NC}"
 else
     echo -e "${YELLOW}⚠️  First time push, setting upstream...${NC}"
-    git push -u origin gh-pages
+    git push -u origin gh-pages --force
 fi
 
 # Switch back to original branch
-git checkout "$CURRENT_BRANCH"
+echo -e "${GREEN}🔄 Switching back to $CURRENT_BRANCH...${NC}"
+git checkout -f "$CURRENT_BRANCH"
 
 # Pop stashed changes if any
-if git stash list | grep -q "Privacy policy setup"; then
+if [ "$STASHED" = true ]; then
     echo -e "${GREEN}💾 Restoring stashed changes...${NC}"
     git stash pop
 fi
@@ -293,8 +312,8 @@ echo "   - Branch: gh-pages"
 echo "   - Folder: / (root)"
 echo ""
 echo "2. Your privacy policy will be available at:"
-echo "   🇺🇸 English: https://yuri-val.github.io/GeneratorTracker/privacy-policy.html"
-echo "   🇺🇦 Ukrainian: https://yuri-val.github.io/GeneratorTracker/privacy-policy-uk.html"
+echo "   🇺🇸 English: https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html"
+echo "   🇺🇦 Ukrainian: https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html"
 echo ""
 echo "3. Add these URLs to:"
 echo "   - app.json (privacy field)"
