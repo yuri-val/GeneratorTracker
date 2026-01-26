@@ -13,10 +13,17 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Check if we're in the right directory
-if [ ! -f "en.md" ] || [ ! -f "uk.md" ]; then
-    echo -e "${RED}❌ Error: en.md and uk.md not found${NC}"
-    echo "Please run this script from the privacy_policy directory"
+# Check if we're in the right directory (repository root)
+if [ ! -d "privacy_policy" ] || [ ! -f "privacy_policy/en.md" ] || [ ! -f "privacy_policy/uk.md" ]; then
+    echo -e "${RED}❌ Error: privacy_policy directory or markdown files not found${NC}"
+    echo "Please run this script from the repository root"
+    exit 1
+fi
+
+# Check if landing directory exists
+if [ ! -d "landing" ] || [ ! -f "landing/index.html" ]; then
+    echo -e "${RED}❌ Error: landing directory or index.html not found${NC}"
+    echo "Please ensure landing/index.html exists"
     exit 1
 fi
 
@@ -178,7 +185,7 @@ cat > "$TEMP_DIR/template.html" << 'EOF'
 EOF
 
 # Convert English version
-pandoc en.md \
+pandoc privacy_policy/en.md \
     --from markdown \
     --to html5 \
     --standalone \
@@ -190,7 +197,7 @@ pandoc en.md \
 echo -e "${GREEN}✅ Created privacy-policy.html${NC}"
 
 # Convert Ukrainian version
-pandoc uk.md \
+pandoc privacy_policy/uk.md \
     --from markdown \
     --to html5 \
     --standalone \
@@ -218,10 +225,8 @@ EOF
 
 echo -e "${GREEN}✅ Created index.html (redirect)${NC}"
 
-# Save current directory and move to repository root
-PRIVACY_POLICY_DIR=$(pwd)
+# Get repository root
 REPO_ROOT=$(git rev-parse --show-toplevel)
-cd "$REPO_ROOT"
 
 echo -e "${GREEN}📁 Working from repository root: $REPO_ROOT${NC}"
 
@@ -262,11 +267,16 @@ cp "$TEMP_DIR/index.html" privacy_policy/
 
 echo -e "${GREEN}📋 Copied HTML files to privacy_policy directory${NC}"
 
+# Copy landing page to root
+cp "$REPO_ROOT/landing/index.html" index.html
+
+echo -e "${GREEN}📋 Copied landing page to root${NC}"
+
 # Create .nojekyll file to prevent Jekyll processing
 touch .nojekyll
 
-# Add only the privacy_policy directory and .nojekyll
-git add privacy_policy/ .nojekyll
+# Add the privacy_policy directory, landing page and .nojekyll
+git add privacy_policy/ index.html .nojekyll
 git commit -m "Update privacy policy
 
 Last updated: $(date +"%Y-%m-%d")
@@ -311,11 +321,12 @@ echo "   - Source: Deploy from branch"
 echo "   - Branch: gh-pages"
 echo "   - Folder: / (root)"
 echo ""
-echo "2. Your privacy policy will be available at:"
-echo "   🇺🇸 English: https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html"
-echo "   🇺🇦 Ukrainian: https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html"
+echo "2. Your site will be available at:"
+echo "   🏠 Landing page: https://yuri-val.github.io/GeneratorTracker/"
+echo "   🇺🇸 Privacy Policy (English): https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html"
+echo "   🇺🇦 Privacy Policy (Ukrainian): https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html"
 echo ""
-echo "3. Add these URLs to:"
+echo "3. Add privacy policy URLs to:"
 echo "   - app.json (privacy field)"
 echo "   - Google Play Console (Store Listing > Privacy Policy)"
 echo ""
