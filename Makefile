@@ -41,7 +41,7 @@ eas-build-prod:
 
 # Generate project digest
 digest:
-	gitingest .
+	gitingest . --output digest.txt
 
 # Version management (Semantic Versioning)
 version-major:

@@ -320,7 +320,26 @@ Follow this workflow for ALL changes to the project:
      - ❌ Bug fixes without visible changes (PATCH version)
      - ❌ Code refactoring without user impact
 
-6. **Write Commit Message**
+6. **Create Release Notes**
+   - **IMPORTANT**: Create release notes for MINOR/MAJOR versions and significant PATCH versions
+   - Create directory: `release_notes/{version}/`
+   - Create `release_notes/{version}/en.md` (English)
+   - Create `release_notes/{version}/uk.md` (Ukrainian)
+   - Structure each release note with:
+     - Version header with release date
+     - Brief overview of changes
+     - "What's New" section with key features
+     - "Fixed" section for bug fixes (if applicable)
+     - "Technical" section for technical improvements (optional)
+   - Keep concise and user-focused (100-300 words optimal)
+   - When to create:
+     - ✅ All MINOR versions (new features)
+     - ✅ All MAJOR versions (breaking changes)
+     - ✅ PATCH versions with significant bug fixes
+     - ❌ Minor PATCH versions with internal changes only
+   - See `release_notes/README.md` for detailed guidelines
+
+7. **Write Commit Message**
    - Create clear, descriptive commit message
    - Include "what" and "why" of the changes
    - List key modifications and new files
@@ -336,8 +355,8 @@ Follow this workflow for ALL changes to the project:
      Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
      ```
 
-7. **Commit Changes**
-   - Stage all relevant files: `git add [files]` (include CHANGELOG.md and description/*.md if updated!)
+8. **Commit Changes**
+   - Stage all relevant files: `git add [files]` (include CHANGELOG.md, description/*.md, and release_notes/ if created!)
    - Commit with the prepared message
    - Verify commit with `git log -1`
    - Push if appropriate: `git push`

@@ -120,12 +120,18 @@ Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase
    - Update "What's New" section
    - Skip for PATCH versions with only bug fixes
 
-6. **Write Commit Message**
+6. **Create Release Notes**
+   - Create `release_notes/{version}/en.md` and `release_notes/{version}/uk.md` for MINOR/MAJOR versions
+   - Include: version header, overview, what's new, fixed, technical sections
+   - Keep concise (100-300 words) and user-focused
+   - See `release_notes/README.md` for guidelines
+
+7. **Write Commit Message**
    - Clear message with what/why
    - Include detailed list of changes
    - Format: "Version X.Y.Z: Brief summary\n\nDetailed changes...\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
-7. **Commit Changes**
-   - `git add [files]` (include CHANGELOG.md and description/*.md if updated!)
+8. **Commit Changes**
+   - `git add [files]` (include CHANGELOG.md, description/*.md, and release_notes/ if created!)
    - `git commit -m "[message]"`
    - Verify with `git log -1`
