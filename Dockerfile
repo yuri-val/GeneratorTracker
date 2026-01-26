@@ -44,19 +44,22 @@ RUN npm install -g expo-cli eas-cli
 # - Disable Gradle daemon to avoid "daemon disappeared" crashes
 # - Limit parallel workers to reduce memory pressure
 # - Use G1GC for better memory handling
-ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2 -Dorg.gradle.parallel=false -Xmx6g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError"
-ENV _JAVA_OPTIONS="-Xmx6g -XX:+UseG1GC"
+# - Reduced memory from 6g to 4g to prevent OOM crashes
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false -Xmx4g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:MaxDirectMemorySize=512m"
+ENV _JAVA_OPTIONS="-Xmx4g -XX:+UseG1GC"
 
 # Limit CMake parallel jobs to reduce memory usage
-ENV CMAKE_BUILD_PARALLEL_LEVEL=2
+ENV CMAKE_BUILD_PARALLEL_LEVEL=1
 
 # Create gradle.properties with memory settings
 RUN mkdir -p /root/.gradle && \
-    echo "org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC -XX:+HeapDumpOnOutOfMemoryError -XX:MaxDirectMemorySize=512m" >> /root/.gradle/gradle.properties && \
     echo "org.gradle.daemon=false" >> /root/.gradle/gradle.properties && \
     echo "org.gradle.parallel=false" >> /root/.gradle/gradle.properties && \
-    echo "org.gradle.workers.max=2" >> /root/.gradle/gradle.properties && \
-    echo "org.gradle.caching=true" >> /root/.gradle/gradle.properties
+    echo "org.gradle.workers.max=1" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.caching=true" >> /root/.gradle/gradle.properties && \
+    echo "kotlin.incremental=false" >> /root/.gradle/gradle.properties && \
+    echo "org.gradle.configureondemand=false" >> /root/.gradle/gradle.properties
 
 # Set working directory
 WORKDIR /app
