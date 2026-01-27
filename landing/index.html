@@ -687,6 +687,90 @@
             stroke-width: 1.5;
         }
 
+        /* Testing Section */
+        .testing {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(34,197,94,0.03) 50%, transparent 100%);
+        }
+
+        .testing-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .testing h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 16px;
+        }
+
+        .testing h2 span {
+            color: var(--success);
+        }
+
+        .testing p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+
+        .testing-steps {
+            text-align: left;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+
+        .testing-step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            align-items: flex-start;
+        }
+
+        .testing-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        .step-content h3 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .step-content p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .step-content a {
+            color: var(--success);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .step-content a:hover {
+            text-decoration: underline;
+        }
+
         /* CTA Section */
         .cta {
             padding: 120px 0;
@@ -1236,6 +1320,42 @@
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                             <polyline points="9 12 11 14 15 10"/>
                         </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testing Section -->
+    <section class="testing">
+        <div class="container">
+            <div class="testing-content">
+                <h2>Join the <span>Beta Testing</span></h2>
+                <p>Help us improve Generator Tracker by testing the latest features before they're released to everyone.</p>
+
+                <div class="testing-steps">
+                    <div class="testing-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>Join the Testing Group</h3>
+                            <p>Request access to our Google Group: <a href="https://groups.google.com/g/generator-tracker" target="_blank" rel="noopener noreferrer">groups.google.com/g/generator-tracker</a></p>
+                        </div>
+                    </div>
+
+                    <div class="testing-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>Become a Tester</h3>
+                            <p>After joining the group, opt in to testing: <a href="https://play.google.com/apps/testing/com.yurival.GeneratorTracker" target="_blank" rel="noopener noreferrer">play.google.com/apps/testing/...</a></p>
+                        </div>
+                    </div>
+
+                    <div class="testing-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>Install & Test</h3>
+                            <p>Download the beta version from Google Play and share your feedback to help us build better features.</p>
+                        </div>
                     </div>
                 </div>
             </div>
