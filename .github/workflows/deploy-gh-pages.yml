@@ -7,7 +7,9 @@ on:
     paths:
       - 'privacy_policy/en.md'
       - 'privacy_policy/uk.md'
+      - 'privacy_policy/template.html'
       - 'landing/index.html'
+      - 'landing/assets/**'
       - '.github/workflows/deploy-gh-pages.yml'
   workflow_dispatch:  # Allows manual trigger
 
@@ -31,144 +33,6 @@ jobs:
         run: |
           mkdir -p temp_build
 
-      - name: Create HTML template
-        run: |
-          cat > temp_build/template.html << 'EOF'
-          <!DOCTYPE html>
-          <html lang="$lang$">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>$title$ - Generator Tracker</title>
-              <style>
-                  * {
-                      margin: 0;
-                      padding: 0;
-                      box-sizing: border-box;
-                  }
-                  body {
-                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-                      line-height: 1.6;
-                      color: #333;
-                      background: #f5f5f5;
-                      padding: 20px;
-                  }
-                  .container {
-                      max-width: 800px;
-                      margin: 0 auto;
-                      background: white;
-                      padding: 40px;
-                      border-radius: 12px;
-                      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                  }
-                  h1 {
-                      color: #FF6B35;
-                      font-size: 2.5em;
-                      margin-bottom: 0.5em;
-                      border-bottom: 3px solid #FF6B35;
-                      padding-bottom: 0.3em;
-                  }
-                  h2 {
-                      color: #2196F3;
-                      font-size: 1.8em;
-                      margin-top: 1.5em;
-                      margin-bottom: 0.5em;
-                  }
-                  h3 {
-                      color: #555;
-                      font-size: 1.3em;
-                      margin-top: 1.2em;
-                      margin-bottom: 0.4em;
-                  }
-                  p {
-                      margin-bottom: 1em;
-                  }
-                  ul, ol {
-                      margin-left: 2em;
-                      margin-bottom: 1em;
-                  }
-                  li {
-                      margin-bottom: 0.5em;
-                  }
-                  strong {
-                      color: #FF6B35;
-                  }
-                  a {
-                      color: #2196F3;
-                      text-decoration: none;
-                  }
-                  a:hover {
-                      text-decoration: underline;
-                  }
-                  code {
-                      background: #f4f4f4;
-                      padding: 2px 6px;
-                      border-radius: 3px;
-                      font-family: 'Courier New', monospace;
-                  }
-                  .emoji {
-                      font-size: 1.2em;
-                  }
-                  .last-updated {
-                      color: #666;
-                      font-style: italic;
-                      margin-bottom: 2em;
-                  }
-                  hr {
-                      border: none;
-                      border-top: 2px solid #eee;
-                      margin: 2em 0;
-                  }
-                  .footer {
-                      margin-top: 3em;
-                      padding-top: 2em;
-                      border-top: 2px solid #eee;
-                      text-align: center;
-                      color: #666;
-                      font-size: 0.9em;
-                  }
-                  .lang-switch {
-                      text-align: right;
-                      margin-bottom: 1em;
-                  }
-                  .lang-switch a {
-                      margin-left: 10px;
-                      padding: 5px 10px;
-                      background: #f0f0f0;
-                      border-radius: 5px;
-                      font-size: 0.9em;
-                  }
-                  @media (max-width: 768px) {
-                      body {
-                          padding: 10px;
-                      }
-                      .container {
-                          padding: 20px;
-                      }
-                      h1 {
-                          font-size: 2em;
-                      }
-                      h2 {
-                          font-size: 1.5em;
-                      }
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <div class="lang-switch">
-                      <a href="privacy-policy.html">English</a>
-                      <a href="privacy-policy-uk.html">Українська</a>
-                  </div>
-                  $body$
-                  <div class="footer">
-                      <p>Generator Tracker | <a href="https://github.com/yuri-val/GeneratorTracker">GitHub</a> | <a href="mailto:yuri.valigursky@gmail.com">Contact</a></p>
-                  </div>
-              </div>
-          </body>
-          </html>
-          EOF
-
       - name: Convert Markdown to HTML
         run: |
           # Convert English version
@@ -176,7 +40,7 @@ jobs:
             --from markdown \
             --to html5 \
             --standalone \
-            --template=temp_build/template.html \
+            --template=privacy_policy/template.html \
             --metadata title="Privacy Policy" \
             --metadata lang="en" \
             --output=temp_build/privacy-policy.html
@@ -186,7 +50,7 @@ jobs:
             --from markdown \
             --to html5 \
             --standalone \
-            --template=temp_build/template.html \
+            --template=privacy_policy/template.html \
             --metadata title="Політика конфіденційності" \
             --metadata lang="uk" \
             --output=temp_build/privacy-policy-uk.html
@@ -211,9 +75,13 @@ jobs:
         run: |
           mkdir -p deploy
           mkdir -p deploy/privacy_policy
+          mkdir -p deploy/assets
 
           # Copy landing page to root
           cp landing/index.html deploy/index.html
+
+          # Copy landing assets
+          cp -r landing/assets/* deploy/assets/
 
           # Copy privacy policy files
           cp temp_build/privacy-policy.html deploy/privacy_policy/

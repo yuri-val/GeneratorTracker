@@ -3,194 +3,1295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Tracker - Power Management Made Easy</title>
+    <title>Generator Tracker - Track Hours, Fuel & Performance</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-dark: #E55A2B;
+            --bg-dark: #0D0D0D;
+            --bg-card: #1A1A1A;
+            --bg-card-hover: #242424;
+            --text-primary: #FFFFFF;
+            --text-secondary: #9CA3AF;
+            --text-muted: #6B7280;
+            --border: #2D2D2D;
+            --success: #22C55E;
+            --info: #0EA5E9;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: #fff;
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Noise texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 1000;
         }
 
         .container {
-            text-align: center;
-            max-width: 600px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
         }
 
-        .logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: pulse 2s ease-in-out infinite;
+        /* Typography */
+        h1, h2, h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.02em;
+            line-height: 1.1;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .tagline {
-            font-size: 1.5em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-
-        .description {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            opacity: 0.85;
-        }
-
-        .cta-section {
-            margin-top: 40px;
-        }
-
-        .store-badge {
-            display: inline-block;
-            margin: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .store-badge:hover {
-            transform: scale(1.05);
-        }
-
-        .store-badge img {
-            height: 60px;
-        }
-
-        .features {
-            margin-top: 50px;
-            text-align: left;
-        }
-
-        .feature {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 20px 0;
+            background: linear-gradient(to bottom, rgba(13,13,13,0.95), rgba(13,13,13,0));
             backdrop-filter: blur(10px);
         }
 
-        .feature-icon {
-            font-size: 2em;
-            margin-right: 15px;
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .feature-text {
-            flex: 1;
-        }
-
-        .footer {
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .footer a {
-            color: #fff;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             text-decoration: none;
-            margin: 0 10px;
-            opacity: 0.8;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-cta {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 0 80px;
+            position: relative;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .hero h1 span {
+            color: var(--primary);
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--primary);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Hero Phone Mockup */
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .phone-mockup {
+            position: relative;
+            z-index: 2;
+        }
+
+        .phone-frame {
+            width: 280px;
+            height: 580px;
+            background: #1a1a1a;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow:
+                0 50px 100px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.1),
+                inset 0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 24px;
+            background: #0d0d0d;
+            border-radius: 20px;
+            z-index: 10;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 30px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .phone-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .phone-secondary {
+            position: absolute;
+            right: -100px;
+            top: 60px;
+            transform: scale(0.85) rotate(5deg);
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        /* Glow effect */
+        .hero-visual::before {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,107,53,0.2) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            animation: fadeInUp 0.6s ease-out 0.5s both;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Features Section */
+        .features {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-tag {
+            display: inline-block;
+            background: var(--bg-card);
+            color: var(--primary);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 16px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+            opacity: 0;
             transition: opacity 0.3s;
         }
 
-        .footer a:hover {
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .feature-card:hover::before {
             opacity: 1;
-            text-decoration: underline;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--primary);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .feature-card h3 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Screenshots Section */
+        .screenshots {
+            padding: 120px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(255,107,53,0.02) 50%, transparent 100%);
+        }
+
+        .screenshots-showcase {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screenshots-showcase::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .screenshots-showcase::-webkit-scrollbar-track {
+            background: var(--bg-card);
+            border-radius: 4px;
+        }
+
+        .screenshots-showcase::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .screenshot-item {
+            flex: 0 0 auto;
+            scroll-snap-align: center;
+        }
+
+        .screenshot-phone {
+            width: 240px;
+            height: 500px;
+            background: #1a1a1a;
+            border-radius: 32px;
+            padding: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transition: transform 0.3s;
+        }
+
+        .screenshot-phone:hover {
+            transform: scale(1.05);
+        }
+
+        .screenshot-phone img {
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .screenshot-label {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Tablet Section */
+        .tablet-section {
+            padding: 80px 0;
+        }
+
+        .tablet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .tablet-content h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 20px;
+        }
+
+        .tablet-content p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+        }
+
+        .tablet-features {
+            list-style: none;
+        }
+
+        .tablet-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            color: var(--text-secondary);
+        }
+
+        .tablet-features li svg {
+            width: 20px;
+            height: 20px;
+            stroke: var(--success);
+            flex-shrink: 0;
+        }
+
+        .tablet-mockup {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        }
+
+        .tablet-mockup img {
+            width: 100%;
+            border-radius: 12px;
+        }
+
+        /* Privacy Section */
+        .privacy {
+            padding: 120px 0;
+        }
+
+        .privacy-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(255,107,53,0.05) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .privacy-content h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 20px;
+        }
+
+        .privacy-content p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+
+        .privacy-badges {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .privacy-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-dark);
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .privacy-badge svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--success);
+        }
+
+        .privacy-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shield-icon {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.2) 0%, rgba(255,107,53,0.05) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .shield-icon::before {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border: 1px solid rgba(255,107,53,0.1);
+            border-radius: 50%;
+            animation: rotateRing 20s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .shield-icon svg {
+            width: 80px;
+            height: 80px;
+            stroke: var(--primary);
+            stroke-width: 1.5;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 20px;
+        }
+
+        .cta h2 span {
+            color: var(--primary);
+        }
+
+        .cta p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .store-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 16px 28px;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .store-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .store-btn svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+
+        .store-btn-text {
+            text-align: left;
+        }
+
+        .store-btn-text span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .store-btn-text strong {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Mobile Navigation */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-menu-btn svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-description {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                margin-top: 60px;
+            }
+
+            .phone-secondary {
+                display: none;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tablet-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tablet-content {
+                text-align: center;
+            }
+
+            .privacy-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 40px;
+            }
+
+            .privacy-badges {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
+            .nav-links, .nav-cta {
+                display: none;
             }
 
-            .tagline {
-                font-size: 1.2em;
+            .mobile-menu-btn {
+                display: block;
             }
 
-            .logo {
-                font-size: 60px;
+            .hero {
+                min-height: auto;
+                padding: 100px 0 60px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .phone-frame {
+                width: 240px;
+                height: 500px;
+            }
+
+            .screenshot-phone {
+                width: 200px;
+                height: 420px;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .store-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 16px;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .phone-frame {
+                width: 200px;
+                height: 420px;
+                border-radius: 30px;
+            }
+
+            .phone-frame::before {
+                width: 60px;
+                height: 20px;
+            }
+
+            .btn {
+                padding: 14px 24px;
+                font-size: 0.9rem;
+            }
+
+            .privacy-card {
+                padding: 24px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">⚡</div>
-        <h1>Generator Tracker</h1>
-        <div class="tagline">Power Management Made Easy</div>
-
-        <div class="description">
-            Track your generator's fuel consumption, work sessions, and maintenance with ease.
-            Keep your power source running efficiently and never run out of fuel unexpectedly.
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <span class="logo-text">Generator Tracker</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#screenshots">Screenshots</a></li>
+                <li><a href="#privacy">Privacy</a></li>
+            </ul>
+            <a href="#download" class="nav-cta">Download</a>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
         </div>
+    </nav>
 
-        <div class="cta-section">
-            <p style="font-size: 1.2em; margin-bottom: 20px;">Coming Soon to App Stores!</p>
-            <!-- Placeholder for store badges -->
-            <div style="opacity: 0.6;">
-                <p>📱 iOS | 🤖 Android</p>
-            </div>
-        </div>
-
-        <div class="features">
-            <div class="feature">
-                <div class="feature-icon">📊</div>
-                <div class="feature-text">
-                    <strong>Track Work Sessions</strong><br>
-                    Monitor generator runtime and fuel consumption
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="hero-badge">Open Source & Privacy-First</div>
+                    <h1>Track Your <span>Generator</span> Like a Pro</h1>
+                    <p class="hero-description">
+                        Monitor operating hours, fuel consumption, and performance analytics.
+                        Works offline-first with optional cloud sync. Built for construction sites,
+                        events, and home backup power.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Get the App
+                        </a>
+                        <a href="https://github.com/yuri-val/GeneratorTracker" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                            </svg>
+                            View Source
+                        </a>
+                    </div>
+                    <div class="stats-bar">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value">100%</div>
+                                <div class="stat-label">Offline Capable</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">0</div>
+                                <div class="stat-label">Ads or Tracking</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">MIT</div>
+                                <div class="stat-label">Open Source License</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="phone-mockup">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <img src="assets/active-session-screen.png" alt="Generator Tracker - Active Session">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="phone-mockup phone-secondary">
+                        <div class="phone-frame">
+                            <div class="phone-screen">
+                                <img src="assets/home-screen.png" alt="Generator Tracker - Home">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="feature">
-                <div class="feature-icon">⛽</div>
-                <div class="feature-text">
-                    <strong>Manage Refills</strong><br>
-                    Record fuel refills and track usage patterns
-                </div>
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Features</span>
+                <h2>Everything You Need to Track</h2>
+                <p>Powerful tools designed for real-world generator management, from construction sites to home backup power.</p>
             </div>
-
-            <div class="feature">
-                <div class="feature-icon">📈</div>
-                <div class="feature-text">
-                    <strong>Analytics & Insights</strong><br>
-                    View detailed statistics and fuel efficiency metrics
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                    </div>
+                    <h3>Session Tracking</h3>
+                    <p>Start and stop sessions with one tap. Track real-time elapsed hours or log sessions manually with precise time entries.</p>
                 </div>
-            </div>
-
-            <div class="feature">
-                <div class="feature-icon">☁️</div>
-                <div class="feature-text">
-                    <strong>Cloud Sync</strong><br>
-                    Sync your data across devices with Firebase
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Fuel Logging</h3>
+                    <p>Record every refill with date and amount. Calculate fuel consumption rates automatically based on operating hours.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>View total hours, fuel consumption, and efficiency metrics. Compare performance across multiple generators.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                            <line x1="8" y1="21" x2="16" y2="21"/>
+                            <line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </div>
+                    <h3>Multi-Generator Support</h3>
+                    <p>Manage unlimited generators from a single dashboard. Perfect for fleets, rental businesses, and facilities.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                        </svg>
+                    </div>
+                    <h3>Cloud Sync</h3>
+                    <p>Optional Firebase sync keeps your data safe across devices. Works offline-first—sync when you have connection.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </div>
+                    <h3>Dark Mode</h3>
+                    <p>Automatic theme switching based on system preferences. Easy on the eyes during night-time checks.</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="footer">
-            <a href="privacy_policy/privacy-policy.html">Privacy Policy</a>
-            <a href="https://github.com/yuri-val/GeneratorTracker">GitHub</a>
-            <a href="mailto:yuri.valigursky@gmail.com">Contact</a>
+    <!-- Screenshots Section -->
+    <section class="screenshots" id="screenshots">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Screenshots</span>
+                <h2>See It in Action</h2>
+                <p>Clean, intuitive interface designed for quick access in the field.</p>
+            </div>
+            <div class="screenshots-showcase">
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/home-screen.png" alt="Home Screen">
+                    </div>
+                    <div class="screenshot-label">Home</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/generator-detail-screen.png" alt="Generator Detail">
+                    </div>
+                    <div class="screenshot-label">Sessions</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/sessions-list-screen.png" alt="Sessions List">
+                    </div>
+                    <div class="screenshot-label">Refills</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/active-session-screen.png" alt="Active Session">
+                    </div>
+                    <div class="screenshot-label">Live Tracking</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/add-session-screen.png" alt="Add Session">
+                    </div>
+                    <div class="screenshot-label">Add Session</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/add-refill-screen.png" alt="Add Refill">
+                    </div>
+                    <div class="screenshot-label">Add Refill</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/analytics-screen.png" alt="Analytics">
+                    </div>
+                    <div class="screenshot-label">Analytics</div>
+                </div>
+                <div class="screenshot-item">
+                    <div class="screenshot-phone">
+                        <img src="assets/settings-screen.png" alt="Settings">
+                    </div>
+                    <div class="screenshot-label">Settings</div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Tablet/Desktop Section -->
+    <section class="tablet-section">
+        <div class="container">
+            <div class="tablet-grid">
+                <div class="tablet-content">
+                    <h2>Works on Any Screen</h2>
+                    <p>Responsive design adapts perfectly to tablets and desktop browsers. Manage your fleet from the office or check stats on the go.</p>
+                    <ul class="tablet-features">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Progressive Web App ready
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Optimized for larger displays
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Full dark mode support
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Keyboard navigation friendly
+                        </li>
+                    </ul>
+                </div>
+                <div class="tablet-mockup">
+                    <img src="localhost_8081__Nest_Hub_Max_.png" alt="Generator Tracker on Tablet">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section class="privacy" id="privacy">
+        <div class="container">
+            <div class="privacy-card">
+                <div class="privacy-content">
+                    <h2>Privacy First, Always</h2>
+                    <p>Your data stays on your device by default. No analytics, no tracking, no ads. Cloud sync is optional and you control what gets shared.</p>
+                    <div class="privacy-badges">
+                        <div class="privacy-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            No Analytics
+                        </div>
+                        <div class="privacy-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            No Ads
+                        </div>
+                        <div class="privacy-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Open Source
+                        </div>
+                        <div class="privacy-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"/>
+                            </svg>
+                            Local Storage
+                        </div>
+                    </div>
+                </div>
+                <div class="privacy-visual">
+                    <div class="shield-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="download">
+        <div class="container">
+            <h2>Ready to <span>Track Smarter</span>?</h2>
+            <p>Download Generator Tracker now and take control of your generator fleet. Free, open source, and built to last.</p>
+            <div class="cta-buttons">
+                <a href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker" class="store-btn" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 20.5v-17c0-.83.67-1.5 1.5-1.5h11.75l4.25 4.25v14.25c0 .83-.67 1.5-1.5 1.5H4.5c-.83 0-1.5-.67-1.5-1.5zm13.5-15.5l-2.5-2.5H5v17h14V5.5h-2.5z"/>
+                        <path d="M17 14l-5-3v6l5-3z"/>
+                    </svg>
+                    <div class="store-btn-text">
+                        <span>Get it on</span>
+                        <strong>Google Play</strong>
+                    </div>
+                </a>
+                <a href="https://github.com/yuri-val/GeneratorTracker" class="store-btn" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    <div class="store-btn-text">
+                        <span>View on</span>
+                        <strong>GitHub</strong>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">Generator Tracker</span>
+                </a>
+                <ul class="footer-links">
+                    <li><a href="/privacy_policy/">Privacy Policy</a></li>
+                    <li><a href="/privacy_policy/">Terms of Service</a></li>
+                    <li><a href="https://github.com/yuri-val/GeneratorTracker" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    <li><a href="mailto:yuri.valigursky@gmail.com">Contact</a></li>
+                </ul>
+                <p class="footer-copy">© 2026 Generator Tracker. MIT License.</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
