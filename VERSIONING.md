@@ -79,8 +79,6 @@ make version-patch
 
 This will:
 - Update version in `app.json` and `package.json`
-- Increment iOS `buildNumber`
-- Increment Android `versionCode`
 
 ### 3. Commit with version info
 ```bash
