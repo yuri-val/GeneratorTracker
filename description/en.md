@@ -68,14 +68,13 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.0
+### 🆕 What's New in Version 2.0.3
 
-- **Material Design 3 Redesign**: Complete UI rewrite with React Native Paper
+- **Modern App Icon**: Fresh new look with energy-themed design
+- **UI Polishing**: Improved layout on small screens
+- **Material Design 3**: Complete UI rewrite with React Native Paper
 - **Interactive Charts**: Bar charts, pie charts for analytics and data visualization
-- **Smooth Animations**: Spring-based entrance animations on cards, FAB, and charts
-- **Haptic Feedback**: Tactile response on start/stop sessions, save, and delete actions
-- **Glassmorphism Tab Bar**: Frosted glass effect on bottom navigation
-- **Gradient Active Sessions**: Beautiful gradient cards for running sessions
+- **Visual Enhancements**: Spring-based animations, haptic feedback, and glassmorphism effects
 - **Enhanced Analytics**: Overview stats grid + interactive charts with monthly trends
 
 ### 📱 Technical Excellence
