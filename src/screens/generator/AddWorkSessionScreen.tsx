@@ -1,23 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  useColorScheme,
-  ScrollView,
-  Alert,
-  Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
+import { Appbar, TextInput, HelperText, Button, Surface, Text, Banner, Chip } from 'react-native-paper';
+import * as Haptics from 'expo-haptics';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { WorkSession } from '../../models/types';
 import { saveWorkSession, getWorkSessions, deleteWorkSession } from '../../utils/storage';
 import { generateId, calculateHours, getCurrentTime } from '../../utils/calculations';
-import { Colors } from '../../constants/colors';
+import { useAppTheme } from '../../theme/useAppTheme';
+import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
 type AddWorkSessionScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddWorkSession'>;
@@ -25,9 +17,7 @@ type AddWorkSessionScreenProps = {
 };
 
 export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessionScreenProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
-
+  const theme = useAppTheme();
   const { generatorId, sessionId } = route.params;
 
   const [existingSession, setExistingSession] = useState<WorkSession | null>(null);
@@ -36,6 +26,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const [endTime, setEndTime] = useState('17:00');
   const [notes, setNotes] = useState('');
   const [keepActive, setKeepActive] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (sessionId) {
@@ -65,29 +56,16 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const isActiveSession = existingSession?.isActive;
 
   const handleDelete = async () => {
-    const confirmed = Platform.OS === 'web'
-      ? window.confirm('Are you sure you want to delete this work session? This cannot be undone.')
-      : await new Promise<boolean>((resolve) => {
-          Alert.alert(
-            'Delete Work Session',
-            'Are you sure you want to delete this work session? This cannot be undone.',
-            [
-              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-              { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
-            ]
-          );
-        });
-
-    if (confirmed) {
-      try {
-        if (sessionId) {
-          await deleteWorkSession(sessionId);
-          navigation.goBack();
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Failed to delete work session');
-        console.error(error);
+    setShowDeleteDialog(false);
+    try {
+      if (sessionId) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        await deleteWorkSession(sessionId);
+        navigation.goBack();
       }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete work session');
+      console.error(error);
     }
   };
 
@@ -102,9 +80,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
       return;
     }
 
-    // For active sessions, end time is optional
     if (isActiveSession && keepActive) {
-      // Save as active session (no end time)
       try {
         const session: WorkSession = {
           id: existingSession?.id || generateId(),
@@ -116,8 +92,8 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
           createdAt: existingSession?.createdAt || new Date().toISOString(),
           isActive: true,
         };
-
         await saveWorkSession(session);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         navigation.goBack();
       } catch (error) {
         Alert.alert('Error', 'Failed to save work session');
@@ -126,7 +102,6 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
       return;
     }
 
-    // For completed sessions or completing an active session
     if (!endTime.trim()) {
       Alert.alert('Error', 'Please enter an end time');
       return;
@@ -149,8 +124,8 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         createdAt: existingSession?.createdAt || new Date().toISOString(),
         isActive: false,
       };
-
       await saveWorkSession(session);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to save work session');
@@ -158,138 +133,131 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
     }
   };
 
+  const title = isEditing
+    ? (isActiveSession ? 'Edit Active Session' : 'Edit Work Session')
+    : 'Add Work Session';
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {isEditing ? (isActiveSession ? 'Edit Active Session' : 'Edit Work Session') : 'Add Work Session'}
-        </Text>
-        <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '600' }]}>
-            Save
-          </Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated>
+        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
+        <Appbar.Content title={title} titleStyle={styles.headerTitle} />
+        <Appbar.Action icon="check" onPress={handleSave} />
+      </Appbar.Header>
+
+      {isActiveSession && (
+        <Banner
+          visible
+          icon="information"
+          actions={[]}
+          style={{ backgroundColor: theme.colors.tertiaryContainer }}
+        >
+          Editing active session. Modify start time/date to keep running, or set an end time to complete it.
+        </Banner>
+      )}
 
       <ScrollView contentContainerStyle={styles.content}>
-        {isActiveSession && (
-          <View style={[styles.infoCard, { backgroundColor: colors.success }]}>
-            <View style={styles.infoRow}>
-              <Ionicons name="information-circle" size={20} color="#ffffff" style={styles.infoIcon} />
-              <Text style={styles.infoText}>
-                Editing active session: Modify start time/date and save to keep it running, or set an end time to complete it.
-              </Text>
-            </View>
-          </View>
-        )}
+        <TextInput
+          mode="outlined"
+          label="Date *"
+          value={date}
+          onChangeText={setDate}
+          placeholder="YYYY-MM-DD"
+          left={<TextInput.Icon icon="calendar" />}
+          style={styles.input}
+        />
+        <HelperText type="info" visible>
+          Format: YYYY-MM-DD (e.g., 2024-01-15)
+        </HelperText>
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Date *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={date}
-            onChangeText={setDate}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.textMuted}
-          />
-          <Text style={[styles.hint, { color: colors.textMuted }]}>
-            Format: YYYY-MM-DD (e.g., 2024-01-15)
-          </Text>
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Start Time *"
+          value={startTime}
+          onChangeText={setStartTime}
+          placeholder="HH:MM"
+          left={<TextInput.Icon icon="clock-start" />}
+          style={styles.input}
+        />
+        <HelperText type="info" visible>
+          Format: HH:MM (e.g., 09:30)
+        </HelperText>
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Start Time *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={startTime}
-            onChangeText={setStartTime}
-            placeholder="HH:MM"
-            placeholderTextColor={colors.textMuted}
-          />
-          <Text style={[styles.hint, { color: colors.textMuted }]}>Format: HH:MM (e.g., 09:30)</Text>
-        </View>
-
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>
-            End Time {isActiveSession ? '(Optional - leave empty to keep running)' : '*'}
-          </Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={endTime}
-            onChangeText={(text) => {
-              setEndTime(text);
-              if (isActiveSession) {
-                setKeepActive(!text.trim());
-              }
-            }}
-            placeholder={isActiveSession ? 'Leave empty to keep running' : 'HH:MM'}
-            placeholderTextColor={colors.textMuted}
-          />
-          <Text style={[styles.hint, { color: colors.textMuted }]}>
-            {isActiveSession
-              ? 'Clear this field to save without completing the session'
-              : 'Format: HH:MM (e.g., 17:30)'}
-          </Text>
-        </View>
+        <TextInput
+          mode="outlined"
+          label={isActiveSession ? 'End Time (Optional)' : 'End Time *'}
+          value={endTime}
+          onChangeText={(text) => {
+            setEndTime(text);
+            if (isActiveSession) {
+              setKeepActive(!text.trim());
+            }
+          }}
+          placeholder={isActiveSession ? 'Leave empty to keep running' : 'HH:MM'}
+          left={<TextInput.Icon icon="clock-end" />}
+          style={styles.input}
+        />
+        <HelperText type="info" visible>
+          {isActiveSession
+            ? 'Clear this field to save without completing the session'
+            : 'Format: HH:MM (e.g., 17:30)'}
+        </HelperText>
 
         {endTime.trim() && (
-          <View style={[styles.hoursCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.hoursLabel, { color: colors.textMuted }]}>Duration</Text>
-            <Text style={[styles.hoursValue, { color: colors.primary }]}>
+          <Surface elevation={1} style={styles.durationCard}>
+            <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+              Duration
+            </Text>
+            <Text variant="headlineMedium" style={{ color: theme.colors.primary, fontWeight: '700' }}>
               {hours > 0 ? `${hours.toFixed(1)} hours` : 'Invalid time range'}
             </Text>
-          </View>
+          </Surface>
         )}
 
         {isActiveSession && !endTime.trim() && (
-          <View style={[styles.activeIndicator, { backgroundColor: colors.success }]}>
-            <View style={styles.activeIndicatorRow}>
-              <Ionicons name="checkmark-circle" size={20} color="#ffffff" style={styles.activeIndicatorIcon} />
-              <Text style={styles.activeIndicatorText}>
-                Session will remain active
-              </Text>
-            </View>
-          </View>
+          <Chip
+            icon="check-circle"
+            style={[styles.activeChip, { backgroundColor: theme.colors.tertiaryContainer }]}
+            textStyle={{ color: theme.colors.onTertiaryContainer }}
+          >
+            Session will remain active
+          </Chip>
         )}
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Notes (Optional)</Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Add any notes about this work session..."
-            placeholderTextColor={colors.textMuted}
-            multiline
-            numberOfLines={4}
-          />
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Notes (Optional)"
+          value={notes}
+          onChangeText={setNotes}
+          placeholder="Add notes about this session..."
+          left={<TextInput.Icon icon="note-text" />}
+          multiline
+          numberOfLines={4}
+          style={styles.input}
+        />
 
         {isEditing && (
-          <TouchableOpacity
-            style={[styles.deleteButton, { backgroundColor: colors.error }]}
-            onPress={handleDelete}
+          <Button
+            mode="contained"
+            buttonColor={theme.colors.error}
+            textColor={theme.colors.onError}
+            icon="delete"
+            onPress={() => setShowDeleteDialog(true)}
+            style={styles.deleteButton}
+            contentStyle={styles.deleteButtonContent}
           >
-            <Text style={styles.deleteButtonText}>Delete Work Session</Text>
-          </TouchableOpacity>
+            Delete Work Session
+          </Button>
         )}
       </ScrollView>
+
+      <DeleteConfirmDialog
+        visible={showDeleteDialog}
+        title="Delete Work Session"
+        message="Are you sure you want to delete this work session? This cannot be undone."
+        onDismiss={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+      />
     </View>
   );
 }
@@ -298,112 +266,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
-  headerButton: {
-    minWidth: 60,
-  },
-  headerButtonText: {
-    fontSize: 16,
-  },
   headerTitle: {
-    fontSize: 18,
     fontWeight: '600',
   },
   content: {
     padding: 16,
-  },
-  infoCard: {
-    padding: 12,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  infoIcon: {
-    marginRight: 8,
-  },
-  infoText: {
-    color: '#ffffff',
-    fontSize: 14,
-    lineHeight: 20,
-    flex: 1,
-  },
-  formGroup: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    paddingTop: 24,
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
+    marginBottom: 4,
   },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  hint: {
-    fontSize: 13,
-    marginTop: 4,
-  },
-  hoursCard: {
-    borderWidth: 1,
+  durationCard: {
     borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
+    gap: 4,
   },
-  hoursLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  hoursValue: {
-    fontSize: 28,
-    fontWeight: '700',
-  },
-  activeIndicator: {
-    padding: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  activeIndicatorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  activeIndicatorIcon: {
-    marginRight: 8,
-  },
-  activeIndicatorText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+  activeChip: {
+    alignSelf: 'flex-start',
+    marginBottom: 16,
   },
   deleteButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
+    marginTop: 16,
     marginBottom: 24,
   },
-  deleteButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+  deleteButtonContent: {
+    paddingVertical: 4,
   },
 });

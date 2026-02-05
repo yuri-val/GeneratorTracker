@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  useColorScheme,
-  ScrollView,
-  Alert,
-  Platform,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { Appbar, TextInput, HelperText } from 'react-native-paper';
+import * as Haptics from 'expo-haptics';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator } from '../../models/types';
 import { saveGenerator, getGenerators } from '../../utils/storage';
 import { generateId } from '../../utils/calculations';
-import { Colors } from '../../constants/colors';
+import { useAppTheme } from '../../theme/useAppTheme';
 
 type AddGeneratorScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddGenerator'>;
@@ -24,9 +16,7 @@ type AddGeneratorScreenProps = {
 };
 
 export default function AddGeneratorScreen({ navigation, route }: AddGeneratorScreenProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
-
+  const theme = useAppTheme();
   const { generatorId } = route.params || {};
   const isEdit = !!generatorId;
 
@@ -34,6 +24,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const [model, setModel] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (generatorId) {
@@ -58,8 +49,8 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   };
 
   const handleSave = async () => {
+    setSubmitted(true);
     if (!name.trim()) {
-      Alert.alert('Error', 'Please enter a generator name');
       return;
     }
 
@@ -73,6 +64,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
       };
 
       await saveGenerator(generator);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to save generator');
@@ -81,66 +73,53 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {isEdit ? 'Edit Generator' : 'Add Generator'}
-        </Text>
-        <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '600' }]}>
-            Save
-          </Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated>
+        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
+        <Appbar.Content
+          title={isEdit ? 'Edit Generator' : 'New Generator'}
+          titleStyle={styles.headerTitle}
+        />
+        <Appbar.Action icon="check" onPress={handleSave} />
+      </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Name *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={name}
-            onChangeText={setName}
-            placeholder="e.g., Honda EU2200i"
-            placeholderTextColor={colors.textMuted}
-          />
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Generator Name *"
+          value={name}
+          onChangeText={setName}
+          placeholder="e.g., Honda EU2200i"
+          left={<TextInput.Icon icon="engine" />}
+          error={submitted && !name.trim()}
+          style={styles.input}
+        />
+        <HelperText type="error" visible={submitted && !name.trim()}>
+          Name is required
+        </HelperText>
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Model (Optional)</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={model}
-            onChangeText={setModel}
-            placeholder="e.g., EU2200i Companion"
-            placeholderTextColor={colors.textMuted}
-          />
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Model (Optional)"
+          value={model}
+          onChangeText={setModel}
+          placeholder="e.g., EU2200i Companion"
+          left={<TextInput.Icon icon="tag" />}
+          style={styles.input}
+        />
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Purchase Date</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={purchaseDate}
-            onChangeText={setPurchaseDate}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.textMuted}
-          />
-          <Text style={[styles.hint, { color: colors.textMuted }]}>
-            Format: YYYY-MM-DD (e.g., 2024-01-15)
-          </Text>
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Purchase Date"
+          value={purchaseDate}
+          onChangeText={setPurchaseDate}
+          placeholder="YYYY-MM-DD"
+          left={<TextInput.Icon icon="calendar" />}
+          style={styles.input}
+        />
+        <HelperText type="info" visible>
+          Format: YYYY-MM-DD (e.g., 2024-01-15)
+        </HelperText>
       </ScrollView>
     </View>
   );
@@ -150,44 +129,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
-  headerButton: {
-    minWidth: 60,
-  },
-  headerButtonText: {
-    fontSize: 16,
-  },
   headerTitle: {
-    fontSize: 18,
     fontWeight: '600',
   },
   content: {
     padding: 16,
-  },
-  formGroup: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    paddingTop: 24,
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-  },
-  hint: {
-    fontSize: 13,
-    marginTop: 4,
+    marginBottom: 4,
   },
 });

@@ -5,6 +5,52 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-02-06
+
+### Added
+- **React Native Paper v5 (Material Design 3)** — Complete UI library migration
+- **Theme System** — Centralized MD3 dark/light themes (`src/theme/index.ts`, `src/theme/useAppTheme.ts`)
+- **Animations** — Spring-based entrance animations via React Native Reanimated v4 (staggered FadeInUp, ZoomIn, FadeIn)
+- **Haptic Feedback** — Tactile feedback via Expo Haptics on key interactions (start/stop session, save, delete, FAB press)
+- **Charts & Data Visualization** — Analytics charts via React Native Gifted Charts (BarChart, PieChart donut)
+- **Analytics Utilities** (`src/utils/analytics.ts`) — Data aggregation for hours over time, fuel over time, generator comparison, fuel distribution
+- **Glassmorphism Effects** — Frosted glass bottom tab bar via Expo Blur (BlurView)
+- **New Components:**
+  - `StatBlock` — Reusable icon + value + label stat display
+  - `GradientCard` — LinearGradient card wrapper for active sessions
+  - `AnimatedCard` — Paper Card with entrance animation
+  - `DeleteConfirmDialog` — Paper Dialog for delete confirmations (replaces Alert.alert)
+  - `PaperBottomTabBar` — Custom tab bar with BlurView + Paper BottomNavigation.Bar
+
+### Changed
+- **COMPLETE UI REWRITE** — Every screen and component rebuilt with React Native Paper
+- **HomeScreen** — Paper Appbar, Card elevated with Avatar.Icon, StatBlock row, Chip for last activity, animated FAB
+- **GeneratorDetailScreen** — GradientCard for active sessions, Surface stat cards, Paper Dialog for delete
+- **AnalyticsScreen** — SegmentedButtons (Overview/Charts), 2x2 stat grid, BarChart/PieChart with animations
+- **SettingsScreen** — Paper List sections, Surface cards, Avatar.Text for user, Badge for sync count
+- **AddGeneratorScreen** — Paper TextInput outlined with icons, HelperText validation, Appbar with close/check
+- **AddWorkSessionScreen** — Paper Banner for active sessions, TextInput with clock icons, Surface duration display
+- **AddRefillScreen** — TextInput with fuel icon and Affix suffix, Paper form patterns
+- **WorkSessionsList** — Paper Card outlined items, contained-tonal add button
+- **RefillsList** — Paper Card outlined items, contained-tonal add button
+- **SyncStatusIndicator** — Paper Text + Badge, internal theme access
+- **EmailAuthForm** — Paper TextInput outlined with password visibility toggle
+- **SignInButton** — Thin Paper Button wrapper
+- **Bottom Tab Bar** — Now floating with blur effect, absolute positioning
+- **Navigation** — MaterialCommunityIcons replace Ionicons, adaptNavigationTheme unifies themes
+- **DESIGN_GUIDE.md** — Complete rewrite for Paper/MD3 component system (v2.0.0)
+
+### Removed
+- Direct dependency on `colors` prop pattern — all components now use `useAppTheme()` internally
+- `Alert.alert` for delete confirmations — replaced by `DeleteConfirmDialog`
+- Ionicons — replaced by MaterialCommunityIcons
+
+### Technical
+- New dependencies: react-native-paper, react-native-reanimated, expo-haptics, expo-blur, expo-linear-gradient, react-native-gifted-charts, react-native-svg
+- PaperProvider wraps entire app with MD3 theme
+- adaptNavigationTheme unifies Paper + React Navigation themes
+- No changes to data models, storage, sync, or navigation structure
+
 ## [1.6.2] - 2026-01-25
 
 ### Added

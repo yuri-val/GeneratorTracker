@@ -1,26 +1,20 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-  Alert,
-} from 'react-native';
-import { Colors } from '../constants/colors';
+import { View, StyleSheet, Alert } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
+import { useAppTheme } from '../theme/useAppTheme';
 
 interface EmailAuthFormProps {
-  colors: typeof Colors.light;
   onSignIn: (email: string, password: string) => Promise<void>;
   onSignUp: (email: string, password: string) => Promise<void>;
 }
 
-export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ colors, onSignIn, onSignUp }) => {
+export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp }) => {
+  const theme = useAppTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
@@ -40,11 +34,9 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ colors, onSignIn, 
       } else {
         await onSignIn(email.trim(), password);
       }
-      // Clear form on success
       setEmail('');
       setPassword('');
     } catch (error: any) {
-      // Error handling is done in parent component
       console.error('Auth error:', error);
     } finally {
       setLoading(false);
@@ -53,63 +45,60 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ colors, onSignIn, 
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.formTitle, { color: colors.text }]}>
+      <Text variant="titleMedium" style={{ marginBottom: 12 }}>
         {isSignUp ? 'Create Account' : 'Sign In with Email'}
       </Text>
 
       <TextInput
-        style={[
-          styles.input,
-          { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-        ]}
-        placeholder="Email"
-        placeholderTextColor={colors.textMuted}
+        mode="outlined"
+        label="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
-        editable={!loading}
+        disabled={loading}
+        left={<TextInput.Icon icon="email" />}
+        style={styles.input}
       />
 
       <TextInput
-        style={[
-          styles.input,
-          { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-        ]}
-        placeholder="Password (min 6 characters)"
-        placeholderTextColor={colors.textMuted}
+        mode="outlined"
+        label="Password"
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
+        secureTextEntry={!showPassword}
         autoCapitalize="none"
         autoCorrect={false}
-        editable={!loading}
+        disabled={loading}
+        left={<TextInput.Icon icon="lock" />}
+        right={
+          <TextInput.Icon
+            icon={showPassword ? 'eye-off' : 'eye'}
+            onPress={() => setShowPassword(!showPassword)}
+          />
+        }
+        style={styles.input}
       />
 
-      <TouchableOpacity
-        style={[styles.submitButton, { backgroundColor: colors.primary }]}
+      <Button
+        mode="contained"
         onPress={handleSubmit}
+        loading={loading}
         disabled={loading}
+        style={styles.submitButton}
+        contentStyle={styles.submitButtonContent}
       >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.submitButtonText}>
-            {isSignUp ? 'Create Account' : 'Sign In'}
-          </Text>
-        )}
-      </TouchableOpacity>
+        {isSignUp ? 'Create Account' : 'Sign In'}
+      </Button>
 
-      <TouchableOpacity
-        style={styles.toggleButton}
+      <Button
+        mode="text"
         onPress={() => setIsSignUp(!isSignUp)}
         disabled={loading}
       >
-        <Text style={[styles.toggleButtonText, { color: colors.primary }]}>
-          {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
-        </Text>
-      </TouchableOpacity>
+        {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+      </Button>
     </View>
   );
 };
@@ -118,35 +107,13 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
   },
-  formTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
   input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
     marginBottom: 12,
   },
   submitButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  toggleButton: {
-    padding: 8,
-    alignItems: 'center',
-  },
-  toggleButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
+  submitButtonContent: {
+    paddingVertical: 4,
   },
 });

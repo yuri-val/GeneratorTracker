@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  useColorScheme,
-  ScrollView,
-  Alert,
-  Platform,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { Appbar, TextInput, HelperText, Button } from 'react-native-paper';
+import * as Haptics from 'expo-haptics';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Refill } from '../../models/types';
 import { saveRefill, getRefills, deleteRefill } from '../../utils/storage';
 import { generateId } from '../../utils/calculations';
-import { Colors } from '../../constants/colors';
+import { useAppTheme } from '../../theme/useAppTheme';
+import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
 type AddRefillScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddRefill'>;
@@ -24,9 +17,7 @@ type AddRefillScreenProps = {
 };
 
 export default function AddRefillScreen({ navigation, route }: AddRefillScreenProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
-
+  const theme = useAppTheme();
   const { generatorId, refillId } = route.params;
   const isEditing = !!refillId;
 
@@ -34,6 +25,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   const [existingRefill, setExistingRefill] = useState<Refill | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     if (refillId) {
@@ -58,29 +50,16 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   };
 
   const handleDelete = async () => {
-    const confirmed = Platform.OS === 'web'
-      ? window.confirm('Are you sure you want to delete this refill? This cannot be undone.')
-      : await new Promise<boolean>((resolve) => {
-          Alert.alert(
-            'Delete Refill',
-            'Are you sure you want to delete this refill? This cannot be undone.',
-            [
-              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
-              { text: 'Delete', style: 'destructive', onPress: () => resolve(true) },
-            ]
-          );
-        });
-
-    if (confirmed) {
-      try {
-        if (refillId) {
-          await deleteRefill(refillId);
-          navigation.goBack();
-        }
-      } catch (error) {
-        Alert.alert('Error', 'Failed to delete refill');
-        console.error(error);
+    setShowDeleteDialog(false);
+    try {
+      if (refillId) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        await deleteRefill(refillId);
+        navigation.goBack();
       }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to delete refill');
+      console.error(error);
     }
   };
 
@@ -107,6 +86,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
       };
 
       await saveRefill(refill);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', 'Failed to save refill');
@@ -115,80 +95,76 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary }]}>Cancel</Text>
-        </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
-          {isEditing ? 'Edit Refill' : 'Add Refill'}
-        </Text>
-        <TouchableOpacity onPress={handleSave} style={styles.headerButton}>
-          <Text style={[styles.headerButtonText, { color: colors.primary, fontWeight: '600' }]}>
-            Save
-          </Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated>
+        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
+        <Appbar.Content
+          title={isEditing ? 'Edit Refill' : 'Add Refill'}
+          titleStyle={styles.headerTitle}
+        />
+        <Appbar.Action icon="check" onPress={handleSave} />
+      </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Date *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={date}
-            onChangeText={setDate}
-            placeholder="YYYY-MM-DD"
-            placeholderTextColor={colors.textMuted}
-          />
-          <Text style={[styles.hint, { color: colors.textMuted }]}>
-            Format: YYYY-MM-DD (e.g., 2024-01-15)
-          </Text>
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Date *"
+          value={date}
+          onChangeText={setDate}
+          placeholder="YYYY-MM-DD"
+          left={<TextInput.Icon icon="calendar" />}
+          style={styles.input}
+        />
+        <HelperText type="info" visible>
+          Format: YYYY-MM-DD (e.g., 2024-01-15)
+        </HelperText>
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Fuel Amount (Liters) *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={amount}
-            onChangeText={setAmount}
-            placeholder="e.g., 5.5"
-            placeholderTextColor={colors.textMuted}
-            keyboardType="decimal-pad"
-          />
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Fuel Amount *"
+          value={amount}
+          onChangeText={setAmount}
+          placeholder="e.g., 5.5"
+          keyboardType="decimal-pad"
+          left={<TextInput.Icon icon="fuel" />}
+          right={<TextInput.Affix text="L" />}
+          style={styles.input}
+        />
 
-        <View style={styles.formGroup}>
-          <Text style={[styles.label, { color: colors.text }]}>Notes (Optional)</Text>
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border },
-            ]}
-            value={notes}
-            onChangeText={setNotes}
-            placeholder="Add any notes about this refill..."
-            placeholderTextColor={colors.textMuted}
-            multiline
-            numberOfLines={4}
-          />
-        </View>
+        <TextInput
+          mode="outlined"
+          label="Notes (Optional)"
+          value={notes}
+          onChangeText={setNotes}
+          placeholder="Add notes about this refill..."
+          left={<TextInput.Icon icon="note-text" />}
+          multiline
+          numberOfLines={4}
+          style={[styles.input, { marginTop: 8 }]}
+        />
 
         {isEditing && (
-          <TouchableOpacity
-            style={[styles.deleteButton, { backgroundColor: colors.error }]}
-            onPress={handleDelete}
+          <Button
+            mode="contained"
+            buttonColor={theme.colors.error}
+            textColor={theme.colors.onError}
+            icon="delete"
+            onPress={() => setShowDeleteDialog(true)}
+            style={styles.deleteButton}
+            contentStyle={styles.deleteButtonContent}
           >
-            <Text style={styles.deleteButtonText}>Delete Refill</Text>
-          </TouchableOpacity>
+            Delete Refill
+          </Button>
         )}
       </ScrollView>
+
+      <DeleteConfirmDialog
+        visible={showDeleteDialog}
+        title="Delete Refill"
+        message="Are you sure you want to delete this refill? This cannot be undone."
+        onDismiss={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+      />
     </View>
   );
 }
@@ -197,60 +173,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
-  headerButton: {
-    minWidth: 60,
-  },
-  headerButtonText: {
-    fontSize: 16,
-  },
   headerTitle: {
-    fontSize: 18,
     fontWeight: '600',
   },
   content: {
     padding: 16,
-  },
-  formGroup: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    paddingTop: 24,
   },
   input: {
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-  },
-  textArea: {
-    minHeight: 100,
-    textAlignVertical: 'top',
-  },
-  hint: {
-    fontSize: 13,
-    marginTop: 4,
+    marginBottom: 4,
   },
   deleteButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
+    marginTop: 16,
     marginBottom: 24,
   },
-  deleteButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
+  deleteButtonContent: {
+    paddingVertical: 4,
   },
 });

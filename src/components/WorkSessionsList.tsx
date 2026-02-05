@@ -1,19 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  RefreshControl,
-} from 'react-native';
+import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
+import { Card, Text, Button, Icon } from 'react-native-paper';
 import { WorkSession } from '../models/types';
 import { formatDate, formatTime } from '../utils/calculations';
-import { Colors } from '../constants/colors';
+import { useAppTheme } from '../theme/useAppTheme';
 
 interface WorkSessionsListProps {
   sessions: WorkSession[];
-  colors: typeof Colors.light;
   onSessionPress: (sessionId: string) => void;
   onRefresh: () => void;
   refreshing: boolean;
@@ -22,48 +15,38 @@ interface WorkSessionsListProps {
 
 export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
   sessions,
-  colors,
   onSessionPress,
   onRefresh,
   refreshing,
   onAddPress,
 }) => {
+  const theme = useAppTheme();
+
   const renderItem = ({ item }: { item: WorkSession }) => (
-    <TouchableOpacity
-      style={[styles.listItem, { backgroundColor: colors.card, borderColor: colors.border }]}
+    <Card
+      mode="outlined"
       onPress={() => onSessionPress(item.id)}
-      activeOpacity={0.7}
+      style={styles.card}
     >
-      <View style={styles.itemContent}>
-        <Text style={[styles.itemDate, { color: colors.text }]}>{formatDate(item.date)}</Text>
-        <Text style={[styles.itemDetail, { color: colors.textMuted }]}>
-          {formatTime(item.startTime)} - {item.endTime ? formatTime(item.endTime) : 'In Progress'}
-        </Text>
-        {item.notes && (
-          <Text style={[styles.itemNotes, { color: colors.textMuted }]} numberOfLines={1}>
-            {item.notes}
+      <Card.Title
+        title={formatDate(item.date)}
+        subtitle={`${formatTime(item.startTime)} - ${item.endTime ? formatTime(item.endTime) : 'In Progress'}`}
+        titleVariant="titleSmall"
+        left={(props) => <Icon {...props} source="clock-outline" size={24} color={theme.colors.secondary} />}
+        right={() => (
+          <Text variant="titleLarge" style={[styles.hoursValue, { color: theme.colors.primary }]}>
+            {item.hours.toFixed(1)}h
           </Text>
         )}
-      </View>
-      <Text style={[styles.itemValue, { color: colors.primary }]}>{item.hours.toFixed(1)}h</Text>
-    </TouchableOpacity>
-  );
-
-  const renderEmpty = () => (
-    <View style={styles.emptyContainer}>
-      <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-        No work sessions yet
-      </Text>
-    </View>
-  );
-
-  const renderHeader = () => (
-    <TouchableOpacity
-      style={[styles.addButton, { backgroundColor: colors.primary }]}
-      onPress={onAddPress}
-    >
-      <Text style={styles.addButtonText}>+ Add Work Session</Text>
-    </TouchableOpacity>
+      />
+      {item.notes && (
+        <Card.Content style={styles.notesContent}>
+          <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, fontStyle: 'italic' }} numberOfLines={1}>
+            {item.notes}
+          </Text>
+        </Card.Content>
+      )}
+    </Card>
   );
 
   return (
@@ -72,12 +55,29 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContent}
-      style={{ backgroundColor: colors.background }}
+      style={{ backgroundColor: theme.colors.background }}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
       }
-      ListHeaderComponent={renderHeader}
-      ListEmptyComponent={renderEmpty}
+      ListHeaderComponent={
+        <Button
+          mode="contained-tonal"
+          icon="plus"
+          onPress={onAddPress}
+          style={styles.addButton}
+          contentStyle={styles.addButtonContent}
+        >
+          Add Work Session
+        </Button>
+      }
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <Icon source="clock-off" size={48} color={theme.colors.onSurfaceVariant} />
+          <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 12 }}>
+            No work sessions yet
+          </Text>
+        </View>
+      }
     />
   );
 };
@@ -86,64 +86,28 @@ const styles = StyleSheet.create({
   listContent: {
     paddingVertical: 8,
   },
-  listItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  card: {
     marginHorizontal: 16,
     marginBottom: 8,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
   },
-  itemContent: {
-    flex: 1,
-  },
-  itemDate: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  itemDetail: {
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  itemNotes: {
-    fontSize: 13,
-    fontStyle: 'italic',
-  },
-  itemValue: {
-    fontSize: 20,
+  hoursValue: {
     fontWeight: '700',
-    marginLeft: 12,
+    marginRight: 16,
+  },
+  notesContent: {
+    paddingTop: 0,
+    paddingBottom: 12,
   },
   emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 60,
     paddingHorizontal: 32,
   },
-  emptyText: {
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
   addButton: {
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  addButtonContent: {
+    paddingVertical: 4,
   },
 });

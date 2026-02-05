@@ -1,21 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  useColorScheme,
-  RefreshControl,
-} from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { Appbar, Card, FAB, Text, Avatar, Chip, Divider, Icon } from 'react-native-paper';
+import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator, GeneratorStats } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
 import { calculateGeneratorStats, formatDate } from '../../utils/calculations';
-import { Colors } from '../../constants/colors';
 import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
+import { StatBlock } from '../../components/StatBlock';
+import { useAppTheme } from '../../theme/useAppTheme';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
@@ -24,9 +20,7 @@ type HomeScreenProps = {
 type GeneratorWithStats = Generator & { stats: GeneratorStats };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const colorScheme = useColorScheme();
-  const colors = Colors[colorScheme === 'dark' ? 'dark' : 'light'];
-
+  const theme = useAppTheme();
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -40,7 +34,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         const genSessions = workSessions.filter(s => s.generatorId === gen.id);
         const genRefills = refills.filter(r => r.generatorId === gen.id);
         const stats = calculateGeneratorStats(genSessions, genRefills);
-
         return { ...gen, stats };
       });
 
@@ -62,53 +55,63 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }, [])
   );
 
-  const renderGenerator = ({ item }: { item: GeneratorWithStats }) => (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={() => navigation.navigate('GeneratorDetail', { generatorId: item.id })}
-      activeOpacity={0.7}
-    >
-      <View style={styles.cardHeader}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{item.name}</Text>
-        {item.model && (
-          <Text style={[styles.cardModel, { color: colors.textMuted }]}>{item.model}</Text>
+  const renderGenerator = ({ item, index }: { item: GeneratorWithStats; index: number }) => (
+    <Animated.View entering={FadeInUp.delay(index * 80).springify()}>
+      <Card
+        mode="elevated"
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          navigation.navigate('GeneratorDetail', { generatorId: item.id });
+        }}
+        style={styles.card}
+      >
+        <Card.Title
+          title={item.name}
+          subtitle={item.model || undefined}
+          titleVariant="titleLarge"
+          left={(props) => (
+            <Avatar.Icon
+              {...props}
+              icon="engine"
+              style={{ backgroundColor: theme.colors.primary }}
+              color={theme.colors.onPrimary}
+            />
+          )}
+        />
+        <Card.Content>
+          <View style={styles.statsRow}>
+            <StatBlock
+              value={`${item.stats.totalHours.toFixed(1)}h`}
+              label="Total Hours"
+              icon="clock-outline"
+              color={theme.colors.secondary}
+            />
+            <Divider style={styles.statDivider} />
+            <StatBlock
+              value={item.stats.totalRefills.toString()}
+              label="Refills"
+              icon="fuel"
+              color={theme.colors.primary}
+            />
+          </View>
+        </Card.Content>
+        {item.stats.lastWorkSessionDate && (
+          <Card.Actions>
+            <Chip icon="clock-outline" compact textStyle={{ fontSize: 12 }}>
+              Last: {formatDate(item.stats.lastWorkSessionDate)}
+            </Chip>
+          </Card.Actions>
         )}
-      </View>
-
-      <View style={styles.cardStats}>
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: colors.primary }]}>
-            {item.stats.totalHours.toFixed(1)}h
-          </Text>
-          <Text style={[styles.statLabel, { color: colors.textMuted }]}>Total Hours</Text>
-        </View>
-
-        <View style={styles.statDivider} />
-
-        <View style={styles.statItem}>
-          <Text style={[styles.statValue, { color: colors.primary }]}>
-            {item.stats.totalRefills}
-          </Text>
-          <Text style={[styles.statLabel, { color: colors.textMuted }]}>Refills</Text>
-        </View>
-      </View>
-
-      {item.stats.lastWorkSessionDate && (
-        <View style={styles.cardFooter}>
-          <Text style={[styles.lastActivity, { color: colors.textMuted }]}>
-            Last used: {formatDate(item.stats.lastWorkSessionDate)}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
+      </Card>
+    </Animated.View>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Generator Tracker</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated>
+        <Appbar.Content title="Generator Tracker" titleStyle={styles.headerTitle} />
         <SyncStatusIndicator />
-      </View>
+      </Appbar.Header>
 
       <FlatList
         data={generators}
@@ -116,27 +119,32 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
         }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+            <Icon source="engine-off-outline" size={80} color={theme.colors.onSurfaceVariant} />
+            <Text variant="titleMedium" style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
               No generators yet
             </Text>
-            <Text style={[styles.emptySubtext, { color: colors.textMuted }]}>
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
               Tap the + button to add your first generator
             </Text>
           </View>
         }
       />
 
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.primary }]}
-        onPress={() => navigation.navigate('AddGenerator', {})}
-        activeOpacity={0.8}
-      >
-        <Text style={styles.fabIcon}>+</Text>
-      </TouchableOpacity>
+      <Animated.View entering={ZoomIn.delay(300)} style={styles.fabContainer}>
+        <FAB
+          icon="plus"
+          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+          color={theme.colors.onPrimary}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            navigation.navigate('AddGenerator', {});
+          }}
+        />
+      </Animated.View>
     </View>
   );
 }
@@ -145,108 +153,41 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   listContent: {
     padding: 16,
     paddingBottom: 100,
   },
   card: {
-    borderRadius: 16,
-    padding: 20,
     marginBottom: 16,
-    borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  cardHeader: {
-    marginBottom: 12,
-  },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  cardModel: {
-    fontSize: 14,
-  },
-  cardStats: {
+  statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
+    paddingVertical: 8,
   },
   statDivider: {
     width: 1,
     height: 40,
-    backgroundColor: '#E5E7EB',
-  },
-  cardFooter: {
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingTop: 12,
-  },
-  lastActivity: {
-    fontSize: 13,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 80,
     paddingHorizontal: 40,
+    gap: 12,
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
+    marginTop: 8,
   },
-  emptySubtext: {
-    fontSize: 14,
-    textAlign: 'center',
-  },
-  fab: {
+  fabContainer: {
     position: 'absolute',
     right: 20,
-    bottom: 90,
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    bottom: 24,
   },
-  fabIcon: {
-    fontSize: 36,
-    color: '#ffffff',
-    fontWeight: '600',
+  fab: {
+    borderRadius: 16,
   },
 });

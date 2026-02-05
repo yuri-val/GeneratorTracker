@@ -1,50 +1,41 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, useColorScheme } from 'react-native';
-import { Colors } from '../constants/colors';
+import { StyleSheet } from 'react-native';
+import { Button } from 'react-native-paper';
 
 interface SignInButtonProps {
   onPress: () => void;
   disabled?: boolean;
   title?: string;
+  icon?: string;
+  mode?: 'contained' | 'outlined' | 'elevated' | 'text';
 }
 
 export const SignInButton: React.FC<SignInButtonProps> = ({
   onPress,
   disabled = false,
   title = 'Sign In',
+  icon,
+  mode = 'contained',
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const colors = Colors[isDark ? 'dark' : 'light'];
-
   return (
-    <TouchableOpacity
-      style={[
-        styles.button,
-        { backgroundColor: colors.primary },
-        disabled && styles.buttonDisabled,
-      ]}
+    <Button
+      mode={mode}
       onPress={onPress}
       disabled={disabled}
+      icon={icon}
+      style={styles.button}
+      contentStyle={styles.buttonContent}
     >
-      <Text style={styles.buttonText}>{title}</Text>
-    </TouchableOpacity>
+      {title}
+    </Button>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 6,
   },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  buttonContent: {
+    paddingVertical: 4,
   },
 });

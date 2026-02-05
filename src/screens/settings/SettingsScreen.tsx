@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import {
-  View,
+  Appbar,
+  Card,
+  Button,
   Text,
-  StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as AuthSession from 'expo-auth-session';
+  List,
+  Divider,
+  Badge,
+  Avatar,
+  Surface,
+} from 'react-native-paper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
-import { Colors } from '../../constants/colors';
 import { EmailAuthForm } from '../../components/EmailAuthForm';
+import { useAppTheme } from '../../theme/useAppTheme';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -25,23 +26,17 @@ import {
 } from '../../services/auth';
 
 export default function SettingsScreen() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-  const colors = Colors[isDark ? 'dark' : 'light'];
-
+  const theme = useAppTheme();
   const { user, signOut } = useAuth();
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
   const { request, response, promptAsync } = useGoogleAuth();
 
-  // Handle Google OAuth response
   useEffect(() => {
     if (response?.type === 'success') {
       const { id_token, authentication } = response.params;
-      // On web, the token might be in authentication.idToken
       const idToken = id_token || authentication?.idToken;
-
       if (idToken) {
         handleGoogleSignIn(idToken);
       } else {
@@ -58,7 +53,6 @@ export default function SettingsScreen() {
     try {
       setSigningIn(true);
       await signInWithGoogleCredential(idToken);
-      // Trigger initial sync after sign-in
       await performInitialSync();
       Alert.alert('Success', 'Signed in successfully');
     } catch (error: any) {
@@ -127,150 +121,176 @@ export default function SettingsScreen() {
     }
   };
 
+  const getSyncIcon = () => {
+    switch (syncStatus) {
+      case 'syncing': return 'cloud-sync';
+      case 'synced': return 'cloud-check';
+      case 'error': return 'cloud-alert';
+      default: return 'cloud-outline';
+    }
+  };
+
+  const getSyncColor = () => {
+    switch (syncStatus) {
+      case 'syncing': return theme.colors.primary;
+      case 'synced': return theme.colors.tertiary;
+      case 'error': return theme.colors.error;
+      default: return theme.colors.onSurfaceVariant;
+    }
+  };
+
+  const getSyncText = () => {
+    switch (syncStatus) {
+      case 'syncing': return 'Syncing...';
+      case 'synced': return 'Synced';
+      case 'error': return 'Error';
+      default: return 'Idle';
+    }
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Settings</Text>
-      </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header elevated>
+        <Appbar.Content title="Settings" titleStyle={styles.headerTitle} />
+      </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Account</Text>
+        <Animated.View entering={FadeInDown.delay(0).springify()}>
+          <List.Section>
+            <List.Subheader style={styles.sectionTitle}>Account</List.Subheader>
 
-        {!user ? (
-          <>
-            <Text style={[styles.infoText, { color: colors.textMuted }]}>
-              Sign in to sync your data across devices
-            </Text>
-
-            <EmailAuthForm
-              colors={colors}
-              onSignIn={handleEmailSignIn}
-              onSignUp={handleEmailSignUp}
-            />
-
-            {Platform.OS !== 'android' && (
-              <View style={styles.divider}>
-                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-                <Text style={[styles.dividerText, { color: colors.textMuted }]}>OR</Text>
-                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-              </View>
-            )}
-
-            {Platform.OS !== 'android' && (
-              <TouchableOpacity
-                style={[styles.button, { backgroundColor: colors.primary }]}
-                onPress={() => promptAsync()}
-                disabled={!request || signingIn}
-              >
-                {signingIn ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>Sign in with Google</Text>
-                )}
-              </TouchableOpacity>
-            )}
-
-            {Platform.OS !== 'android' && (
-              <TouchableOpacity
-                style={[styles.button, styles.secondaryButton, { borderColor: colors.primary }]}
-                onPress={handleAnonymousSignIn}
-                disabled={signingIn}
-              >
-                <Text style={[styles.buttonTextSecondary, { color: colors.primary }]}>
-                  Sign in Anonymously
+            {!user ? (
+              <Surface elevation={1} style={styles.sectionCard}>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16 }}>
+                  Sign in to sync your data across devices
                 </Text>
-              </TouchableOpacity>
-            )}
-          </>
-        ) : (
-          <>
-            <View style={[styles.userInfo, { backgroundColor: colors.card }]}>
-              <Text style={[styles.userEmail, { color: colors.text }]}>
-                {user.email || 'Anonymous User'}
-              </Text>
-              {user.displayName && (
-                <Text style={[styles.userName, { color: colors.textMuted }]}>
-                  {user.displayName}
-                </Text>
-              )}
-            </View>
 
-            <TouchableOpacity
-              style={[styles.button, styles.dangerButton]}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.buttonText}>Sign Out</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+                <EmailAuthForm
+                  onSignIn={handleEmailSignIn}
+                  onSignUp={handleEmailSignUp}
+                />
 
-      {user && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Sync</Text>
-
-          <View style={[styles.syncInfo, { backgroundColor: colors.card }]}>
-            <View style={styles.syncRow}>
-              <Text style={[styles.syncLabel, { color: colors.textMuted }]}>Status:</Text>
-              <View style={styles.syncStatusRow}>
-                {syncStatus === 'syncing' && (
+                {Platform.OS !== 'android' && (
                   <>
-                    <ActivityIndicator size="small" color={colors.primary} style={styles.syncIcon} />
-                    <Text style={[styles.syncValue, { color: colors.text }]}>Syncing...</Text>
+                    <View style={styles.divider}>
+                      <Divider style={styles.dividerLine} />
+                      <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, paddingHorizontal: 12 }}>
+                        OR
+                      </Text>
+                      <Divider style={styles.dividerLine} />
+                    </View>
+
+                    <Button
+                      mode="elevated"
+                      icon="google"
+                      onPress={() => promptAsync()}
+                      disabled={!request || signingIn}
+                      loading={signingIn}
+                      style={styles.authButton}
+                      contentStyle={styles.authButtonContent}
+                    >
+                      Sign in with Google
+                    </Button>
+
+                    <Button
+                      mode="outlined"
+                      icon="incognito"
+                      onPress={handleAnonymousSignIn}
+                      disabled={signingIn}
+                      style={styles.authButton}
+                      contentStyle={styles.authButtonContent}
+                    >
+                      Sign in Anonymously
+                    </Button>
                   </>
                 )}
-                {syncStatus === 'synced' && (
-                  <>
-                    <Ionicons name="checkmark-circle" size={16} color="#4CAF50" style={styles.syncIcon} />
-                    <Text style={[styles.syncValue, { color: colors.text }]}>Synced</Text>
-                  </>
-                )}
-                {syncStatus === 'error' && (
-                  <>
-                    <Ionicons name="alert-circle" size={16} color="#f44336" style={styles.syncIcon} />
-                    <Text style={[styles.syncValue, { color: colors.text }]}>Error</Text>
-                  </>
-                )}
-                {syncStatus === 'idle' && <Text style={[styles.syncValue, { color: colors.text }]}>Idle</Text>}
-              </View>
-            </View>
-
-            {pendingCount > 0 && (
-              <View style={styles.syncRow}>
-                <Text style={[styles.syncLabel, { color: colors.textMuted }]}>
-                  Pending:
-                </Text>
-                <Text style={[styles.syncValue, { color: colors.text }]}>
-                  {pendingCount} items
-                </Text>
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: colors.primary }]}
-            onPress={handleManualSync}
-            disabled={syncStatus === 'syncing'}
-          >
-            {syncStatus === 'syncing' ? (
-              <ActivityIndicator color="#fff" />
+              </Surface>
             ) : (
-              <Text style={styles.buttonText}>Sync Now</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
+              <Surface elevation={1} style={styles.sectionCard}>
+                <Card mode="contained" style={{ backgroundColor: 'transparent' }}>
+                  <Card.Title
+                    title={user.email || 'Anonymous User'}
+                    subtitle={user.displayName || undefined}
+                    titleVariant="titleMedium"
+                    left={(props) => (
+                      <Avatar.Text
+                        {...props}
+                        label={(user.email?.[0] || 'A').toUpperCase()}
+                        style={{ backgroundColor: theme.colors.primary }}
+                        color={theme.colors.onPrimary}
+                      />
+                    )}
+                  />
+                </Card>
 
-      <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>About</Text>
-        <View style={[styles.infoBox, { backgroundColor: colors.card }]}>
-          <Text style={[styles.infoLabel, { color: colors.textMuted }]}>
-            Generator Tracker
-          </Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>Version 1.6.2</Text>
-        </View>
-      </View>
+                <Button
+                  mode="contained"
+                  buttonColor={theme.colors.error}
+                  textColor={theme.colors.onError}
+                  icon="logout"
+                  onPress={handleSignOut}
+                  style={styles.authButton}
+                  contentStyle={styles.authButtonContent}
+                >
+                  Sign Out
+                </Button>
+              </Surface>
+            )}
+          </List.Section>
+        </Animated.View>
+
+        {user && (
+          <Animated.View entering={FadeInDown.delay(100).springify()}>
+            <List.Section>
+              <List.Subheader style={styles.sectionTitle}>Sync</List.Subheader>
+              <Surface elevation={1} style={styles.sectionCard}>
+                <List.Item
+                  title="Status"
+                  description={getSyncText()}
+                  left={(props) => (
+                    <List.Icon {...props} icon={getSyncIcon()} color={getSyncColor()} />
+                  )}
+                />
+                {pendingCount > 0 && (
+                  <List.Item
+                    title="Pending changes"
+                    description={`${pendingCount} items waiting to sync`}
+                    left={(props) => <List.Icon {...props} icon="cloud-upload" />}
+                    right={() => (
+                      <Badge style={{ backgroundColor: theme.colors.primary, alignSelf: 'center' }}>
+                        {pendingCount}
+                      </Badge>
+                    )}
+                  />
+                )}
+                <Button
+                  mode="contained"
+                  icon="sync"
+                  onPress={handleManualSync}
+                  loading={syncStatus === 'syncing'}
+                  disabled={syncStatus === 'syncing'}
+                  style={{ marginTop: 8 }}
+                  contentStyle={styles.authButtonContent}
+                >
+                  Sync Now
+                </Button>
+              </Surface>
+            </List.Section>
+          </Animated.View>
+        )}
+
+        <Animated.View entering={FadeInDown.delay(200).springify()}>
+          <List.Section>
+            <List.Subheader style={styles.sectionTitle}>About</List.Subheader>
+            <Surface elevation={1} style={styles.sectionCard}>
+              <List.Item
+                title="Generator Tracker"
+                description="Version 2.0.0"
+                left={(props) => <List.Icon {...props} icon="information" />}
+              />
+            </Surface>
+          </List.Section>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -280,103 +300,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   content: {
     padding: 16,
-  },
-  section: {
-    marginBottom: 32,
+    paddingBottom: 100,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
-  infoText: {
-    fontSize: 14,
-    marginBottom: 16,
-    lineHeight: 20,
-  },
-  button: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-  },
-  dangerButton: {
-    backgroundColor: '#f44336',
-  },
-  buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
-  buttonTextSecondary: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  userInfo: {
+  sectionCard: {
+    borderRadius: 16,
     padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  userEmail: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  userName: {
-    fontSize: 14,
-  },
-  syncInfo: {
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-  },
-  syncRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  syncStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  syncIcon: {
-    marginRight: 6,
-    marginBottom: 8,
-  },
-  syncLabel: {
-    fontSize: 14,
-  },
-  syncValue: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  infoBox: {
-    padding: 16,
-    borderRadius: 12,
-  },
-  infoLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 16,
-    fontWeight: '600',
   },
   divider: {
     flexDirection: 'row',
@@ -385,11 +322,11 @@ const styles = StyleSheet.create({
   },
   dividerLine: {
     flex: 1,
-    height: 1,
   },
-  dividerText: {
-    paddingHorizontal: 12,
-    fontSize: 12,
-    fontWeight: '500',
+  authButton: {
+    marginTop: 8,
+  },
+  authButtonContent: {
+    paddingVertical: 4,
   },
 });
