@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
 import { BottomNavigation } from 'react-native-paper';
 import { CommonActions } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
@@ -8,11 +8,13 @@ import { useAppTheme } from '../theme/useAppTheme';
 
 export function PaperBottomTabBar({ navigation, state, descriptors, insets }: BottomTabBarProps) {
   const theme = useAppTheme();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <BlurView
       intensity={80}
-      tint="dark"
+      tint={isDark ? 'dark' : 'light'}
       style={[
         styles.blurContainer,
         {
