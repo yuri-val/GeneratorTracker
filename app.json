@@ -27,7 +27,8 @@
       },
       "package": "com.yurival.GeneratorTracker",
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "versionCode": 1002
     },
     "web": {
       "favicon": "./assets/favicon.png"
