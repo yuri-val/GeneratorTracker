@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-02-06
+
+### Added
+- **Multi-language Support** — Full app localization in English and Ukrainian.
+- **Language Switcher** — New language selection section in Settings with persistence.
+- **Native Date & Time Pickers** — Replaced manual text inputs with native system pickers for a smoother user experience.
+
+### Changed
+- **Localized Formatting** — Date and time displays now automatically adapt to the user's selected language and locale.
+- **Improved Forms** — Add Generator, Add Work Session, and Add Refill screens now use calendar and clock pickers.
+- **Real-time Duration Tracking** — Refined duration calculation in work sessions when picking times.
+
+### Technical
+- Integrated `i18next` and `react-i18next` for translation management.
+- Integrated `@react-native-community/datetimepicker` for native platform pickers.
+- Updated `storage.ts` to persist language preferences across sessions.
+
 ## [2.1.1] - 2026-02-06
 
 ### Changed

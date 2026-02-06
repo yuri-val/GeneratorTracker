@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
 import { Appbar, TextInput, HelperText } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator } from '../../models/types';
 import { saveGenerator, getGenerators } from '../../utils/storage';
-import { generateId } from '../../utils/calculations';
+import { generateId, formatDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 
 type AddGeneratorScreenProps = {
@@ -17,6 +19,7 @@ type AddGeneratorScreenProps = {
 
 export default function AddGeneratorScreen({ navigation, route }: AddGeneratorScreenProps) {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const { generatorId } = route.params || {};
   const isEdit = !!generatorId;
 
@@ -25,6 +28,14 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
   const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setPurchaseDate(selectedDate.toISOString().split('T')[0]);
+    }
+  };
 
   useEffect(() => {
     if (generatorId) {
@@ -44,7 +55,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
       }
     } catch (error) {
       console.error('Error loading generator:', error);
-      Alert.alert('Error', 'Failed to load generator');
+      Alert.alert(t('common.error'), t('generator.loadError'));
     }
   };
 
@@ -55,19 +66,22 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
     }
 
     try {
+      const now = new Date().toISOString();
       const generator: Generator = {
         id: isEdit && existingGenerator ? existingGenerator.id : generateId(),
         name: name.trim(),
         model: model.trim() || undefined,
         purchaseDate,
-        createdAt: isEdit && existingGenerator ? existingGenerator.createdAt : new Date().toISOString(),
+        createdAt: isEdit && existingGenerator ? existingGenerator.createdAt : now,
+        lastModified: now,
+        syncStatus: 'pending',
       };
 
       await saveGenerator(generator);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to save generator');
+      Alert.alert(t('common.error'), t('generator.saveError'));
       console.error(error);
     }
   };
@@ -77,7 +91,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
       <Appbar.Header elevated>
         <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
         <Appbar.Content
-          title={isEdit ? 'Edit Generator' : 'New Generator'}
+          title={isEdit ? t('generator.editTitle') : t('generator.addTitle')}
           titleStyle={styles.headerTitle}
         />
         <Appbar.Action icon="check" onPress={handleSave} />
@@ -86,40 +100,51 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
       <ScrollView contentContainerStyle={styles.content}>
         <TextInput
           mode="outlined"
-          label="Generator Name *"
+          label={t('generator.nameLabel')}
           value={name}
           onChangeText={setName}
-          placeholder="e.g., Honda EU2200i"
+          placeholder={t('generator.namePlaceholder')}
           left={<TextInput.Icon icon="engine" />}
           error={submitted && !name.trim()}
           style={styles.input}
         />
         <HelperText type="error" visible={submitted && !name.trim()}>
-          Name is required
+          {t('generator.nameRequired')}
         </HelperText>
 
         <TextInput
           mode="outlined"
-          label="Model (Optional)"
+          label={t('generator.modelLabel')}
           value={model}
           onChangeText={setModel}
-          placeholder="e.g., EU2200i Companion"
+          placeholder={t('generator.modelPlaceholder')}
           left={<TextInput.Icon icon="tag" />}
           style={styles.input}
         />
 
-        <TextInput
-          mode="outlined"
-          label="Purchase Date"
-          value={purchaseDate}
-          onChangeText={setPurchaseDate}
-          placeholder="YYYY-MM-DD"
-          left={<TextInput.Icon icon="calendar" />}
-          style={styles.input}
-        />
-        <HelperText type="info" visible>
-          Format: YYYY-MM-DD (e.g., 2024-01-15)
-        </HelperText>
+        <Pressable onPress={() => setShowDatePicker(true)}>
+          <View pointerEvents="none">
+            <TextInput
+              mode="outlined"
+              label={t('generator.purchaseDateLabel')}
+              value={formatDate(purchaseDate, i18n.language)}
+              placeholder="YYYY-MM-DD"
+              left={<TextInput.Icon icon="calendar" />}
+              style={styles.input}
+              editable={false}
+            />
+          </View>
+        </Pressable>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={new Date(purchaseDate)}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()}
+          />
+        )}
       </ScrollView>
     </View>
   );

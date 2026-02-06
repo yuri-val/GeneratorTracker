@@ -10,13 +10,16 @@ import {
   Badge,
   Avatar,
   Surface,
+  SegmentedButtons,
 } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
 import { EmailAuthForm } from '../../components/EmailAuthForm';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { saveLanguage } from '../../utils/storage';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -27,25 +30,31 @@ import {
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
   const { request, response, promptAsync } = useGoogleAuth();
 
+  const handleLanguageChange = async (newLang: string) => {
+    await i18n.changeLanguage(newLang);
+    await saveLanguage(newLang);
+  };
+
   useEffect(() => {
     if (response?.type === 'success') {
-      const { id_token, authentication } = response.params;
-      const idToken = id_token || authentication?.idToken;
+      const { id_token } = response.params;
+      const idToken = id_token || response.authentication?.idToken;
       if (idToken) {
         handleGoogleSignIn(idToken);
       } else {
         console.error('No ID token found in OAuth response:', response.params);
-        Alert.alert('Error', 'Failed to get authentication token from Google');
+        Alert.alert(t('common.error'), t('auth.failedToGetToken'));
       }
     } else if (response?.type === 'error') {
       console.error('OAuth error:', response.error);
-      Alert.alert('Error', response.error?.message || 'Authentication failed');
+      Alert.alert(t('common.error'), response.error?.message || t('auth.authFailed'));
     }
   }, [response]);
 
@@ -54,10 +63,10 @@ export default function SettingsScreen() {
       setSigningIn(true);
       await signInWithGoogleCredential(idToken);
       await performInitialSync();
-      Alert.alert('Success', 'Signed in successfully');
+      Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Google sign in error:', error);
-      Alert.alert('Error', error.message || 'Failed to sign in with Google');
+      Alert.alert(t('common.error'), error.message || t('auth.failedToSignInWithGoogle'));
     } finally {
       setSigningIn(false);
     }
@@ -68,10 +77,10 @@ export default function SettingsScreen() {
       setSigningIn(true);
       await signInAnonymouslyUser();
       await performInitialSync();
-      Alert.alert('Success', 'Signed in anonymously');
+      Alert.alert(t('common.success'), t('settings.signedInAnonymously'));
     } catch (error: any) {
       console.error('Anonymous sign in error:', error);
-      Alert.alert('Error', error.message || 'Failed to sign in anonymously');
+      Alert.alert(t('common.error'), error.message || t('auth.failedToSignInAnonymously'));
     } finally {
       setSigningIn(false);
     }
@@ -80,20 +89,20 @@ export default function SettingsScreen() {
   const handleSignOut = async () => {
     try {
       await signOut();
-      Alert.alert('Success', 'Signed out successfully');
+      Alert.alert(t('common.success'), t('settings.signedOutSuccess'));
     } catch (error: any) {
       console.error('Sign out error:', error);
-      Alert.alert('Error', error.message || 'Failed to sign out');
+      Alert.alert(t('common.error'), error.message || t('auth.failedToSignOut'));
     }
   };
 
   const handleManualSync = async () => {
     try {
       await performManualSync();
-      Alert.alert('Success', 'Sync completed');
+      Alert.alert(t('common.success'), t('settings.syncCompleted'));
     } catch (error: any) {
       console.error('Manual sync error:', error);
-      Alert.alert('Error', error.message || 'Sync failed');
+      Alert.alert(t('common.error'), error.message || t('settings.syncFailed'));
     }
   };
 
@@ -101,10 +110,10 @@ export default function SettingsScreen() {
     try {
       await signInWithEmail(email, password);
       await performInitialSync();
-      Alert.alert('Success', 'Signed in successfully');
+      Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Email sign in error:', error);
-      Alert.alert('Error', error.message || 'Failed to sign in');
+      Alert.alert(t('common.error'), error.message || t('auth.failedToSignIn'));
       throw error;
     }
   };
@@ -113,10 +122,10 @@ export default function SettingsScreen() {
     try {
       await signUpWithEmail(email, password);
       await performInitialSync();
-      Alert.alert('Success', 'Account created successfully');
+      Alert.alert(t('common.success'), t('settings.accountCreatedSuccess'));
     } catch (error: any) {
       console.error('Email sign up error:', error);
-      Alert.alert('Error', error.message || 'Failed to create account');
+      Alert.alert(t('common.error'), error.message || t('auth.failedToCreateAccount'));
       throw error;
     }
   };
@@ -141,28 +150,28 @@ export default function SettingsScreen() {
 
   const getSyncText = () => {
     switch (syncStatus) {
-      case 'syncing': return 'Syncing...';
-      case 'synced': return 'Synced';
-      case 'error': return 'Error';
-      default: return 'Idle';
+      case 'syncing': return t('settings.syncing');
+      case 'synced': return t('settings.synced');
+      case 'error': return t('settings.syncError');
+      default: return t('settings.idle');
     }
   };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
-        <Appbar.Content title="Settings" titleStyle={styles.headerTitle} />
+        <Appbar.Content title={t('settings.title')} titleStyle={styles.headerTitle} />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>Account</List.Subheader>
+            <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>
 
             {!user ? (
               <Surface elevation={1} style={styles.sectionCard}>
                 <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16 }}>
-                  Sign in to sync your data across devices
+                  {t('settings.syncDescription')}
                 </Text>
 
                 <EmailAuthForm
@@ -175,7 +184,7 @@ export default function SettingsScreen() {
                     <View style={styles.divider}>
                       <Divider style={styles.dividerLine} />
                       <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant, paddingHorizontal: 12 }}>
-                        OR
+                        {t('common.or')}
                       </Text>
                       <Divider style={styles.dividerLine} />
                     </View>
@@ -189,7 +198,7 @@ export default function SettingsScreen() {
                       style={styles.authButton}
                       contentStyle={styles.authButtonContent}
                     >
-                      Sign in with Google
+                      {t('settings.signInWithGoogle')}
                     </Button>
 
                     <Button
@@ -200,7 +209,7 @@ export default function SettingsScreen() {
                       style={styles.authButton}
                       contentStyle={styles.authButtonContent}
                     >
-                      Sign in Anonymously
+                      {t('settings.signInAnonymously')}
                     </Button>
                   </>
                 )}
@@ -209,7 +218,7 @@ export default function SettingsScreen() {
               <Surface elevation={1} style={styles.sectionCard}>
                 <Card mode="contained" style={{ backgroundColor: 'transparent' }}>
                   <Card.Title
-                    title={user.email || 'Anonymous User'}
+                    title={user.email || t('settings.anonymousUser')}
                     subtitle={user.displayName || undefined}
                     titleVariant="titleMedium"
                     left={(props) => (
@@ -232,7 +241,7 @@ export default function SettingsScreen() {
                   style={styles.authButton}
                   contentStyle={styles.authButtonContent}
                 >
-                  Sign Out
+                  {t('settings.signOut')}
                 </Button>
               </Surface>
             )}
@@ -242,10 +251,10 @@ export default function SettingsScreen() {
         {user && (
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <List.Section>
-              <List.Subheader style={styles.sectionTitle}>Sync</List.Subheader>
+              <List.Subheader style={styles.sectionTitle}>{t('settings.sync')}</List.Subheader>
               <Surface elevation={1} style={styles.sectionCard}>
                 <List.Item
-                  title="Status"
+                  title={t('settings.status')}
                   description={getSyncText()}
                   left={(props) => (
                     <List.Icon {...props} icon={getSyncIcon()} color={getSyncColor()} />
@@ -253,8 +262,8 @@ export default function SettingsScreen() {
                 />
                 {pendingCount > 0 && (
                   <List.Item
-                    title="Pending changes"
-                    description={`${pendingCount} items waiting to sync`}
+                    title={t('settings.pendingChanges')}
+                    description={t('settings.itemsWaitingSync', { count: pendingCount })}
                     left={(props) => <List.Icon {...props} icon="cloud-upload" />}
                     right={() => (
                       <Badge style={{ backgroundColor: theme.colors.primary, alignSelf: 'center' }}>
@@ -272,20 +281,36 @@ export default function SettingsScreen() {
                   style={{ marginTop: 8 }}
                   contentStyle={styles.authButtonContent}
                 >
-                  Sync Now
+                  {t('settings.syncNow')}
                 </Button>
               </Surface>
             </List.Section>
           </Animated.View>
         )}
 
+        <Animated.View entering={FadeInDown.delay(150).springify()}>
+          <List.Section>
+            <List.Subheader style={styles.sectionTitle}>{t('settings.language')}</List.Subheader>
+            <Surface elevation={1} style={styles.sectionCard}>
+              <SegmentedButtons
+                value={i18n.language.split('-')[0]}
+                onValueChange={handleLanguageChange}
+                buttons={[
+                  { value: 'en', label: t('settings.english') },
+                  { value: 'uk', label: t('settings.ukrainian') },
+                ]}
+              />
+            </Surface>
+          </List.Section>
+        </Animated.View>
+
         <Animated.View entering={FadeInDown.delay(200).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>About</List.Subheader>
+            <List.Subheader style={styles.sectionTitle}>{t('settings.about')}</List.Subheader>
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
                 title="Generator Tracker"
-                description="Version 2.1.1"
+                description={t('settings.version', { version: '2.2.0' })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
             </Surface>

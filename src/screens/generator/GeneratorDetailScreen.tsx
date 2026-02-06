@@ -6,6 +6,7 @@ import * as Haptics from 'expo-haptics';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator, WorkSession, Refill } from '../../models/types';
@@ -43,6 +44,7 @@ const Tab = createMaterialTopTabNavigator();
 
 export default function GeneratorDetailScreen({ navigation, route }: GeneratorDetailScreenProps) {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const { generatorId } = route.params;
 
   const [generator, setGenerator] = useState<Generator | null>(null);
@@ -96,20 +98,24 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
   const handleStartSession = async () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      const now = new Date().toISOString();
       const newSession: WorkSession = {
         id: generateId(),
         generatorId,
         date: getCurrentDate(),
         startTime: getCurrentTime(),
         hours: 0,
-        createdAt: new Date().toISOString(),
+        createdAt: now,
         isActive: true,
+        lastModified: now,
+        syncStatus: 'pending',
       };
       await saveWorkSession(newSession);
       setActiveSession(newSession);
       await loadData();
+      Alert.alert(t('common.success'), t('detail.sessionStarted'));
     } catch (error) {
-      Alert.alert('Error', 'Failed to start work session');
+      Alert.alert(t('common.error'), t('detail.failedToStartSession'));
       console.error(error);
     }
   };
@@ -125,12 +131,15 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         endTime,
         hours: Math.round(hours * 10) / 10,
         isActive: false,
+        lastModified: new Date().toISOString(),
+        syncStatus: 'pending',
       };
       await saveWorkSession(updatedSession);
       setActiveSession(null);
       await loadData();
+      Alert.alert(t('common.success'), t('detail.sessionStopped', { hours: updatedSession.hours.toFixed(1) }));
     } catch (error) {
-      Alert.alert('Error', 'Failed to stop work session');
+      Alert.alert(t('common.error'), t('detail.failedToStopSession'));
       console.error(error);
     }
   };
@@ -142,13 +151,18 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
   };
 
   const handleDeleteGenerator = async () => {
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = async () => {
     setShowDeleteDialog(false);
     try {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       await deleteGenerator(generatorId);
       navigation.goBack();
+      Alert.alert(t('common.success'), t('detail.generatorDeleted'));
     } catch (error) {
-      Alert.alert('Error', 'Failed to delete generator');
+      Alert.alert(t('common.error'), t('detail.failedToDeleteGenerator'));
     }
   };
 
@@ -157,11 +171,11 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <Appbar.Header>
           <Appbar.BackAction onPress={() => navigation.goBack()} />
-          <Appbar.Content title="Not Found" />
+          <Appbar.Content title={t('common.notFound')} />
         </Appbar.Header>
         <View style={styles.errorContainer}>
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
-            Generator not found
+            {t('detail.generatorNotFound')}
           </Text>
         </View>
       </View>
@@ -203,13 +217,13 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
           title={generator.name}
-          subtitle={generator.model || 'Tap to edit'}
+          subtitle={generator.model || t('detail.tapToEdit')}
           onPress={() => navigation.navigate('AddGenerator', { generatorId })}
         />
         <Appbar.Action
           icon="delete"
           iconColor={theme.colors.error}
-          onPress={() => setShowDeleteDialog(true)}
+          onPress={handleDeleteGenerator}
         />
       </Appbar.Header>
 
@@ -219,13 +233,13 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
             <GradientCard colors={[appColors.activeSession, appColors.activeSessionDark]}>
               <View style={styles.activeContent}>
                 <Text variant="titleMedium" style={styles.whiteText}>
-                  Session Running
+                  {t('detail.activeSession')}
                 </Text>
                 <Text variant="displaySmall" style={[styles.whiteText, { fontWeight: '700' }]}>
-                  {activeHours.toFixed(1)}h
+                  {activeHours.toFixed(1)}{t('common.hoursAbbr')}
                 </Text>
                 <Text variant="bodyMedium" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Started: {formatTime(activeSession.startTime)}
+                  {t('detail.startedAt')}: {formatTime(activeSession.startTime, i18n.language)}
                 </Text>
                 <View style={styles.activeButtons}>
                   <Button
@@ -235,7 +249,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
                     icon="stop"
                     onPress={handleStopSession}
                   >
-                    STOP
+                    {t('detail.stopSession')}
                   </Button>
                   <Button
                     mode="outlined"
@@ -243,7 +257,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
                     style={{ borderColor: '#fff' }}
                     onPress={handleOpenActiveSession}
                   >
-                    Edit
+                    {t('common.edit')}
                   </Button>
                 </View>
               </View>
@@ -258,7 +272,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
             contentStyle={styles.startButtonContent}
             labelStyle={styles.startButtonLabel}
           >
-            START SESSION
+            {t('detail.startSession')}
           </Button>
         )}
 
@@ -266,15 +280,15 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
           <Surface elevation={2} style={styles.statsCard}>
             <View style={styles.statsRow}>
               <StatBlock
-                value={`${stats.totalHours.toFixed(1)}h`}
-                label="Total Hours"
+                value={`${stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
+                label={t('home.totalHours')}
                 icon="clock-outline"
                 color={theme.colors.secondary}
               />
               <Divider style={styles.statDivider} />
               <StatBlock
                 value={stats.totalRefills.toString()}
-                label="Refills"
+                label={t('home.refills')}
                 icon="fuel"
                 color={theme.colors.primary}
               />
@@ -283,7 +297,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
               <>
                 <Divider style={{ marginVertical: 12 }} />
                 <Chip icon="chart-line" compact style={{ alignSelf: 'center' }}>
-                  Avg: {stats.averageFuelPerHour.toFixed(2)} L/hour
+                  {t('common.avg')}: {stats.averageFuelPerHour.toFixed(2)} {t('common.litersPerHour')}
                 </Chip>
               </>
             )}
@@ -311,24 +325,24 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
           name="Work Sessions"
           component={WorkSessionsTab}
           options={{
-            tabBarLabel: `Sessions (${workSessions.filter(s => !s.isActive).length})`,
+            tabBarLabel: `${t('detail.workSessions')} (${workSessions.filter(s => !s.isActive).length})`,
           }}
         />
         <Tab.Screen
           name="Refills"
           component={RefillsTab}
           options={{
-            tabBarLabel: `Refills (${refills.length})`,
+            tabBarLabel: `${t('detail.refills')} (${refills.length})`,
           }}
         />
       </Tab.Navigator>
 
       <DeleteConfirmDialog
         visible={showDeleteDialog}
-        title="Delete Generator"
-        message="Are you sure? This will delete all work sessions and refills for this generator."
+        title={t('detail.deleteGeneratorTitle')}
+        message={t('detail.deleteGeneratorConfirm')}
         onDismiss={() => setShowDeleteDialog(false)}
-        onConfirm={handleDeleteGenerator}
+        onConfirm={confirmDelete}
       />
     </View>
   );

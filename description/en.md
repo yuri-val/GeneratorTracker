@@ -68,14 +68,13 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.1.1
+### 🆕 What's New in Version 2.2.0
 
-- **Modern App Icon**: Fresh new look with energy-themed design
-- **UI Polishing**: Improved layout on small screens
-- **Material Design 3**: Complete UI rewrite with React Native Paper
-- **Interactive Charts**: Bar charts, pie charts for analytics and data visualization
-- **Visual Enhancements**: Spring-based animations, haptic feedback, and glassmorphism effects
-- **Enhanced Analytics**: Overview stats grid + interactive charts with monthly trends
+- **Multi-language Support**: Full application localization in English and Ukrainian.
+- **Language Switcher**: Manually switch app language in settings with persistence.
+- **Native Date & Time Pickers**: Calendar and clock pickers for easier and faster date entry.
+- **Localized Formatting**: Dates and times now automatically adapt to your chosen locale and language.
+- **Improved Forms**: Redesigned Add Generator, Add Work Session, and Add Refill screens for better UX.
 
 ### 📱 Technical Excellence
 

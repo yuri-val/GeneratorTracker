@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Platform, Pressable } from 'react-native';
 import { Appbar, TextInput, HelperText, Button, Surface, Text, Banner, Chip } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { WorkSession } from '../../models/types';
 import { saveWorkSession, getWorkSessions, deleteWorkSession } from '../../utils/storage';
-import { generateId, calculateHours, getCurrentTime } from '../../utils/calculations';
+import { generateId, calculateHours, getCurrentTime, formatDate, formatTime } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
@@ -18,6 +20,7 @@ type AddWorkSessionScreenProps = {
 
 export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessionScreenProps) {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const { generatorId, sessionId } = route.params;
 
   const [existingSession, setExistingSession] = useState<WorkSession | null>(null);
@@ -27,6 +30,39 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const [notes, setNotes] = useState('');
   const [keepActive, setKeepActive] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDate(selectedDate.toISOString().split('T')[0]);
+    }
+  };
+
+  const onStartTimeChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
+    setShowStartTimePicker(Platform.OS === 'ios');
+    if (selectedTime) {
+      const hours = selectedTime.getHours().toString().padStart(2, '0');
+      const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+      setStartTime(`${hours}:${minutes}`);
+    }
+  };
+
+  const onEndTimeChange = (event: DateTimePickerEvent, selectedTime?: Date) => {
+    setShowEndTimePicker(Platform.OS === 'ios');
+    if (selectedTime) {
+      const hours = selectedTime.getHours().toString().padStart(2, '0');
+      const minutes = selectedTime.getMinutes().toString().padStart(2, '0');
+      const timeStr = `${hours}:${minutes}`;
+      setEndTime(timeStr);
+      if (isActiveSession) {
+        setKeepActive(!timeStr.trim());
+      }
+    }
+  };
 
   useEffect(() => {
     if (sessionId) {
@@ -64,21 +100,23 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         navigation.goBack();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to delete work session');
+      Alert.alert(t('common.error'), t('workSession.deleteError'));
       console.error(error);
     }
   };
 
   const handleSave = async () => {
     if (!date.trim()) {
-      Alert.alert('Error', 'Please enter a date');
+      Alert.alert(t('common.error'), t('workSession.dateRequired'));
       return;
     }
 
     if (!startTime.trim()) {
-      Alert.alert('Error', 'Please enter a start time');
+      Alert.alert(t('common.error'), t('workSession.startTimeRequired'));
       return;
     }
+
+    const now = new Date().toISOString();
 
     if (isActiveSession && keepActive) {
       try {
@@ -89,26 +127,28 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
           startTime,
           hours: 0,
           notes: notes.trim() || undefined,
-          createdAt: existingSession?.createdAt || new Date().toISOString(),
+          createdAt: existingSession?.createdAt || now,
           isActive: true,
+          lastModified: now,
+          syncStatus: 'pending',
         };
         await saveWorkSession(session);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         navigation.goBack();
       } catch (error) {
-        Alert.alert('Error', 'Failed to save work session');
+        Alert.alert(t('common.error'), t('workSession.saveError'));
         console.error(error);
       }
       return;
     }
 
     if (!endTime.trim()) {
-      Alert.alert('Error', 'Please enter an end time');
+      Alert.alert(t('common.error'), t('workSession.endTimeRequired'));
       return;
     }
 
     if (hours <= 0) {
-      Alert.alert('Error', 'End time must be after start time');
+      Alert.alert(t('common.error'), t('workSession.timeRangeError'));
       return;
     }
 
@@ -121,21 +161,23 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         endTime,
         hours,
         notes: notes.trim() || undefined,
-        createdAt: existingSession?.createdAt || new Date().toISOString(),
+        createdAt: existingSession?.createdAt || now,
         isActive: false,
+        lastModified: now,
+        syncStatus: 'pending',
       };
       await saveWorkSession(session);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to save work session');
+      Alert.alert(t('common.error'), t('workSession.saveError'));
       console.error(error);
     }
   };
 
   const title = isEditing
-    ? (isActiveSession ? 'Edit Active Session' : 'Edit Work Session')
-    : 'Add Work Session';
+    ? (isActiveSession ? t('workSession.editActiveTitle') : t('workSession.editTitle'))
+    : t('workSession.addTitle');
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -152,64 +194,100 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
           actions={[]}
           style={{ backgroundColor: theme.colors.tertiaryContainer }}
         >
-          Editing active session. Modify start time/date to keep running, or set an end time to complete it.
+          {t('workSession.editActiveBanner')}
         </Banner>
       )}
 
       <ScrollView contentContainerStyle={styles.content}>
-        <TextInput
-          mode="outlined"
-          label="Date *"
-          value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          left={<TextInput.Icon icon="calendar" />}
-          style={styles.input}
-        />
-        <HelperText type="info" visible>
-          Format: YYYY-MM-DD (e.g., 2024-01-15)
-        </HelperText>
+        <Pressable onPress={() => setShowDatePicker(true)}>
+          <View pointerEvents="none">
+            <TextInput
+              mode="outlined"
+              label={t('workSession.dateLabel')}
+              value={formatDate(date, i18n.language)}
+              placeholder="YYYY-MM-DD"
+              left={<TextInput.Icon icon="calendar" />}
+              style={styles.input}
+              editable={false}
+            />
+          </View>
+        </Pressable>
 
-        <TextInput
-          mode="outlined"
-          label="Start Time *"
-          value={startTime}
-          onChangeText={setStartTime}
-          placeholder="HH:MM"
-          left={<TextInput.Icon icon="clock-start" />}
-          style={styles.input}
-        />
-        <HelperText type="info" visible>
-          Format: HH:MM (e.g., 09:30)
-        </HelperText>
+        <View style={styles.timeRow}>
+          <Pressable style={styles.timeInput} onPress={() => setShowStartTimePicker(true)}>
+            <View pointerEvents="none">
+              <TextInput
+                mode="outlined"
+                label={t('workSession.startTimeLabel')}
+                value={formatTime(startTime, i18n.language)}
+                placeholder="HH:MM"
+                left={<TextInput.Icon icon="clock-start" />}
+                editable={false}
+              />
+            </View>
+          </Pressable>
 
-        <TextInput
-          mode="outlined"
-          label={isActiveSession ? 'End Time (Optional)' : 'End Time *'}
-          value={endTime}
-          onChangeText={(text) => {
-            setEndTime(text);
-            if (isActiveSession) {
-              setKeepActive(!text.trim());
-            }
-          }}
-          placeholder={isActiveSession ? 'Leave empty to keep running' : 'HH:MM'}
-          left={<TextInput.Icon icon="clock-end" />}
-          style={styles.input}
-        />
-        <HelperText type="info" visible>
-          {isActiveSession
-            ? 'Clear this field to save without completing the session'
-            : 'Format: HH:MM (e.g., 17:30)'}
-        </HelperText>
+          <Pressable style={styles.timeInput} onPress={() => setShowEndTimePicker(true)}>
+            <View pointerEvents="none">
+              <TextInput
+                mode="outlined"
+                label={isActiveSession ? t('workSession.endTimeOptionalLabel') : t('workSession.endTimeLabel')}
+                value={endTime ? formatTime(endTime, i18n.language) : ''}
+                placeholder={isActiveSession ? t('workSession.endTimePlaceholderActive') : 'HH:MM'}
+                left={<TextInput.Icon icon="clock-end" />}
+                editable={false}
+              />
+            </View>
+          </Pressable>
+        </View>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={new Date(date)}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()}
+          />
+        )}
+
+        {showStartTimePicker && (
+          <DateTimePicker
+            value={(() => {
+              const [h, m] = startTime.split(':').map(Number);
+              const d = new Date();
+              d.setHours(h, m, 0, 0);
+              return d;
+            })()}
+            mode="time"
+            is24Hour={true}
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onStartTimeChange}
+          />
+        )}
+
+        {showEndTimePicker && (
+          <DateTimePicker
+            value={(() => {
+              const [h, m] = (endTime || '12:00').split(':').map(Number);
+              const d = new Date();
+              d.setHours(h, m, 0, 0);
+              return d;
+            })()}
+            mode="time"
+            is24Hour={true}
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onEndTimeChange}
+          />
+        )}
 
         {endTime.trim() && (
           <Surface elevation={1} style={styles.durationCard}>
             <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-              Duration
+              {t('workSession.durationLabel')}
             </Text>
             <Text variant="headlineMedium" style={{ color: theme.colors.primary, fontWeight: '700' }}>
-              {hours > 0 ? `${hours.toFixed(1)} hours` : 'Invalid time range'}
+              {hours > 0 ? `${hours.toFixed(1)} ${t('common.hours')}` : t('workSession.invalidTimeRange')}
             </Text>
           </Surface>
         )}
@@ -220,16 +298,16 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
             style={[styles.activeChip, { backgroundColor: theme.colors.tertiaryContainer }]}
             textStyle={{ color: theme.colors.onTertiaryContainer }}
           >
-            Session will remain active
+            {t('workSession.sessionWillRemainActive')}
           </Chip>
         )}
 
         <TextInput
           mode="outlined"
-          label="Notes (Optional)"
+          label={t('workSession.notesLabel')}
           value={notes}
           onChangeText={setNotes}
-          placeholder="Add notes about this session..."
+          placeholder={t('workSession.notesPlaceholder')}
           left={<TextInput.Icon icon="note-text" />}
           multiline
           numberOfLines={4}
@@ -246,15 +324,15 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
             style={styles.deleteButton}
             contentStyle={styles.deleteButtonContent}
           >
-            Delete Work Session
+            {t('workSession.deleteButton')}
           </Button>
         )}
       </ScrollView>
 
       <DeleteConfirmDialog
         visible={showDeleteDialog}
-        title="Delete Work Session"
-        message="Are you sure you want to delete this work session? This cannot be undone."
+        title={t('workSession.deleteTitle')}
+        message={t('workSession.deleteConfirm')}
         onDismiss={() => setShowDeleteDialog(false)}
         onConfirm={handleDelete}
       />
@@ -275,6 +353,14 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 4,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 4,
+  },
+  timeInput: {
+    flex: 1,
   },
   durationCard: {
     borderRadius: 16,

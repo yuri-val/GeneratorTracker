@@ -15,15 +15,15 @@ interface PieDataPoint {
   label?: string;
 }
 
-function getMonthLabel(dateStr: string): string {
+function getMonthLabel(dateStr: string, locale: string = 'en-US'): string {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', { month: 'short' });
+  return date.toLocaleDateString(locale, { month: 'short' });
 }
 
-function getWeekLabel(dateStr: string): string {
+function getWeekLabel(dateStr: string, locale: string = 'en-US'): string {
   const date = new Date(dateStr);
   const day = date.getDate();
-  const month = date.toLocaleDateString('en-US', { month: 'short' });
+  const month = date.toLocaleDateString(locale, { month: 'short' });
   return `${month} ${day}`;
 }
 
@@ -41,6 +41,7 @@ function groupByMonth(dates: string[]): Map<string, string[]> {
 export function getHoursOverTime(
   sessions: WorkSession[],
   color: string = '#FF6B35',
+  locale: string = 'en-US',
 ): ChartDataPoint[] {
   if (sessions.length === 0) return [];
 
@@ -48,17 +49,24 @@ export function getHoursOverTime(
   const monthGroups = groupByMonth(completed.map(s => s.date));
 
   const sortedKeys = Array.from(monthGroups.keys()).sort();
+  // Ensure we show at least the last few months even if empty?
+  // For now stick to existing logic
+
+  // Limiting to last 6 months present in data
   const last6 = sortedKeys.slice(-6);
 
   return last6.map(key => {
     const dates = monthGroups.get(key) || [];
+    // We need to sum hours for all sessions in this month
+    // The previous implementation was slightly incorrect in filtering again
+    // reducing map lookup. Let's stick to previous logical flow but fix filter key
     const totalHours = completed
       .filter(s => s.date.startsWith(key))
       .reduce((sum, s) => sum + s.hours, 0);
 
     return {
       value: Math.round(totalHours * 10) / 10,
-      label: getMonthLabel(key + '-01'),
+      label: getMonthLabel(key + '-01', locale),
       frontColor: color,
     };
   });
@@ -67,6 +75,7 @@ export function getHoursOverTime(
 export function getFuelOverTime(
   refills: Refill[],
   color: string = '#FF6B35',
+  locale: string = 'en-US',
 ): ChartDataPoint[] {
   if (refills.length === 0) return [];
 
@@ -81,7 +90,7 @@ export function getFuelOverTime(
 
     return {
       value: Math.round(totalFuel * 10) / 10,
-      label: getMonthLabel(key + '-01'),
+      label: getMonthLabel(key + '-01', locale),
       frontColor: color,
     };
   });
@@ -105,6 +114,7 @@ export function getGeneratorComparison(
 export function getFuelDistribution(
   generators: Array<Generator & { stats: GeneratorStats }>,
   refills: Refill[],
+  unit: string = 'L'
 ): PieDataPoint[] {
   const pieColors = ['#FF6B35', '#0a7ea4', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6'];
 
@@ -115,7 +125,7 @@ export function getFuelDistribution(
       return {
         value: Math.round(totalFuel * 10) / 10,
         color: pieColors[i % pieColors.length],
-        text: `${Math.round(totalFuel)}L`,
+        text: `${Math.round(totalFuel)}${unit}`,
         label: g.name,
       };
     })

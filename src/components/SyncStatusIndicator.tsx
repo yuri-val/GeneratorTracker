@@ -2,12 +2,14 @@ import React from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Text, Badge } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { useSync } from '../hooks/useSync';
 import { useAppTheme } from '../theme/useAppTheme';
 
 export const SyncStatusIndicator: React.FC = () => {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { syncStatus, pendingCount } = useSync();
 
@@ -22,7 +24,7 @@ export const SyncStatusIndicator: React.FC = () => {
           <>
             <ActivityIndicator size="small" color={theme.colors.primary} />
             <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
-              Syncing...
+              {t('settings.syncStatusSyncing')}
             </Text>
           </>
         );
@@ -31,7 +33,7 @@ export const SyncStatusIndicator: React.FC = () => {
           <>
             <MaterialCommunityIcons name="check-circle" size={16} color={theme.colors.tertiary} />
             <Text variant="labelSmall" style={{ color: theme.colors.tertiary }}>
-              Synced
+              {t('settings.syncStatusSynced')}
             </Text>
           </>
         );
@@ -40,7 +42,7 @@ export const SyncStatusIndicator: React.FC = () => {
           <>
             <MaterialCommunityIcons name="alert-circle" size={16} color={theme.colors.error} />
             <Text variant="labelSmall" style={{ color: theme.colors.error }}>
-              Sync error
+              {t('settings.syncStatusError')}
             </Text>
           </>
         );

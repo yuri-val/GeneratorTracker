@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { Card, Text, Button, Icon } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { WorkSession } from '../models/types';
 import { formatDate, formatTime } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
@@ -21,6 +22,7 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
   onAddPress,
 }) => {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
 
   const renderItem = ({ item }: { item: WorkSession }) => (
     <Card
@@ -29,13 +31,13 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       style={styles.card}
     >
       <Card.Title
-        title={formatDate(item.date)}
-        subtitle={`${formatTime(item.startTime)} - ${item.endTime ? formatTime(item.endTime) : 'In Progress'}`}
+        title={formatDate(item.date, i18n.language)}
+        subtitle={`${formatTime(item.startTime, i18n.language)} - ${item.endTime ? formatTime(item.endTime, i18n.language) : t('workSession.inProgress')}`}
         titleVariant="titleSmall"
         left={(props) => <Icon {...props} source="clock-outline" size={24} color={theme.colors.secondary} />}
         right={() => (
           <Text variant="titleLarge" style={[styles.hoursValue, { color: theme.colors.primary }]}>
-            {item.hours.toFixed(1)}h
+            {item.hours.toFixed(1)}{t('common.hoursAbbr')}
           </Text>
         )}
       />
@@ -67,14 +69,14 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
           style={styles.addButton}
           contentStyle={styles.addButtonContent}
         >
-          Add Work Session
+          {t('workSession.addButton')}
         </Button>
       }
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
           <Icon source="clock-off" size={48} color={theme.colors.onSurfaceVariant} />
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 12 }}>
-            No work sessions yet
+            {t('workSession.emptyState')}
           </Text>
         </View>
       }

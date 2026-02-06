@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Appbar, Card, FAB, Text, Avatar, Chip, Divider, Icon } from 'react-native-paper';
 import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -21,6 +22,7 @@ type GeneratorWithStats = Generator & { stats: GeneratorStats };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -81,15 +83,15 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         <Card.Content>
           <View style={styles.statsRow}>
             <StatBlock
-              value={`${item.stats.totalHours.toFixed(1)}h`}
-              label="Total Hours"
+              value={`${item.stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
+              label={t('home.totalHours')}
               icon="clock-outline"
               color={theme.colors.secondary}
             />
             <Divider style={styles.statDivider} />
             <StatBlock
               value={item.stats.totalRefills.toString()}
-              label="Refills"
+              label={t('home.refills')}
               icon="fuel"
               color={theme.colors.primary}
             />
@@ -98,7 +100,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         {item.stats.lastWorkSessionDate && (
           <Card.Actions>
             <Chip icon="clock-outline" compact textStyle={{ fontSize: 12 }}>
-              Last: {formatDate(item.stats.lastWorkSessionDate)}
+              {t('common.last')}: {formatDate(item.stats.lastWorkSessionDate, i18n.language)}
             </Chip>
           </Card.Actions>
         )}
@@ -109,7 +111,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
-        <Appbar.Content title="Generator Tracker" titleStyle={styles.headerTitle} />
+        <Appbar.Content title={t('home.title')} titleStyle={styles.headerTitle} />
         <SyncStatusIndicator />
       </Appbar.Header>
 
@@ -125,10 +127,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <View style={styles.emptyContainer}>
             <Icon source="engine-off-outline" size={80} color={theme.colors.onSurfaceVariant} />
             <Text variant="titleMedium" style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
-              No generators yet
+              {t('home.noGenerators')}
             </Text>
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
-              Tap the + button to add your first generator
+              {t('home.addFirstGenerator')}
             </Text>
           </View>
         }

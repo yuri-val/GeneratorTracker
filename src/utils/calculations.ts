@@ -44,20 +44,25 @@ export const calculateGeneratorStats = (
   };
 };
 
-export const formatDate = (dateString: string): string => {
+export const formatDate = (dateString: string, locale: string = 'en-US'): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   });
 };
 
-export const formatTime = (timeString: string): string => {
+export const formatTime = (timeString: string, locale: string = 'en-US'): string => {
   const [hour, minute] = timeString.split(':').map(Number);
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour % 12 || 12;
-  return `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`;
+  const date = new Date();
+  date.setHours(hour, minute, 0, 0);
+
+  return date.toLocaleTimeString(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: locale.startsWith('en'),
+  });
 };
 
 export const generateId = (): string => {

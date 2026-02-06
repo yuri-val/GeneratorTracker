@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
 import { Appbar, TextInput, HelperText, Button } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Refill } from '../../models/types';
 import { saveRefill, getRefills, deleteRefill } from '../../utils/storage';
-import { generateId } from '../../utils/calculations';
+import { generateId, formatDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
@@ -18,6 +20,7 @@ type AddRefillScreenProps = {
 
 export default function AddRefillScreen({ navigation, route }: AddRefillScreenProps) {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
   const { generatorId, refillId } = route.params;
   const isEditing = !!refillId;
 
@@ -26,6 +29,14 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   const [notes, setNotes] = useState('');
   const [existingRefill, setExistingRefill] = useState<Refill | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    setShowDatePicker(Platform.OS === 'ios');
+    if (selectedDate) {
+      setDate(selectedDate.toISOString().split('T')[0]);
+    }
+  };
 
   useEffect(() => {
     if (refillId) {
@@ -45,7 +56,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
       }
     } catch (error) {
       console.error('Error loading refill:', error);
-      Alert.alert('Error', 'Failed to load refill');
+      Alert.alert(t('common.error'), t('refill.loadError'));
     }
   };
 
@@ -53,43 +64,46 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
     setShowDeleteDialog(false);
     try {
       if (refillId) {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         await deleteRefill(refillId);
         navigation.goBack();
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to delete refill');
+      Alert.alert(t('common.error'), t('refill.deleteError'));
       console.error(error);
     }
   };
 
   const handleSave = async () => {
     if (!date.trim()) {
-      Alert.alert('Error', 'Please enter a date');
+      Alert.alert(t('common.error'), t('refill.dateRequired'));
       return;
     }
 
     const amountNum = parseFloat(amount);
     if (!amount.trim() || isNaN(amountNum) || amountNum <= 0) {
-      Alert.alert('Error', 'Please enter a valid fuel amount');
+      Alert.alert(t('common.error'), t('refill.amountRequired'));
       return;
     }
 
     try {
+      const now = new Date().toISOString();
       const refill: Refill = {
         id: isEditing && existingRefill ? existingRefill.id : generateId(),
         generatorId,
         date,
         amount: amountNum,
         notes: notes.trim() || undefined,
-        createdAt: isEditing && existingRefill ? existingRefill.createdAt : new Date().toISOString(),
+        createdAt: isEditing && existingRefill ? existingRefill.createdAt : now,
+        lastModified: now,
+        syncStatus: 'pending',
       };
 
       await saveRefill(refill);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'Failed to save refill');
+      Alert.alert(t('common.error'), t('refill.saveError'));
       console.error(error);
     }
   };
@@ -99,44 +113,55 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
       <Appbar.Header elevated>
         <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
         <Appbar.Content
-          title={isEditing ? 'Edit Refill' : 'Add Refill'}
+          title={isEditing ? t('refill.editTitle') : t('refill.addTitle')}
           titleStyle={styles.headerTitle}
         />
         <Appbar.Action icon="check" onPress={handleSave} />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <TextInput
-          mode="outlined"
-          label="Date *"
-          value={date}
-          onChangeText={setDate}
-          placeholder="YYYY-MM-DD"
-          left={<TextInput.Icon icon="calendar" />}
-          style={styles.input}
-        />
-        <HelperText type="info" visible>
-          Format: YYYY-MM-DD (e.g., 2024-01-15)
-        </HelperText>
+        <Pressable onPress={() => setShowDatePicker(true)}>
+          <View pointerEvents="none">
+            <TextInput
+              mode="outlined"
+              label={t('workSession.dateLabel')}
+              value={formatDate(date, i18n.language)}
+              placeholder="YYYY-MM-DD"
+              left={<TextInput.Icon icon="calendar" />}
+              style={styles.input}
+              editable={false}
+            />
+          </View>
+        </Pressable>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={new Date(date)}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()}
+          />
+        )}
 
         <TextInput
           mode="outlined"
-          label="Fuel Amount *"
+          label={t('refill.amountLabel')}
           value={amount}
           onChangeText={setAmount}
-          placeholder="e.g., 5.5"
+          placeholder={t('refill.amountPlaceholder')}
           keyboardType="decimal-pad"
           left={<TextInput.Icon icon="fuel" />}
-          right={<TextInput.Affix text="L" />}
+          right={<TextInput.Affix text={t('common.litersAbbr')} />}
           style={styles.input}
         />
 
         <TextInput
           mode="outlined"
-          label="Notes (Optional)"
+          label={t('workSession.notesLabel')}
           value={notes}
           onChangeText={setNotes}
-          placeholder="Add notes about this refill..."
+          placeholder={t('refill.notesPlaceholder')}
           left={<TextInput.Icon icon="note-text" />}
           multiline
           numberOfLines={4}
@@ -153,15 +178,15 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
             style={styles.deleteButton}
             contentStyle={styles.deleteButtonContent}
           >
-            Delete Refill
+            {t('refill.deleteButton')}
           </Button>
         )}
       </ScrollView>
 
       <DeleteConfirmDialog
         visible={showDeleteDialog}
-        title="Delete Refill"
-        message="Are you sure you want to delete this refill? This cannot be undone."
+        title={t('refill.deleteTitle')}
+        message={t('refill.deleteConfirm')}
         onDismiss={() => setShowDeleteDialog(false)}
         onConfirm={handleDelete}
       />

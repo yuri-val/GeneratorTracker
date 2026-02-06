@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { Card, Text, Button, Icon } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { Refill } from '../models/types';
 import { formatDate } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
@@ -21,6 +22,7 @@ export const RefillsList: React.FC<RefillsListProps> = ({
   onAddPress,
 }) => {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
 
   const renderItem = ({ item }: { item: Refill }) => (
     <Card
@@ -29,13 +31,13 @@ export const RefillsList: React.FC<RefillsListProps> = ({
       style={styles.card}
     >
       <Card.Title
-        title={formatDate(item.date)}
+        title={formatDate(item.date, i18n.language)}
         subtitle={item.notes || undefined}
         titleVariant="titleSmall"
         left={(props) => <Icon {...props} source="fuel" size={24} color={theme.colors.primary} />}
         right={() => (
           <Text variant="titleLarge" style={[styles.amountValue, { color: theme.colors.primary }]}>
-            {item.amount}L
+            {item.amount}{t('common.litersAbbr')}
           </Text>
         )}
       />
@@ -60,14 +62,14 @@ export const RefillsList: React.FC<RefillsListProps> = ({
           style={styles.addButton}
           contentStyle={styles.addButtonContent}
         >
-          Add Refill
+          {t('refill.addButton')}
         </Button>
       }
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
           <Icon source="fuel-off" size={48} color={theme.colors.onSurfaceVariant} />
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 12 }}>
-            No refills yet
+            {t('refill.emptyState')}
           </Text>
         </View>
       }

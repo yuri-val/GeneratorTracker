@@ -6,6 +6,25 @@ import { getCurrentUser } from '../services/auth';
 const GENERATORS_KEY = '@generators';
 const WORK_SESSIONS_KEY = '@work_sessions';
 const REFILLS_KEY = '@refills';
+const LANGUAGE_KEY = '@app_language';
+
+// Language storage
+export const getSavedLanguage = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(LANGUAGE_KEY);
+  } catch (error) {
+    console.error('Error getting language:', error);
+    return null;
+  }
+};
+
+export const saveLanguage = async (language: string): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(LANGUAGE_KEY, language);
+  } catch (error) {
+    console.error('Error saving language:', error);
+  }
+};
 
 // Generator CRUD
 export const getGenerators = async (): Promise<Generator[]> => {

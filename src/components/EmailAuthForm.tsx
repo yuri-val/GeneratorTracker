@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '../theme/useAppTheme';
 
 interface EmailAuthFormProps {
@@ -10,6 +11,7 @@ interface EmailAuthFormProps {
 
 export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp }) => {
   const theme = useAppTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,12 +20,12 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
 
   const handleSubmit = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please enter both email and password');
+      Alert.alert(t('common.error'), t('auth.bothEmailPasswordRequired'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+      Alert.alert(t('common.error'), t('auth.passwordTooShort'));
       return;
     }
 
@@ -46,12 +48,12 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
   return (
     <View style={styles.container}>
       <Text variant="titleMedium" style={{ marginBottom: 12 }}>
-        {isSignUp ? 'Create Account' : 'Sign In with Email'}
+        {isSignUp ? t('auth.createAccount') : t('auth.signInEmail')}
       </Text>
 
       <TextInput
         mode="outlined"
-        label="Email"
+        label={t('auth.email')}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -64,7 +66,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
 
       <TextInput
         mode="outlined"
-        label="Password"
+        label={t('auth.password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry={!showPassword}
@@ -89,7 +91,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
         style={styles.submitButton}
         contentStyle={styles.submitButtonContent}
       >
-        {isSignUp ? 'Create Account' : 'Sign In'}
+        {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
       </Button>
 
       <Button
@@ -97,7 +99,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
         onPress={() => setIsSignUp(!isSignUp)}
         disabled={loading}
       >
-        {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+        {isSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
       </Button>
     </View>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useColorScheme } from 'react-native';
 import { PaperProvider, adaptNavigationTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 import HomeScreen from './src/screens/home/HomeScreen';
 import AnalyticsScreen from './src/screens/analytics/AnalyticsScreen';
@@ -17,6 +18,8 @@ import AddRefillScreen from './src/screens/generator/AddRefillScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { darkTheme, lightTheme } from './src/theme';
 import { PaperBottomTabBar } from './src/components/PaperBottomTabBar';
+import { getSavedLanguage } from './src/utils/storage';
+import i18n from './src/i18n';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -29,6 +32,7 @@ const { DarkTheme: NavDark, LightTheme: NavLight } = adaptNavigationTheme({
 });
 
 function MainTabs() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       tabBar={(props) => <PaperBottomTabBar {...props} />}
@@ -41,7 +45,7 @@ function MainTabs() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: t('tabs.home'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="flash" size={size} color={color} />
           ),
@@ -51,7 +55,7 @@ function MainTabs() {
         name="Analytics"
         component={AnalyticsScreen}
         options={{
-          tabBarLabel: 'Analytics',
+          tabBarLabel: t('tabs.analytics'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="chart-bar" size={size} color={color} />
           ),
@@ -61,7 +65,7 @@ function MainTabs() {
         name="Settings"
         component={SettingsScreen}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: t('tabs.settings'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cog" size={size} color={color} />
           ),
@@ -76,6 +80,16 @@ export default function App() {
   const isDark = colorScheme === 'dark';
   const paperTheme = isDark ? darkTheme : lightTheme;
   const navTheme = isDark ? NavDark : NavLight;
+
+  useEffect(() => {
+    const loadLanguage = async () => {
+      const savedLanguage = await getSavedLanguage();
+      if (savedLanguage && savedLanguage !== i18n.language) {
+        i18n.changeLanguage(savedLanguage);
+      }
+    };
+    loadLanguage();
+  }, []);
 
   return (
     <AuthProvider>

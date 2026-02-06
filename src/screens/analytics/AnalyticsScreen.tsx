@@ -4,6 +4,7 @@ import { Appbar, Surface, Text, SegmentedButtons, Icon } from 'react-native-pape
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { BarChart, LineChart, PieChart } from 'react-native-gifted-charts';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { Generator, WorkSession, Refill, GeneratorStats } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
 import { calculateGeneratorStats } from '../../utils/calculations';
@@ -21,6 +22,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function AnalyticsScreen() {
   const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
 
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
   const [workSessions, setWorkSessions] = useState<WorkSession[]>([]);
@@ -72,20 +74,20 @@ export default function AnalyticsScreen() {
   const avgHours = totalGenerators > 0 ? Math.round((totalHours / totalGenerators) * 10) / 10 : 0;
 
   const hoursChartData = useMemo(
-    () => getHoursOverTime(workSessions, theme.colors.primary),
-    [workSessions]
+    () => getHoursOverTime(workSessions, theme.colors.primary, i18n.language),
+    [workSessions, i18n.language]
   );
   const fuelChartData = useMemo(
-    () => getFuelOverTime(refillsList, theme.colors.primary),
-    [refillsList]
+    () => getFuelOverTime(refillsList, theme.colors.primary, i18n.language),
+    [refillsList, i18n.language]
   );
   const comparisonData = useMemo(
     () => getGeneratorComparison(generators, theme.colors.primary),
     [generators]
   );
   const pieData = useMemo(
-    () => getFuelDistribution(generators, refillsList),
-    [generators, refillsList]
+    () => getFuelDistribution(generators, refillsList, t('common.litersAbbr')),
+    [generators, refillsList, t]
   );
 
   const chartWidth = screenWidth - 96;
@@ -100,7 +102,7 @@ export default function AnalyticsScreen() {
               {totalGenerators}
             </Text>
             <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-              GENERATORS
+              {t('analytics.generators')}
             </Text>
           </Surface>
         </Animated.View>
@@ -112,7 +114,7 @@ export default function AnalyticsScreen() {
               {totalHours.toFixed(1)}
             </Text>
             <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-              TOTAL HOURS
+              {t('analytics.totalHours')}
             </Text>
           </Surface>
         </Animated.View>
@@ -124,7 +126,7 @@ export default function AnalyticsScreen() {
               {totalFuel.toFixed(1)}
             </Text>
             <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-              LITERS USED
+              {t('analytics.litersUsed')}
             </Text>
           </Surface>
         </Animated.View>
@@ -136,7 +138,7 @@ export default function AnalyticsScreen() {
               {avgHours.toFixed(1)}
             </Text>
             <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
-              AVG HOURS/GEN
+              {t('analytics.avgHoursPerGen')}
             </Text>
           </Surface>
         </Animated.View>
@@ -146,10 +148,10 @@ export default function AnalyticsScreen() {
         <View style={styles.emptyContainer}>
           <Icon source="chart-box-outline" size={64} color={theme.colors.onSurfaceVariant} />
           <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
-            No data available yet
+            {t('analytics.noDataAvailable')}
           </Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
-            Add generators and log work sessions to see analytics
+            {t('analytics.addGeneratorsHint')}
           </Text>
         </View>
       )}
@@ -161,7 +163,7 @@ export default function AnalyticsScreen() {
       {hoursChartData.length > 0 && (
         <Animated.View entering={FadeInUp.delay(0).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
-            <Text variant="titleMedium" style={styles.chartTitle}>Operating Hours</Text>
+            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.operatingHours')}</Text>
             <BarChart
               data={hoursChartData}
               barWidth={24}
@@ -185,7 +187,7 @@ export default function AnalyticsScreen() {
       {fuelChartData.length > 0 && (
         <Animated.View entering={FadeInUp.delay(100).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
-            <Text variant="titleMedium" style={styles.chartTitle}>Fuel Consumption</Text>
+            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelConsumption')}</Text>
             <BarChart
               data={fuelChartData}
               barWidth={24}
@@ -209,7 +211,7 @@ export default function AnalyticsScreen() {
       {comparisonData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(200).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
-            <Text variant="titleMedium" style={styles.chartTitle}>Generator Comparison</Text>
+            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.generatorComparison')}</Text>
             <BarChart
               data={comparisonData}
               barWidth={20}
@@ -233,7 +235,7 @@ export default function AnalyticsScreen() {
       {pieData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(300).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
-            <Text variant="titleMedium" style={styles.chartTitle}>Fuel Distribution</Text>
+            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelDistribution')}</Text>
             <View style={styles.pieContainer}>
               <PieChart
                 data={pieData}
@@ -243,7 +245,7 @@ export default function AnalyticsScreen() {
                 innerCircleColor={theme.colors.elevation.level1}
                 centerLabelComponent={() => (
                   <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                    {totalFuel.toFixed(0)}L
+                    {totalFuel.toFixed(0)}{t('common.liters')}
                   </Text>
                 )}
               />
@@ -269,10 +271,10 @@ export default function AnalyticsScreen() {
         <View style={styles.emptyContainer}>
           <Icon source="chart-line-variant" size={64} color={theme.colors.onSurfaceVariant} />
           <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
-            Not enough data for charts
+            {t('analytics.notEnoughData')}
           </Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
-            Log more sessions and refills to see trends
+            {t('analytics.logMoreHint')}
           </Text>
         </View>
       )}
@@ -282,15 +284,15 @@ export default function AnalyticsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <Appbar.Header elevated>
-        <Appbar.Content title="Analytics" titleStyle={styles.headerTitle} />
+        <Appbar.Content title={t('analytics.title')} titleStyle={styles.headerTitle} />
       </Appbar.Header>
 
       <SegmentedButtons
         value={selectedView}
         onValueChange={setSelectedView}
         buttons={[
-          { value: 'overview', label: 'Overview', icon: 'view-grid' },
-          { value: 'charts', label: 'Charts', icon: 'chart-line' },
+          { value: 'overview', label: t('analytics.overview'), icon: 'view-grid' },
+          { value: 'charts', label: t('analytics.charts'), icon: 'chart-line' },
         ]}
         style={styles.segmentedButtons}
       />
