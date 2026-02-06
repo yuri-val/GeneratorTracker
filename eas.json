@@ -19,7 +19,8 @@
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleRelease",
-        "credentialsSource": "local"
+        "credentialsSource": "local",
+        "autoIncrement": true
       }
     },
     "production": {
@@ -28,7 +29,8 @@
       },
       "android": {
         "buildType": "app-bundle",
-        "credentialsSource": "local"
+        "credentialsSource": "local",
+        "autoIncrement": true
       }
     }
   },

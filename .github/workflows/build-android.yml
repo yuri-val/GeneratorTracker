@@ -69,7 +69,7 @@ jobs:
       - name: 🐘 Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          cache-read-only: false
+          cache-disabled: true
 
       - name: 🏗 Setup Expo and EAS
         uses: expo/expo-github-action@v8
