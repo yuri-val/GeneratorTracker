@@ -68,7 +68,7 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.0.3
+### 🆕 What's New in Version 2.1.1
 
 - **Modern App Icon**: Fresh new look with energy-themed design
 - **UI Polishing**: Improved layout on small screens

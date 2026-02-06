@@ -352,7 +352,6 @@ Follow this workflow for ALL changes to the project:
      - Specific change 2
      - New files created: path/to/file.ts
 
-     Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
      ```
 
 8. **Commit Changes**

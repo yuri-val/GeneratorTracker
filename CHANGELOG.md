@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - 2026-02-06
+
+### Changed
+- Updated app icon with a completely modernized, energy-themed design featuring high contrast and contemporary aesthetics
+- Enabled EAS autoIncrement for Android builds, streamlining version management
+- Removed custom version increment script and pre-commit hook in favor of EAS-managed build numbers
+
+### Technical
+- Simplified build process by leveraging EAS Build's automatic version code management
+- Removed `scripts/increment-build.sh` and related Husky pre-commit hook
+- Updated `app.json` to use EAS Build autoIncrement feature
+
 ## [2.0.3] - 2026-02-06
 
 ### Changed
