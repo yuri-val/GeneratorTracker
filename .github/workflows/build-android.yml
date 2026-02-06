@@ -1,11 +1,11 @@
-name: Build Android (Local)
+name: Build Android
 
 on:
   workflow_dispatch:
     inputs:
       build_type:
         type: choice
-        description: Build type
+        description: Build type (Select 'both' for parallel builds)
         options:
           - both
           - apk
@@ -13,16 +13,43 @@ on:
         default: both
       profile:
         type: choice
-        description: Build profile
+        description: Eas Profile (Applied when single type selected. 'both' uses defaults)
         options:
           - preview
           - production
         default: preview
 
 jobs:
-  build:
-    name: Build Android ${{ github.event.inputs.build_type }}
+  setup:
+    name: 🚦 Setup Build Matrix
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event.inputs.build_type }}" == "both" ]; then
+            echo 'matrix=["apk", "aab"]' >> $GITHUB_OUTPUT
+          else
+            echo 'matrix=["${{ github.event.inputs.build_type }}"]' >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    needs: setup
+    name: 👷 Build ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        type: ${{ fromJson(needs.setup.outputs.matrix) }}
+    
+    env:
+      EAS_LOCAL_BUILD_SKIP_WAIT: 1
+      EAS_NO_VCS: 1
+      # Optimize Gradle memory for CI runners (7GB RAM available)
+      GRADLE_OPTS: '-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs="-Xmx3072m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError"'
+
     steps:
       - name: 🏗 Checkout repository
         uses: actions/checkout@v4
@@ -39,6 +66,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: 🐘 Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: false
+
       - name: 🏗 Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
@@ -48,16 +80,29 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
-      - name: 🔐 Decode Android Keystore
+      - name: 🔢 Bump Version Code
+        run: |
+          # Generate a unique, strictly increasing Version Code using GitHub Run Number
+          # Base offset 1000 ensures we are well above previous manual versions (e.g. 20)
+          # Result: 1001, 1002, 1003...
+          VERSION_CODE=$((1000 + ${{ github.run_number }}))
+          echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_ENV
+          
+          echo "Bumping android.versionCode to $VERSION_CODE in app.json..."
+          
+          # Safely update app.json using jq
+          tmp=$(mktemp)
+          jq --argjson vc $VERSION_CODE '.expo.android.versionCode = $vc' app.json > "$tmp" && mv "$tmp" app.json
+          
+          # Verify the change
+          grep -A 1 "versionCode" app.json || cat app.json
+
+      - name: 🔐 Setup Android Credentials
         run: |
           mkdir -p ./credentials/android
           echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > ./credentials/android/keystore.jks
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-
-      - name: 🔐 Create credentials.json
-        run: |
-          cat > credentials.json << 'EOF'
+          
+          cat > credentials.json <<EOF
           {
             "android": {
               "keystore": {
@@ -70,54 +115,41 @@ jobs:
           }
           EOF
 
-      - name: 👷 Build APK
-        if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+      - name: ⚙️ Determine Profile
+        id: profile
+        run: |
+          INPUT_TYPE="${{ github.event.inputs.build_type }}"
+          INPUT_PROFILE="${{ github.event.inputs.profile }}"
+          CURRENT_TYPE="${{ matrix.type }}"
+          
+          if [ "$INPUT_TYPE" == "both" ]; then
+            if [ "$CURRENT_TYPE" == "apk" ]; then
+              echo "profile=preview" >> $GITHUB_OUTPUT
+            else
+              echo "profile=production" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "profile=$INPUT_PROFILE" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🚀 Build ${{ matrix.type }}
         run: |
           eas build --local \
             --non-interactive \
             --platform android \
-            --profile preview \
-            --output ./build/app-release.apk
+            --profile ${{ steps.profile.outputs.profile }} \
+            --output ./build/app-release.${{ matrix.type }}
 
-      - name: 👷 Build AAB
-        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
-        run: |
-          eas build --local \
-            --non-interactive \
-            --platform android \
-            --profile production \
-            --output ./build/app-release.aab
-
-      - name: 📤 Upload APK Artifact
-        if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+      - name: 📤 Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
-          path: ./build/app-release.apk
-          retention-days: 14
-
-      - name: 📤 Upload AAB Artifact
-        if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-aab
-          path: ./build/app-release.aab
+          name: android-${{ matrix.type }}
+          path: ./build/app-release.${{ matrix.type }}
           retention-days: 14
 
       - name: 📋 Build Summary
+        if: always()
         run: |
-          echo "## 🎉 Build Complete!" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Build Details" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Type:** ${{ github.event.inputs.build_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Profile:** ${{ github.event.inputs.profile }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Artifacts" >> $GITHUB_STEP_SUMMARY
-          if [[ "${{ github.event.inputs.build_type }}" == "apk" || "${{ github.event.inputs.build_type }}" == "both" ]]; then
-            echo "- ✅ APK uploaded as artifact" >> $GITHUB_STEP_SUMMARY
-          fi
-          if [[ "${{ github.event.inputs.build_type }}" == "aab" || "${{ github.event.inputs.build_type }}" == "both" ]]; then
-            echo "- ✅ AAB uploaded as artifact" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "## ✅ ${{ matrix.type }} Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- **Profile:** ${{ steps.profile.outputs.profile }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version Code:** ${{ env.VERSION_CODE }}" >> $GITHUB_STEP_SUMMARY
