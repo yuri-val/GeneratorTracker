@@ -310,7 +310,7 @@ export default function SettingsScreen() {
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
                 title="Generator Tracker"
-                description={t('settings.version', { version: '2.2.0' })}
+                description={t('settings.version', { version: '2.3.0' })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
             </Surface>

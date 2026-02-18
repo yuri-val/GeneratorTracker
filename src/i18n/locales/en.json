@@ -45,7 +45,8 @@
         "generatorComparison": "Generator Comparison",
         "fuelDistribution": "Fuel Distribution",
         "notEnoughData": "Not enough data for charts",
-        "logMoreHint": "Log more sessions and refills to see trends"
+        "logMoreHint": "Log more sessions and refills to see trends",
+        "allGenerators": "All Generators"
     },
     "settings": {
         "title": "Settings",

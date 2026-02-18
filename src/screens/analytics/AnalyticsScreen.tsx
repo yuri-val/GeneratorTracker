@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
-import { Appbar, Surface, Text, SegmentedButtons, Icon } from 'react-native-paper';
+import { Appbar, Chip, Surface, Text, SegmentedButtons, Icon } from 'react-native-paper';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { BarChart, LineChart, PieChart } from 'react-native-gifted-charts';
 import { useFocusEffect } from '@react-navigation/native';
@@ -29,6 +29,7 @@ export default function AnalyticsScreen() {
   const [refillsList, setRefillsList] = useState<Refill[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedView, setSelectedView] = useState('overview');
+  const [selectedGeneratorId, setSelectedGeneratorId] = useState<string | null>(null);
 
   const loadAnalytics = async () => {
     try {
@@ -62,24 +63,43 @@ export default function AnalyticsScreen() {
     }, [])
   );
 
-  const totalGenerators = generators.length;
+  const filteredSessions = useMemo(
+    () => selectedGeneratorId
+      ? workSessions.filter(s => s.generatorId === selectedGeneratorId)
+      : workSessions,
+    [workSessions, selectedGeneratorId]
+  );
+  const filteredRefills = useMemo(
+    () => selectedGeneratorId
+      ? refillsList.filter(r => r.generatorId === selectedGeneratorId)
+      : refillsList,
+    [refillsList, selectedGeneratorId]
+  );
+  const filteredGenerators = useMemo(
+    () => selectedGeneratorId
+      ? generators.filter(g => g.id === selectedGeneratorId)
+      : generators,
+    [generators, selectedGeneratorId]
+  );
+
+  const totalGenerators = filteredGenerators.length;
   const totalHours = useMemo(
-    () => Math.round(workSessions.reduce((sum, s) => sum + s.hours, 0) * 10) / 10,
-    [workSessions]
+    () => Math.round(filteredSessions.reduce((sum, s) => sum + s.hours, 0) * 10) / 10,
+    [filteredSessions]
   );
   const totalFuel = useMemo(
-    () => Math.round(refillsList.reduce((sum, r) => sum + r.amount, 0) * 10) / 10,
-    [refillsList]
+    () => Math.round(filteredRefills.reduce((sum, r) => sum + r.amount, 0) * 10) / 10,
+    [filteredRefills]
   );
   const avgHours = totalGenerators > 0 ? Math.round((totalHours / totalGenerators) * 10) / 10 : 0;
 
   const hoursChartData = useMemo(
-    () => getHoursOverTime(workSessions, theme.colors.primary, i18n.language),
-    [workSessions, i18n.language]
+    () => getHoursOverTime(filteredSessions, theme.colors.primary, i18n.language),
+    [filteredSessions, i18n.language]
   );
   const fuelChartData = useMemo(
-    () => getFuelOverTime(refillsList, theme.colors.primary, i18n.language),
-    [refillsList, i18n.language]
+    () => getFuelOverTime(filteredRefills, theme.colors.primary, i18n.language),
+    [filteredRefills, i18n.language]
   );
   const comparisonData = useMemo(
     () => getGeneratorComparison(generators, theme.colors.primary),
@@ -208,7 +228,7 @@ export default function AnalyticsScreen() {
         </Animated.View>
       )}
 
-      {comparisonData.length > 1 && (
+      {!selectedGeneratorId && comparisonData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(200).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.generatorComparison')}</Text>
@@ -232,7 +252,7 @@ export default function AnalyticsScreen() {
         </Animated.View>
       )}
 
-      {pieData.length > 1 && (
+      {!selectedGeneratorId && pieData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(300).springify()}>
           <Surface elevation={1} style={styles.chartCard}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelDistribution')}</Text>
@@ -297,6 +317,34 @@ export default function AnalyticsScreen() {
         style={styles.segmentedButtons}
       />
 
+      {generators.length > 1 && (
+        <View style={styles.filterContainer}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterBar}
+          >
+            <Chip
+              selected={selectedGeneratorId === null}
+              onPress={() => setSelectedGeneratorId(null)}
+              showSelectedOverlay
+            >
+              {t('analytics.allGenerators')}
+            </Chip>
+            {generators.map(g => (
+              <Chip
+                key={g.id}
+                selected={selectedGeneratorId === g.id}
+                onPress={() => setSelectedGeneratorId(g.id)}
+                showSelectedOverlay
+              >
+                {g.name}
+              </Chip>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={
@@ -319,6 +367,13 @@ const styles = StyleSheet.create({
   segmentedButtons: {
     marginHorizontal: 16,
     marginVertical: 12,
+  },
+  filterContainer: {
+    paddingBottom: 8,
+  },
+  filterBar: {
+    paddingHorizontal: 16,
+    gap: 8,
   },
   content: {
     padding: 16,

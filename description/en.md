@@ -25,6 +25,7 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 - View total operating hours per generator
 - Monitor fuel consumption patterns
 - Calculate average fuel per hour
+- Filter analytics by individual generator or view all combined
 - Get insights across all generators
 
 **Cloud Sync & Security**
@@ -68,13 +69,11 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.2.0
+### 🆕 What's New in Version 2.3.0
 
-- **Multi-language Support**: Full application localization in English and Ukrainian.
-- **Language Switcher**: Manually switch app language in settings with persistence.
-- **Native Date & Time Pickers**: Calendar and clock pickers for easier and faster date entry.
-- **Localized Formatting**: Dates and times now automatically adapt to your chosen locale and language.
-- **Improved Forms**: Redesigned Add Generator, Add Work Session, and Add Refill screens for better UX.
+- **Generator Filter on Analytics**: Filter charts and stats by a specific generator or view all combined using a convenient chip bar.
+- **Filtered Overview Stats**: Total hours, fuel, and averages now reflect the selected generator.
+- **Smarter Chart Display**: Comparison and distribution charts auto-hide when viewing a single generator.
 
 ### 📱 Technical Excellence
 

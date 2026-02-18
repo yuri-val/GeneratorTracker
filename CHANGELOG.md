@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-02-18
+
+### Added
+- **Generator Filter on Analytics** — Horizontal chip bar to filter charts and stats by a specific generator or view all combined.
+
+### Changed
+- Overview stats (total hours, fuel, avg hours) now reflect the selected generator filter.
+- "Generator Comparison" and "Fuel Distribution" charts are hidden when a single generator is selected.
+
 ## [2.2.0] - 2026-02-06
 
 ### Added
