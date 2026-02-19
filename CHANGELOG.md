@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-02-19
+
+### Fixed
+- Add 10 missing i18n translation keys (sync status and auth error messages) that caused raw key strings to display to users.
+- Internationalize hardcoded "Generator Tracker" app name in Settings screen.
+
+### Removed
+- Delete unused components: `AnimatedCard`, `SignInButton`, and old `colors.ts` theme constants.
+- Remove unused `getWeekLabel()` helper from analytics utilities.
+- Remove unused `LineChart` import from AnalyticsScreen.
+- Remove unused `Generator` import from navigation types.
+
+### Changed
+- Replace deprecated `String.substr()` with `String.substring()` in ID generation.
+- Remove redundant field re-declarations from `Generator`, `WorkSession`, and `Refill` interfaces (already inherited from `SyncMetadata`).
+
 ## [2.3.0] - 2026-02-18
 
 ### Added

@@ -20,13 +20,6 @@ function getMonthLabel(dateStr: string, locale: string = 'en-US'): string {
   return date.toLocaleDateString(locale, { month: 'short' });
 }
 
-function getWeekLabel(dateStr: string, locale: string = 'en-US'): string {
-  const date = new Date(dateStr);
-  const day = date.getDate();
-  const month = date.toLocaleDateString(locale, { month: 'short' });
-  return `${month} ${day}`;
-}
-
 function groupByMonth(dates: string[]): Map<string, string[]> {
   const groups = new Map<string, string[]>();
   for (const d of dates) {

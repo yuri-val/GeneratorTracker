@@ -68,6 +68,10 @@
         "syncNow": "Sync Now",
         "syncCompleted": "Sync completed",
         "syncFailed": "Sync failed",
+        "syncing": "Syncing...",
+        "synced": "Synced",
+        "syncError": "Sync error",
+        "idle": "Idle",
         "version": "Version {{version}}",
         "language": "Language",
         "english": "English",
@@ -165,6 +169,12 @@
         "dontHaveAccount": "Don't have an account? Sign Up",
         "bothEmailPasswordRequired": "Please enter both email and password",
         "passwordTooShort": "Password must be at least 6 characters",
-        "failedToGetToken": "Failed to get authentication token from Google"
+        "failedToGetToken": "Failed to get authentication token from Google",
+        "authFailed": "Authentication failed",
+        "failedToSignInWithGoogle": "Failed to sign in with Google",
+        "failedToSignInAnonymously": "Failed to sign in anonymously",
+        "failedToSignOut": "Failed to sign out",
+        "failedToSignIn": "Failed to sign in",
+        "failedToCreateAccount": "Failed to create account"
     }
 }

@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
 import { Appbar, Chip, Surface, Text, SegmentedButtons, Icon } from 'react-native-paper';
 import Animated, { FadeInUp } from 'react-native-reanimated';
-import { BarChart, LineChart, PieChart } from 'react-native-gifted-charts';
+import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Generator, WorkSession, Refill, GeneratorStats } from '../../models/types';

@@ -68,6 +68,10 @@
         "syncNow": "Синхронізувати зараз",
         "syncCompleted": "Синхронізацію завершено",
         "syncFailed": "Помилка синхронізації",
+        "syncing": "Синхронізація...",
+        "synced": "Синхронізовано",
+        "syncError": "Помилка синхронізації",
+        "idle": "Очікування",
         "version": "Версія {{version}}",
         "language": "Мова",
         "english": "English",
@@ -165,6 +169,12 @@
         "dontHaveAccount": "Немає облікового запису? Зареєструватися",
         "bothEmailPasswordRequired": "Будь ласка, введіть і email, і пароль",
         "passwordTooShort": "Пароль має бути не менше 6 символів",
-        "failedToGetToken": "Не вдалося отримати токен автентифікації від Google"
+        "failedToGetToken": "Не вдалося отримати токен автентифікації від Google",
+        "authFailed": "Помилка автентифікації",
+        "failedToSignInWithGoogle": "Не вдалося увійти через Google",
+        "failedToSignInAnonymously": "Не вдалося увійти анонімно",
+        "failedToSignOut": "Не вдалося вийти",
+        "failedToSignIn": "Не вдалося увійти",
+        "failedToCreateAccount": "Не вдалося створити обліковий запис"
     }
 }

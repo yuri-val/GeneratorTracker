@@ -12,10 +12,6 @@ export interface Generator extends SyncMetadata {
   model?: string;
   purchaseDate: string; // ISO 8601 date
   createdAt: string; // ISO 8601 datetime
-  lastModified: string;
-  syncStatus: 'synced' | 'pending' | 'error';
-  syncedAt?: string;
-  userId?: string;
 }
 
 export interface WorkSession extends SyncMetadata {
@@ -28,10 +24,6 @@ export interface WorkSession extends SyncMetadata {
   notes?: string;
   createdAt: string; // ISO 8601 datetime
   isActive?: boolean; // True if session is currently running
-  lastModified: string;
-  syncStatus: 'synced' | 'pending' | 'error';
-  syncedAt?: string;
-  userId?: string;
 }
 
 export interface Refill extends SyncMetadata {
@@ -41,10 +33,6 @@ export interface Refill extends SyncMetadata {
   amount: number; // Liters or gallons
   notes?: string;
   createdAt: string; // ISO 8601 datetime
-  lastModified: string;
-  syncStatus: 'synced' | 'pending' | 'error';
-  syncedAt?: string;
-  userId?: string;
 }
 
 export interface GeneratorStats {

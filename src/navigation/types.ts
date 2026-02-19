@@ -1,5 +1,3 @@
-import { Generator } from '../models/types';
-
 export type RootStackParamList = {
   MainTabs: undefined;
   GeneratorDetail: { generatorId: string };
