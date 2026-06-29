@@ -15,6 +15,7 @@ import GeneratorDetailScreen from './src/screens/generator/GeneratorDetailScreen
 import AddGeneratorScreen from './src/screens/generator/AddGeneratorScreen';
 import AddWorkSessionScreen from './src/screens/generator/AddWorkSessionScreen';
 import AddRefillScreen from './src/screens/generator/AddRefillScreen';
+import AddMaintenanceScreen from './src/screens/generator/AddMaintenanceScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { darkTheme, lightTheme } from './src/theme';
 import { PaperBottomTabBar } from './src/components/PaperBottomTabBar';
@@ -121,6 +122,11 @@ export default function App() {
             <Stack.Screen
               name="AddRefill"
               component={AddRefillScreen}
+              options={{ presentation: 'modal' }}
+            />
+            <Stack.Screen
+              name="AddMaintenance"
+              component={AddMaintenanceScreen}
               options={{ presentation: 'modal' }}
             />
           </Stack.Navigator>

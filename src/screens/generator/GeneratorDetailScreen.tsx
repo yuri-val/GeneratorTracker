@@ -9,11 +9,13 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
-import { Generator, WorkSession, Refill } from '../../models/types';
+import { Generator, WorkSession, Refill, MaintenanceTask } from '../../models/types';
 import {
   getGenerators,
   getWorkSessions,
   getRefills,
+  getMaintenanceTasks,
+  saveMaintenanceTask,
   deleteGenerator,
   getActiveWorkSession,
   saveWorkSession,
@@ -26,12 +28,15 @@ import {
   generateId,
   calculateActiveSessionHours,
   calculateHours,
+  getGeneratorMaintenanceSummary,
+  markTaskServiced,
 } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { StatBlock } from '../../components/StatBlock';
 import { GradientCard } from '../../components/GradientCard';
 import { WorkSessionsList } from '../../components/WorkSessionsList';
 import { RefillsList } from '../../components/RefillsList';
+import { MaintenanceList } from '../../components/MaintenanceList';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 import { appColors } from '../../theme';
 
@@ -50,6 +55,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
   const [generator, setGenerator] = useState<Generator | null>(null);
   const [workSessions, setWorkSessions] = useState<WorkSession[]>([]);
   const [refills, setRefills] = useState<Refill[]>([]);
+  const [maintenanceTasks, setMaintenanceTasks] = useState<MaintenanceTask[]>([]);
   const [activeSession, setActiveSession] = useState<WorkSession | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -78,6 +84,9 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
 
       const refillsList = await getRefills(generatorId);
       setRefills(refillsList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+
+      const tasks = await getMaintenanceTasks(generatorId);
+      setMaintenanceTasks(tasks.sort((a, b) => a.title.localeCompare(b.title)));
     } catch (error) {
       console.error('Error loading data:', error);
     }
@@ -144,6 +153,23 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
     }
   };
 
+  const handleMarkServiced = async (task: MaintenanceTask) => {
+    try {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      const currentHours = calculateGeneratorStats(
+        workSessions.filter(s => !s.isActive),
+        []
+      ).totalHours;
+      const updated = markTaskServiced(task, currentHours, getCurrentDate());
+      await saveMaintenanceTask(updated);
+      await loadData();
+      Alert.alert(t('common.success'), t('maintenance.marked'));
+    } catch (error) {
+      Alert.alert(t('common.error'), t('maintenance.saveError'));
+      console.error(error);
+    }
+  };
+
   const handleOpenActiveSession = () => {
     if (activeSession) {
       navigation.navigate('AddWorkSession', { generatorId, sessionId: activeSession.id });
@@ -191,6 +217,14 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
     ? calculateActiveSessionHours(activeSession.startTime, activeSession.date)
     : 0;
 
+  const maintenanceSummary = getGeneratorMaintenanceSummary(maintenanceTasks, stats.totalHours);
+  const maintenanceColor =
+    maintenanceSummary.level === 'due'
+      ? theme.colors.error
+      : maintenanceSummary.level === 'soon'
+      ? appColors.warning
+      : appColors.success;
+
   const WorkSessionsTab = () => (
     <WorkSessionsList
       sessions={workSessions.filter(s => !s.isActive)}
@@ -208,6 +242,18 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
       onRefresh={onRefresh}
       refreshing={refreshing}
       onAddPress={() => navigation.navigate('AddRefill', { generatorId })}
+    />
+  );
+
+  const MaintenanceTab = () => (
+    <MaintenanceList
+      tasks={maintenanceTasks}
+      currentEngineHours={stats.totalHours}
+      onTaskPress={(taskId) => navigation.navigate('AddMaintenance', { generatorId, taskId })}
+      onAddPress={() => navigation.navigate('AddMaintenance', { generatorId })}
+      onMarkServiced={handleMarkServiced}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
     />
   );
 
@@ -301,6 +347,21 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
                 </Chip>
               </>
             )}
+            {maintenanceSummary.level !== 'ok' && (
+              <>
+                <Divider style={{ marginVertical: 12 }} />
+                <Chip
+                  icon="wrench"
+                  compact
+                  style={{ alignSelf: 'center', backgroundColor: maintenanceColor + '22' }}
+                  textStyle={{ color: maintenanceColor }}
+                >
+                  {maintenanceSummary.dueCount > 0
+                    ? t('maintenance.badgeDue', { count: maintenanceSummary.dueCount })
+                    : t('maintenance.badgeSoon', { count: maintenanceSummary.soonCount })}
+                </Chip>
+              </>
+            )}
           </Surface>
         </Animated.View>
       </View>
@@ -333,6 +394,13 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
           component={RefillsTab}
           options={{
             tabBarLabel: `${t('detail.refills')} (${refills.length})`,
+          }}
+        />
+        <Tab.Screen
+          name="Maintenance"
+          component={MaintenanceTab}
+          options={{
+            tabBarLabel: `${t('maintenance.tabLabel')} (${maintenanceTasks.length})`,
           }}
         />
       </Tab.Navigator>

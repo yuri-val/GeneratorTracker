@@ -7,18 +7,19 @@ import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { Generator, GeneratorStats } from '../../models/types';
-import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
-import { calculateGeneratorStats, formatDate } from '../../utils/calculations';
+import { Generator, GeneratorStats, MaintenanceSummary } from '../../models/types';
+import { getGenerators, getWorkSessions, getRefills, getMaintenanceTasks } from '../../utils/storage';
+import { calculateGeneratorStats, formatDate, getGeneratorMaintenanceSummary } from '../../utils/calculations';
 import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
 import { StatBlock } from '../../components/StatBlock';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { appColors } from '../../theme';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
 };
 
-type GeneratorWithStats = Generator & { stats: GeneratorStats };
+type GeneratorWithStats = Generator & { stats: GeneratorStats; maintenance: MaintenanceSummary };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const theme = useAppTheme();
@@ -31,12 +32,15 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       const generatorList = await getGenerators();
       const workSessions = await getWorkSessions();
       const refills = await getRefills();
+      const maintenanceTasks = await getMaintenanceTasks();
 
       const generatorsWithStats: GeneratorWithStats[] = generatorList.map(gen => {
         const genSessions = workSessions.filter(s => s.generatorId === gen.id);
         const genRefills = refills.filter(r => r.generatorId === gen.id);
         const stats = calculateGeneratorStats(genSessions, genRefills);
-        return { ...gen, stats };
+        const genTasks = maintenanceTasks.filter(m => m.generatorId === gen.id);
+        const maintenance = getGeneratorMaintenanceSummary(genTasks, stats.totalHours);
+        return { ...gen, stats, maintenance };
       });
 
       setGenerators(generatorsWithStats);
@@ -97,11 +101,25 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             />
           </View>
         </Card.Content>
-        {item.stats.lastWorkSessionDate && (
+        {(item.stats.lastWorkSessionDate || item.maintenance.level !== 'ok') && (
           <Card.Actions>
-            <Chip icon="clock-outline" compact textStyle={{ fontSize: 12 }}>
-              {t('common.last')}: {formatDate(item.stats.lastWorkSessionDate, i18n.language)}
-            </Chip>
+            {item.maintenance.level !== 'ok' && (
+              <Chip
+                icon="wrench"
+                compact
+                textStyle={{ fontSize: 12, color: item.maintenance.level === 'due' ? theme.colors.error : appColors.warning }}
+                style={{ backgroundColor: (item.maintenance.level === 'due' ? theme.colors.error : appColors.warning) + '22' }}
+              >
+                {item.maintenance.dueCount > 0
+                  ? t('maintenance.badgeDue', { count: item.maintenance.dueCount })
+                  : t('maintenance.badgeSoon', { count: item.maintenance.soonCount })}
+              </Chip>
+            )}
+            {item.stats.lastWorkSessionDate && (
+              <Chip icon="clock-outline" compact textStyle={{ fontSize: 12 }}>
+                {t('common.last')}: {formatDate(item.stats.lastWorkSessionDate, i18n.language)}
+              </Chip>
+            )}
           </Card.Actions>
         )}
       </Card>

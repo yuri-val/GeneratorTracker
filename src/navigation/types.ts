@@ -4,6 +4,7 @@ export type RootStackParamList = {
   AddGenerator: { generatorId?: string };
   AddWorkSession: { generatorId: string; sessionId?: string };
   AddRefill: { generatorId: string; refillId?: string };
+  AddMaintenance: { generatorId: string; taskId?: string };
 };
 
 export type TabParamList = {
