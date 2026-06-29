@@ -1,6 +1,6 @@
 import { onSnapshot, collection, collectionGroup, query, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Generator, WorkSession, Refill } from '../models/types';
+import { Generator, WorkSession, Refill, MaintenanceTask } from '../models/types';
 import {
   saveGeneratorToFirestore,
   getAllGeneratorsFromFirestore,
@@ -8,9 +8,12 @@ import {
   getAllWorkSessionsFromFirestore,
   saveRefillToFirestore,
   getAllRefillsFromFirestore,
+  saveMaintenanceTaskToFirestore,
+  getAllMaintenanceTasksFromFirestore,
   deleteGeneratorFromFirestore,
   deleteWorkSessionFromFirestore,
   deleteRefillFromFirestore,
+  deleteMaintenanceTaskFromFirestore,
 } from './firestore';
 import {
   getGenerators,
@@ -19,6 +22,8 @@ import {
   saveWorkSession,
   getRefills,
   saveRefill,
+  getMaintenanceTasks,
+  saveMaintenanceTask,
 } from '../utils/storage';
 import { syncQueue } from '../utils/syncQueue';
 
@@ -28,7 +33,7 @@ import { syncQueue } from '../utils/syncQueue';
  */
 
 type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
-type EntityType = 'generator' | 'workSession' | 'refill';
+type EntityType = 'generator' | 'workSession' | 'refill' | 'maintenance';
 
 let syncStatus: SyncStatus = 'idle';
 let listenerUnsubscribers: (() => void)[] = [];
@@ -70,6 +75,9 @@ export const pushEntityToFirestore = async (
       case 'refill':
         await saveRefillToFirestore(data as Refill, userId);
         break;
+      case 'maintenance':
+        await saveMaintenanceTaskToFirestore(data as MaintenanceTask, userId);
+        break;
     }
   } catch (error) {
     console.error(`Error pushing ${entityType} to Firestore:`, error);
@@ -98,6 +106,10 @@ export const deleteEntityFromFirestore = async (
       case 'refill':
         if (!generatorId) throw new Error('generatorId required for refill');
         await deleteRefillFromFirestore(userId, generatorId, entityId);
+        break;
+      case 'maintenance':
+        if (!generatorId) throw new Error('generatorId required for maintenance task');
+        await deleteMaintenanceTaskFromFirestore(userId, generatorId, entityId);
         break;
     }
   } catch (error) {
@@ -168,6 +180,13 @@ export const performInitialSync = async (userId: string): Promise<void> => {
         const refillWithUserId = { ...refill, userId };
         await saveRefillToFirestore(refillWithUserId, userId);
       }
+
+      // Push related maintenance tasks
+      const tasks = (await getMaintenanceTasks(gen.id)).filter(m => m.generatorId === gen.id);
+      for (const task of tasks) {
+        const taskWithUserId = { ...task, userId };
+        await saveMaintenanceTaskToFirestore(taskWithUserId, userId);
+      }
     }
 
     // 2. Pull remote data and merge with local
@@ -236,6 +255,21 @@ const pullAllDataFromFirestore = async (userId: string): Promise<void> => {
         await saveRefill({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
       } else {
         await saveRefill({ ...remoteRefill, syncStatus: 'synced', syncedAt: new Date().toISOString() });
+      }
+    }
+
+    // Pull all maintenance tasks
+    const remoteTasks = await getAllMaintenanceTasksFromFirestore(userId);
+    const localTasks = await getMaintenanceTasks();
+
+    for (const remoteTask of remoteTasks) {
+      const localTask = localTasks.find(t => t.id === remoteTask.id);
+
+      if (localTask) {
+        const resolved = resolveConflict(localTask, remoteTask);
+        await saveMaintenanceTask({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
+      } else {
+        await saveMaintenanceTask({ ...remoteTask, syncStatus: 'synced', syncedAt: new Date().toISOString() });
       }
     }
   } catch (error) {
@@ -313,8 +347,29 @@ export const startRealtimeListeners = (userId: string): void => {
     }
   });
 
+  // Listen to all maintenance tasks using collection group
+  const tasksQuery = collectionGroup(db, 'maintenanceTasks');
+  const tasksUserQuery = query(tasksQuery, where('userId', '==', userId));
+  const unsubTasks = onSnapshot(tasksUserQuery, async (snapshot) => {
+    for (const change of snapshot.docChanges()) {
+      const remoteTask = change.doc.data() as MaintenanceTask;
+
+      if (change.type === 'added' || change.type === 'modified') {
+        const localTasks = await getMaintenanceTasks();
+        const localTask = localTasks.find(t => t.id === remoteTask.id);
+
+        if (localTask) {
+          const resolved = resolveConflict(localTask, remoteTask);
+          await saveMaintenanceTask({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
+        } else {
+          await saveMaintenanceTask({ ...remoteTask, syncStatus: 'synced', syncedAt: new Date().toISOString() });
+        }
+      }
+    }
+  });
+
   // Store unsubscribers
-  listenerUnsubscribers = [unsubGenerators, unsubSessions, unsubRefills];
+  listenerUnsubscribers = [unsubGenerators, unsubSessions, unsubRefills, unsubTasks];
 };
 
 /**

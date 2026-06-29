@@ -1,4 +1,12 @@
-import { WorkSession, Refill, GeneratorStats } from '../models/types';
+import {
+  WorkSession,
+  Refill,
+  GeneratorStats,
+  MaintenanceTask,
+  MaintenanceStatus,
+  MaintenanceStatusLevel,
+  MaintenanceSummary,
+} from '../models/types';
 
 export const calculateHours = (startTime: string, endTime: string): number => {
   const [startHour, startMin] = startTime.split(':').map(Number);
@@ -87,3 +95,110 @@ export const calculateActiveSessionHours = (startTime: string, startDate: string
   const diffMs = now.getTime() - sessionStart.getTime();
   return Math.max(0, diffMs / (1000 * 60 * 60));
 };
+
+// ===== Maintenance =====
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const SOON_DAYS = 7; // a date-based task is "soon" within this many days
+const SOON_HOURS_FRACTION = 0.1; // an hours-based task is "soon" within 10% of its interval
+
+// Parse a 'YYYY-MM-DD' date as UTC midnight so day math is timezone-independent.
+const parseDateUTC = (dateString: string): number => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return Date.UTC(year, month - 1, day);
+};
+
+const toDateStringUTC = (ms: number): string => new Date(ms).toISOString().split('T')[0];
+
+const startOfDayUTC = (date: Date): number =>
+  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+
+const worstLevel = (a: MaintenanceStatusLevel, b: MaintenanceStatusLevel): MaintenanceStatusLevel => {
+  const rank: Record<MaintenanceStatusLevel, number> = { ok: 0, soon: 1, due: 2 };
+  return rank[a] >= rank[b] ? a : b;
+};
+
+/**
+ * Determine whether a maintenance task is ok / due soon / due, based on the
+ * generator's current engine hours and the calendar. When both an hours- and a
+ * date-interval are set, the worst (soonest-due) axis wins.
+ */
+export const calculateMaintenanceStatus = (
+  task: MaintenanceTask,
+  currentEngineHours: number,
+  now: Date = new Date()
+): MaintenanceStatus => {
+  const status: MaintenanceStatus = { level: 'ok' };
+  let level: MaintenanceStatusLevel = 'ok';
+  let hasAxis = false;
+
+  if (task.intervalHours && task.intervalHours > 0) {
+    hasAxis = true;
+    const dueHours = task.lastServiceHours + task.intervalHours;
+    const hoursRemaining = dueHours - currentEngineHours;
+    status.dueHours = dueHours;
+    status.hoursRemaining = hoursRemaining;
+
+    const hoursLevel: MaintenanceStatusLevel =
+      hoursRemaining <= 0
+        ? 'due'
+        : hoursRemaining <= task.intervalHours * SOON_HOURS_FRACTION
+        ? 'soon'
+        : 'ok';
+    level = worstLevel(level, hoursLevel);
+  }
+
+  if (task.intervalDays && task.intervalDays > 0) {
+    hasAxis = true;
+    const dueMs = parseDateUTC(task.lastServiceDate) + task.intervalDays * MS_PER_DAY;
+    const daysRemaining = Math.round((dueMs - startOfDayUTC(now)) / MS_PER_DAY);
+    status.dueDate = toDateStringUTC(dueMs);
+    status.daysRemaining = daysRemaining;
+
+    const dateLevel: MaintenanceStatusLevel =
+      daysRemaining <= 0 ? 'due' : daysRemaining <= SOON_DAYS ? 'soon' : 'ok';
+    level = worstLevel(level, dateLevel);
+  }
+
+  status.level = hasAxis ? level : 'ok';
+  return status;
+};
+
+/**
+ * Aggregate the maintenance state of all of a generator's tasks into the worst
+ * level plus per-bucket counts (drives badges on Home and the Detail header).
+ */
+export const getGeneratorMaintenanceSummary = (
+  tasks: MaintenanceTask[],
+  currentEngineHours: number,
+  now: Date = new Date()
+): MaintenanceSummary => {
+  let level: MaintenanceStatusLevel = 'ok';
+  let dueCount = 0;
+  let soonCount = 0;
+
+  for (const task of tasks) {
+    const { level: taskLevel } = calculateMaintenanceStatus(task, currentEngineHours, now);
+    if (taskLevel === 'due') dueCount++;
+    else if (taskLevel === 'soon') soonCount++;
+    level = worstLevel(level, taskLevel);
+  }
+
+  return { level, dueCount, soonCount, total: tasks.length };
+};
+
+/**
+ * Reset a task's counters after the user marks it serviced. The caller persists
+ * the returned task via storage.
+ */
+export const markTaskServiced = (
+  task: MaintenanceTask,
+  currentEngineHours: number,
+  date: string
+): MaintenanceTask => ({
+  ...task,
+  lastServiceHours: currentEngineHours,
+  lastServiceDate: date,
+  lastModified: new Date().toISOString(),
+  syncStatus: 'pending',
+});

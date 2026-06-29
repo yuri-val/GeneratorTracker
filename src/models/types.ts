@@ -35,6 +35,35 @@ export interface Refill extends SyncMetadata {
   createdAt: string; // ISO 8601 datetime
 }
 
+export interface MaintenanceTask extends SyncMetadata {
+  id: string;
+  generatorId: string;
+  title: string;
+  intervalHours?: number; // engine-hours interval between services
+  intervalDays?: number; // calendar-days interval between services
+  lastServiceHours: number; // engine hours recorded at the last service
+  lastServiceDate: string; // ISO 8601 date (YYYY-MM-DD) of the last service
+  notes?: string;
+  createdAt: string; // ISO 8601 datetime
+}
+
+export type MaintenanceStatusLevel = 'ok' | 'soon' | 'due';
+
+export interface MaintenanceStatus {
+  level: MaintenanceStatusLevel;
+  hoursRemaining?: number; // engine hours until due (negative = overdue)
+  daysRemaining?: number; // whole days until due (negative = overdue)
+  dueHours?: number; // absolute engine-hour mark when due
+  dueDate?: string; // ISO 8601 date when due
+}
+
+export interface MaintenanceSummary {
+  level: MaintenanceStatusLevel;
+  dueCount: number;
+  soonCount: number;
+  total: number;
+}
+
 export interface GeneratorStats {
   totalHours: number;
   totalRefills: number;
@@ -54,7 +83,7 @@ export interface User {
 // Sync queue item for offline changes
 export interface SyncQueueItem {
   id: string;
-  entityType: 'generator' | 'workSession' | 'refill';
+  entityType: 'generator' | 'workSession' | 'refill' | 'maintenance';
   entityId: string;
   operation: 'create' | 'update' | 'delete';
   data: any;

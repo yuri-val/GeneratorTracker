@@ -1,11 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Generator, WorkSession, Refill } from '../models/types';
+import { Generator, WorkSession, Refill, MaintenanceTask } from '../models/types';
 import { syncQueue } from './syncQueue';
 import { getCurrentUser } from '../services/auth';
 
 const GENERATORS_KEY = '@generators';
 const WORK_SESSIONS_KEY = '@work_sessions';
 const REFILLS_KEY = '@refills';
+const MAINTENANCE_KEY = '@maintenance_tasks';
 const LANGUAGE_KEY = '@app_language';
 
 // Language storage
@@ -89,6 +90,10 @@ export const deleteGenerator = async (id: string): Promise<void> => {
     const refills = await getRefills();
     const filteredRefills = refills.filter(r => r.generatorId !== id);
     await AsyncStorage.setItem(REFILLS_KEY, JSON.stringify(filteredRefills));
+
+    const maintenanceTasks = await getMaintenanceTasks();
+    const filteredTasks = maintenanceTasks.filter(m => m.generatorId !== id);
+    await AsyncStorage.setItem(MAINTENANCE_KEY, JSON.stringify(filteredTasks));
 
     // Queue for sync if user is authenticated
     const currentUser = getCurrentUser();
@@ -266,6 +271,83 @@ export const deleteRefill = async (id: string): Promise<void> => {
     }
   } catch (error) {
     console.error('Error deleting refill:', error);
+    throw error;
+  }
+};
+
+// Maintenance Task CRUD
+export const getMaintenanceTasks = async (generatorId?: string): Promise<MaintenanceTask[]> => {
+  try {
+    const data = await AsyncStorage.getItem(MAINTENANCE_KEY);
+    const tasks: MaintenanceTask[] = data ? JSON.parse(data) : [];
+
+    if (generatorId) {
+      return tasks.filter(t => t.generatorId === generatorId);
+    }
+
+    return tasks;
+  } catch (error) {
+    console.error('Error getting maintenance tasks:', error);
+    return [];
+  }
+};
+
+export const saveMaintenanceTask = async (task: MaintenanceTask): Promise<void> => {
+  try {
+    const tasks = await getMaintenanceTasks();
+    const index = tasks.findIndex(t => t.id === task.id);
+    const isUpdate = index >= 0;
+
+    // Add sync metadata - preserve existing values or set defaults
+    const taskWithMeta: MaintenanceTask = {
+      ...task,
+      lastModified: task.lastModified || new Date().toISOString(),
+      syncStatus: task.syncStatus || 'pending',
+    };
+
+    if (isUpdate) {
+      tasks[index] = taskWithMeta;
+    } else {
+      tasks.push(taskWithMeta);
+    }
+
+    await AsyncStorage.setItem(MAINTENANCE_KEY, JSON.stringify(tasks));
+
+    // Queue for sync only if status is pending and user is authenticated
+    const currentUser = getCurrentUser();
+    if (currentUser && taskWithMeta.syncStatus === 'pending') {
+      await syncQueue.addToQueue({
+        entityType: 'maintenance',
+        entityId: task.id,
+        operation: isUpdate ? 'update' : 'create',
+        data: taskWithMeta,
+      });
+    }
+  } catch (error) {
+    console.error('Error saving maintenance task:', error);
+    throw error;
+  }
+};
+
+export const deleteMaintenanceTask = async (id: string): Promise<void> => {
+  try {
+    const tasks = await getMaintenanceTasks();
+    const task = tasks.find(t => t.id === id);
+    const filtered = tasks.filter(t => t.id !== id);
+    await AsyncStorage.setItem(MAINTENANCE_KEY, JSON.stringify(filtered));
+
+    // Queue for sync if user is authenticated
+    const currentUser = getCurrentUser();
+    if (currentUser && task) {
+      await syncQueue.addToQueue({
+        entityType: 'maintenance',
+        entityId: id,
+        operation: 'delete',
+        data: task,
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting maintenance task:', error);
     throw error;
   }
 };

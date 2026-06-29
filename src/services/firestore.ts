@@ -12,7 +12,7 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { Generator, WorkSession, Refill } from '../models/types';
+import { Generator, WorkSession, Refill, MaintenanceTask } from '../models/types';
 
 /**
  * Firestore Service
@@ -59,6 +59,20 @@ const getRefillRef = (userId: string, generatorId: string, refillId: string) => 
  */
 const getRefillsRef = (userId: string, generatorId: string) => {
   return collection(db, `users/${userId}/generators/${generatorId}/refills`);
+};
+
+/**
+ * Get document reference for a maintenance task
+ */
+const getMaintenanceRef = (userId: string, generatorId: string, taskId: string) => {
+  return doc(db, `users/${userId}/generators/${generatorId}/maintenanceTasks/${taskId}`);
+};
+
+/**
+ * Get collection reference for maintenance tasks
+ */
+const getMaintenanceTasksRef = (userId: string, generatorId: string) => {
+  return collection(db, `users/${userId}/generators/${generatorId}/maintenanceTasks`);
 };
 
 // ============= Generator Operations =============
@@ -229,6 +243,50 @@ export const deleteRefillFromFirestore = async (
 ): Promise<void> => {
   const refillRef = getRefillRef(userId, generatorId, refillId);
   await deleteDoc(refillRef);
+};
+
+// ============= Maintenance Task Operations =============
+
+export const saveMaintenanceTaskToFirestore = async (
+  task: MaintenanceTask,
+  userId: string
+): Promise<void> => {
+  const taskRef = getMaintenanceRef(userId, task.generatorId, task.id);
+  await setDoc(taskRef, {
+    ...task,
+    userId,
+    lastModified: serverTimestamp(),
+  }, { merge: true });
+};
+
+export const getMaintenanceTasksForGeneratorFromFirestore = async (
+  userId: string,
+  generatorId: string
+): Promise<MaintenanceTask[]> => {
+  const tasksRef = getMaintenanceTasksRef(userId, generatorId);
+  const snapshot = await getDocs(tasksRef);
+
+  return snapshot.docs.map(doc => convertTimestamps(doc.data()) as MaintenanceTask);
+};
+
+export const getAllMaintenanceTasksFromFirestore = async (
+  userId: string
+): Promise<MaintenanceTask[]> => {
+  // Use collection group query to get all maintenance tasks across all generators
+  const tasksQuery = collectionGroup(db, 'maintenanceTasks');
+  const q = query(tasksQuery, where('userId', '==', userId));
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map(doc => convertTimestamps(doc.data()) as MaintenanceTask);
+};
+
+export const deleteMaintenanceTaskFromFirestore = async (
+  userId: string,
+  generatorId: string,
+  taskId: string
+): Promise<void> => {
+  const taskRef = getMaintenanceRef(userId, generatorId, taskId);
+  await deleteDoc(taskRef);
 };
 
 // ============= Helper Functions =============
