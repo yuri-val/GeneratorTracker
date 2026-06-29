@@ -21,6 +21,13 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 - Add notes to sessions and refills
 - Track multiple generators effortlessly
 
+**Maintenance & Service Tracking**
+- Define recurring service tasks per generator (oil changes, filters, seasonal checks)
+- Set intervals by engine hours, by calendar days, or both
+- See an at-a-glance status: OK, Due soon, or Due now
+- "Mark serviced" to reset a task in one tap
+- Due-soon and overdue badges on the home screen
+
 **Smart Analytics**
 - View total operating hours per generator
 - Monitor fuel consumption patterns
@@ -69,11 +76,11 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.3.0
+### 🆕 What's New in Version 2.4.0
 
-- **Generator Filter on Analytics**: Filter charts and stats by a specific generator or view all combined using a convenient chip bar.
-- **Filtered Overview Stats**: Total hours, fuel, and averages now reflect the selected generator.
-- **Smarter Chart Display**: Comparison and distribution charts auto-hide when viewing a single generator.
+- **Maintenance & Service Tracking**: Create recurring service tasks per generator with intervals by engine hours, days, or both.
+- **Due Status & Badges**: Each task shows OK / Due soon / Due now, and generators with pending service are flagged right on the home screen.
+- **Mark Serviced**: Reset a task to today and the current engine hours with a single tap.
 
 ### 📱 Technical Excellence
 

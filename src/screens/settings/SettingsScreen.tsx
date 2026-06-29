@@ -310,7 +310,7 @@ export default function SettingsScreen() {
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
                 title={t('home.title')}
-                description={t('settings.version', { version: '2.3.1' })}
+                description={t('settings.version', { version: '2.4.0' })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
             </Surface>

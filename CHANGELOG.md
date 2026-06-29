@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-29
+
+### Added
+- **Maintenance / Service Tracking** — Define recurring service tasks per generator (e.g. oil change every 250 engine hours, seasonal check every 180 days). Each task tracks its own interval by engine hours, by calendar days, or both.
+- **Due Status & Reminders (in-app)** — Every task shows an at-a-glance status: OK / Due soon / Due now, with the remaining engine hours and days. The worst axis wins when both intervals are set.
+- **Maintenance tab** on the Generator Detail screen, with a per-task "Mark serviced" action that resets the counters to the current engine hours and today's date.
+- **Maintenance badges** — The Home generator cards and the Detail stats card surface a coloured badge when a generator has tasks due soon or overdue.
+
+### Technical
+- New `MaintenanceTask` entity wired through the offline-first stack: storage (with cascade delete), Firestore `maintenanceTasks` subcollection, and bidirectional sync (push/pull/realtime, last-write-wins).
+- New maintenance status logic (`calculateMaintenanceStatus`, `getGeneratorMaintenanceSummary`, `markTaskServiced`) covered by unit tests (TDD).
+- Introduced a test toolchain: Jest (jest-expo) unit tests and Playwright web e2e for the maintenance flow.
+- Full English + Ukrainian localization for the maintenance feature.
+
 ## [2.3.1] - 2026-02-19
 
 ### Fixed
