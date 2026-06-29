@@ -150,7 +150,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
           title={isEditing ? t('maintenance.editTitle') : t('maintenance.addTitle')}
           titleStyle={styles.headerTitle}
         />
-        <Appbar.Action icon="check" onPress={handleSave} />
+        <Appbar.Action icon="check" onPress={handleSave} testID="save-maintenance" />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -161,6 +161,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
           onChangeText={setTitle}
           placeholder={t('maintenance.titlePlaceholder')}
           left={<TextInput.Icon icon="wrench" />}
+          testID="input-maintenance-title"
           style={styles.input}
         />
 
@@ -173,6 +174,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
           keyboardType="decimal-pad"
           left={<TextInput.Icon icon="clock-outline" />}
           right={<TextInput.Affix text={t('common.hoursAbbr')} />}
+          testID="input-maintenance-hours"
           style={styles.input}
         />
 

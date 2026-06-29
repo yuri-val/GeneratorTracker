@@ -52,6 +52,7 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@react-native-community/cli": "latest",
     "@react-native/metro-config": "0.83.1",
     "@testing-library/react-native": "^14.0.1",

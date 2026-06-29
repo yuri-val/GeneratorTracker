@@ -94,7 +94,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
           title={isEdit ? t('generator.editTitle') : t('generator.addTitle')}
           titleStyle={styles.headerTitle}
         />
-        <Appbar.Action icon="check" onPress={handleSave} />
+        <Appbar.Action icon="check" onPress={handleSave} testID="save-generator" />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -106,6 +106,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
           placeholder={t('generator.namePlaceholder')}
           left={<TextInput.Icon icon="engine" />}
           error={submitted && !name.trim()}
+          testID="input-generator-name"
           style={styles.input}
         />
         <HelperText type="error" visible={submitted && !name.trim()}>

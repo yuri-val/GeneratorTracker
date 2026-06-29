@@ -157,6 +157,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       <Animated.View entering={ZoomIn.delay(300)} style={styles.fabContainer}>
         <FAB
           icon="plus"
+          testID="fab-add-generator"
           style={[styles.fab, { backgroundColor: theme.colors.primary }]}
           color={theme.colors.onPrimary}
           onPress={() => {
