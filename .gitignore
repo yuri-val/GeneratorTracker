@@ -54,3 +54,9 @@ credentials.json
 
 # gitingest digest
 digest.txt
+
+# test artifacts
+coverage/
+test-results/
+playwright-report/
+.playwright/
