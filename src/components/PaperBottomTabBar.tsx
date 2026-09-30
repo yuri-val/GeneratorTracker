@@ -1,20 +1,24 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { BottomNavigation } from 'react-native-paper';
 import { CommonActions } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BottomTabBarHeightCallbackContext, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useAppTheme } from '../theme/useAppTheme';
 
 export function PaperBottomTabBar({ navigation, state, descriptors, insets }: BottomTabBarProps) {
   const theme = useAppTheme();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  // A custom tab bar must report its height itself, otherwise useBottomTabBarHeight()
+  // returns an estimate that is too small on devices with a home indicator.
+  const onHeightChange = useContext(BottomTabBarHeightCallbackContext);
 
   return (
     <BlurView
       intensity={80}
       tint={isDark ? 'dark' : 'light'}
+      onLayout={event => onHeightChange?.(event.nativeEvent.layout.height)}
       style={[
         styles.blurContainer,
         {

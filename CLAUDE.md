@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-React Native/Expo mobile app for tracking generator operating hours and fuel refills. Uses Firebase for authentication/sync with an **offline-first architecture** where local AsyncStorage is the source of truth.
+React Native/Expo mobile app (Expo SDK 57, React Native 0.86, React 19.2) for tracking generator operating hours and fuel refills. Uses Firebase for authentication/sync with an **offline-first architecture** where local AsyncStorage is the source of truth.
 
 ## Essential Commands
 
@@ -50,7 +50,8 @@ npm run test:rules     # Firestore security rules tests (emulator)
 npm run emulators      # Firebase emulators for manual testing (UI at :4000)
 npm run start:emu      # Expo dev server wired to the emulators (never touches prod data)
 ```
-Use Node 22 (`.nvmrc`). `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` forces the `demo-generatortracker`
+Use Node 22 (`.nvmrc`). The project `.npmrc` forces `legacy-peer-deps=false` so the lockfile matches what `npm ci`
+expects on CI/EAS — never regenerate it with legacy peer resolution. `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` forces the `demo-generatortracker`
 project, so emulator mode cannot reach production.
 
 ## Current Phase: Stabilization

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2026-09-30
+
+Platform upgrade to **Expo SDK 57** (React Native 0.86, React 19.2) — required for iOS builds with
+Xcode 27 / the iOS 27 SDK (S-35). No new features.
+
+### Changed
+- Expo SDK 54 → 57: React Native 0.81 → 0.86, React 19.1 → 19.2, reanimated 4.1 → 4.5, worklets 0.5 → 0.10, all `expo-*` modules and navigation/UI native libraries aligned via `expo install --fix`; TypeScript 6.
+- iOS minimum version is now 16.4 (Expo SDK 56+). Android is unchanged (min SDK 24, target SDK 36).
+- `app.json`: removed `newArchEnabled` and `android.edgeToEdgeEnabled` (both mandatory since SDK 55); added `expo-build-properties` with `ios.enableSceneSupport`.
+- `build-android.yml` uses the Node version from `.nvmrc` (22).
+
+### Fixed
+- **iOS app exited immediately at launch when built with Xcode 27** (S-35): the UIScene life cycle required by the iOS 27 SDK is now enabled.
+- Xcode 27 rejected pods with a deployment target below iOS 15 — config plugin `plugins/withPodsDeploymentTarget.js` raises them to the SDK floor.
+- **The "+" button overlapped the tab bar** on iPhones with a home indicator and on Android tablets: the custom tab bar reports its real height and the FAB / bottom padding of Home, Analytics and Settings follow it (part of S-34).
+- **Empty "Sessions" and "Refills" tabs showed "?" instead of an icon** (names that do not exist in MaterialCommunityIcons); a new test checks every icon name against the installed font.
+- **`npm ci` failed on GitHub Actions/EAS** because a global `legacy-peer-deps=true` produced a lockfile without peer dependencies; a project `.npmrc` now enforces strict peers and the lockfile was regenerated.
+
+### Verified
+- Unit 109/109, web + Firebase-emulator e2e 14/14.
+- Native iOS Release build (Xcode 27, iOS 27 simulator): launch, create generator, start/stop session, restart with data kept.
+- Android release APK (GitHub Actions, Android 16 emulator): full smoke test incl. refills, maintenance, analytics, settings, restart.
+
 ## [2.4.2] - 2026-09-30
 
 Stabilization stage 1 — sync data integrity (`docs/STABILIZATION_PLAN.md` S-1, S-2, S-3, S-8, S-9, S-28).

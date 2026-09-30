@@ -67,7 +67,7 @@ export const RefillsList: React.FC<RefillsListProps> = ({
       }
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
-          <Icon source="fuel-off" size={48} color={theme.colors.onSurfaceVariant} />
+          <Icon source="gas-station-off-outline" size={48} color={theme.colors.onSurfaceVariant} />
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 12 }}>
             {t('refill.emptyState')}
           </Text>

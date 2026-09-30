@@ -74,7 +74,7 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       }
       ListEmptyComponent={
         <View style={styles.emptyContainer}>
-          <Icon source="clock-off" size={48} color={theme.colors.onSurfaceVariant} />
+          <Icon source="timer-off-outline" size={48} color={theme.colors.onSurfaceVariant} />
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 12 }}>
             {t('workSession.emptyState')}
           </Text>
