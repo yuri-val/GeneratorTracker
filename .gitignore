@@ -66,3 +66,7 @@ firestore-debug.log
 firebase-debug.log
 ui-debug.log
 .emulator-data/
+
+# Google Play service account keys (never commit)
+generator-tracker-df1a5-*.json
+*service-account*.json
