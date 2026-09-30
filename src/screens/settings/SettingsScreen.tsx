@@ -41,7 +41,7 @@ export default function SettingsScreen() {
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
-  const { request, response, promptAsync } = useGoogleAuth();
+  const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
 
   const handleLanguageChange = async (newLang: string) => {
     await i18n.changeLanguage(newLang);
@@ -195,17 +195,19 @@ export default function SettingsScreen() {
                       <Divider style={styles.dividerLine} />
                     </View>
 
-                    <Button
-                      mode="elevated"
-                      icon="google"
-                      onPress={() => promptAsync()}
-                      disabled={!request || signingIn}
-                      loading={signingIn}
-                      style={styles.authButton}
-                      contentStyle={styles.authButtonContent}
-                    >
-                      {t('settings.signInWithGoogle')}
-                    </Button>
+                    {googleAvailable && (
+                      <Button
+                        mode="elevated"
+                        icon="google"
+                        onPress={() => promptAsync()}
+                        disabled={!request || signingIn}
+                        loading={signingIn}
+                        style={styles.authButton}
+                        contentStyle={styles.authButtonContent}
+                      >
+                        {t('settings.signInWithGoogle')}
+                      </Button>
+                    )}
 
                     <Button
                       mode="outlined"

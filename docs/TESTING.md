@@ -71,6 +71,11 @@ npm run test:e2e:ui     # Playwright UI mode
 - The native date/time pickers have **no web implementation**; e2e flows must not open them. Seed
   dated records instead.
 - `Alert.alert` is a no-op on web, so success/error alerts cannot be asserted there.
+- CI has no `.env` and no Google OAuth client ids — the app must work without them. To reproduce CI
+  locally, move `.env` aside temporarily (`EXPO_NO_DOTENV` is not honoured by the Expo CLI here) and start
+  Metro with `--clear`: `EXPO_PUBLIC_*` values are inlined into the cached transform.
+- Playwright fails a missing element after 15 s (`actionTimeout`); the first navigation may take up to
+  120 s while Metro compiles the bundle.
 - In CI mode Metro does not hot-reload: restart the web server after code changes when you keep one
   running between runs.
 
@@ -136,7 +141,7 @@ npx firebase-tools@14 deploy --only firestore:rules,firestore:indexes --project 
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs on every push and pull request:
+`.github/workflows/ci.yml` runs on pull requests and on pushes to `main` (one run per PR update):
 
 1. **unit** — `npm ci`, `npm run typecheck`, `npm test -- --ci --coverage` (coverage uploaded as an artifact).
 2. **rules** — Firestore security rules tests on the emulator (`npm run test:rules`).

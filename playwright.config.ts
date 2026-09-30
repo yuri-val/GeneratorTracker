@@ -23,6 +23,10 @@ export default defineConfig({
     baseURL: 'http://localhost:8081',
     headless: true,
     trace: 'on-first-retry',
+    // Fail a missing element in seconds, not after the whole test timeout; the first
+    // navigation waits for Metro to compile the bundle, hence the long navigation limit.
+    actionTimeout: 15_000,
+    navigationTimeout: 120_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {

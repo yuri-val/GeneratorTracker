@@ -1,13 +1,15 @@
 name: CI
 
+# Pull requests run through `pull_request`; pushes only for main, so a push to a PR
+# branch does not start a second, identical run.
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -81,6 +83,7 @@ jobs:
     env:
       # The web bundle only needs a syntactically complete config; in emulator mode
       # src/config/firebase.ts ignores these values and targets the local emulators.
+      # Google OAuth client ids are deliberately absent: the app must work without them.
       EXPO_PUBLIC_FIREBASE_API_KEY: ci-dummy-key
       EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: localhost
       EXPO_PUBLIC_FIREBASE_PROJECT_ID: demo-generatortracker

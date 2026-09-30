@@ -21,6 +21,8 @@ devices still on 2.4.0/2.4.1.
 - **Queued changes were dropped after 3 failed attempts** (S-6): replaced by state-based change tracking — failures stay pending and are retried.
 - **Sync could hang forever offline** (S-7, partial): network operations time out after 30 s; reconciliation reads come from the server only (`getDocsFromServer`), never from an empty offline cache.
 - Unreadable local data is backed up under `<key>.corrupt-<timestamp>` before being reset.
+- **Settings screen crashed when the build had no Google OAuth client id for its platform** (S-31): expo-auth-session throws during render in that case. Google sign-in is now only offered when the id is present; the rest of Settings always works. Store builds carry all three ids, so released apps were not affected.
+- CI: pull requests no longer run the workflow twice (push + pull_request), and Playwright fails a missing element after 15 s instead of waiting for the whole test timeout.
 
 ### Changed
 - The persisted sync queue (`src/utils/syncQueue.ts`) was removed; old installs migrate automatically (queued deletes → tombstones, queued updates → pending).
