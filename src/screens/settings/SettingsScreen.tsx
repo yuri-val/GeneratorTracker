@@ -15,6 +15,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Constants from 'expo-constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
@@ -36,6 +37,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
@@ -169,7 +171,7 @@ export default function SettingsScreen() {
         <Appbar.Content title={t('settings.title')} titleStyle={styles.headerTitle} />
       </Appbar.Header>
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 16 }]}>
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
             <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>
@@ -347,7 +349,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 100,
   },
   sectionTitle: {
     fontSize: 16,

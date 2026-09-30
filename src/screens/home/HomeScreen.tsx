@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator, GeneratorStats, MaintenanceSummary } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills, getMaintenanceTasks } from '../../utils/storage';
@@ -19,6 +20,11 @@ type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>;
 };
 
+// The FAB floats FAB_MARGIN above the (absolutely positioned) tab bar; the list leaves
+// room for it so the last card can scroll clear of the button.
+const FAB_MARGIN = 16;
+const FAB_CLEARANCE = FAB_MARGIN + 56 + 16;
+
 type GeneratorWithStats = Generator & { stats: GeneratorStats; maintenance: MaintenanceSummary };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
@@ -26,6 +32,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { t, i18n } = useTranslation();
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const tabBarHeight = useBottomTabBarHeight();
 
   const loadGenerators = async () => {
     try {
@@ -137,7 +144,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         data={generators}
         renderItem={renderGenerator}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + FAB_CLEARANCE }]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
         }
@@ -154,7 +161,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         }
       />
 
-      <Animated.View entering={ZoomIn.delay(300)} style={styles.fabContainer}>
+      <Animated.View entering={ZoomIn.delay(300)} style={[styles.fabContainer, { bottom: tabBarHeight + FAB_MARGIN }]}>
         <FAB
           icon="plus"
           testID="fab-add-generator"
@@ -179,7 +186,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingBottom: 100,
   },
   card: {
     marginBottom: 16,
@@ -206,7 +212,6 @@ const styles = StyleSheet.create({
   fabContainer: {
     position: 'absolute',
     right: 20,
-    bottom: 110,
   },
   fab: {
     borderRadius: 16,

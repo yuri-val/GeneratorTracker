@@ -5,6 +5,7 @@ import Animated, { FadeInUp } from 'react-native-reanimated';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import { Generator, WorkSession, Refill, GeneratorStats } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
 import { calculateGeneratorStats } from '../../utils/calculations';
@@ -22,6 +23,7 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function AnalyticsScreen() {
   const theme = useAppTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const { t, i18n } = useTranslation();
 
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
@@ -349,7 +351,7 @@ export default function AnalyticsScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 16 }]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
         }
@@ -380,7 +382,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-    paddingBottom: 100,
   },
   statsGrid: {
     flexDirection: 'row',
