@@ -9,7 +9,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { Refill } from '../../models/types';
 import { saveRefill, getRefills, deleteRefill } from '../../utils/storage';
-import { generateId, formatDate } from '../../utils/calculations';
+import { generateId, formatDate, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
@@ -24,7 +24,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   const { generatorId, refillId } = route.params;
   const isEditing = !!refillId;
 
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(toLocalDateString());
   const [amount, setAmount] = useState('');
   const [notes, setNotes] = useState('');
   const [existingRefill, setExistingRefill] = useState<Refill | null>(null);
@@ -34,7 +34,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setDate(selectedDate.toISOString().split('T')[0]);
+      setDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -136,7 +136,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(date)}
+            value={parseLocalDate(date)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}

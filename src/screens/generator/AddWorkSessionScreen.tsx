@@ -9,7 +9,7 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { WorkSession } from '../../models/types';
 import { saveWorkSession, getWorkSessions, deleteWorkSession } from '../../utils/storage';
-import { generateId, calculateHours, getCurrentTime, formatDate, formatTime } from '../../utils/calculations';
+import { generateId, calculateHours, getCurrentTime, formatDate, formatTime, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
@@ -24,7 +24,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const { generatorId, sessionId } = route.params;
 
   const [existingSession, setExistingSession] = useState<WorkSession | null>(null);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(toLocalDateString());
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
   const [notes, setNotes] = useState('');
@@ -38,7 +38,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setDate(selectedDate.toISOString().split('T')[0]);
+      setDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -243,7 +243,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(date)}
+            value={parseLocalDate(date)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}

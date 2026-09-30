@@ -14,7 +14,7 @@ import {
   deleteMaintenanceTask,
   getWorkSessions,
 } from '../../utils/storage';
-import { generateId, formatDate, calculateGeneratorStats } from '../../utils/calculations';
+import { generateId, formatDate, calculateGeneratorStats, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 
@@ -32,7 +32,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
   const [title, setTitle] = useState('');
   const [intervalHours, setIntervalHours] = useState('');
   const [intervalDays, setIntervalDays] = useState('');
-  const [lastServiceDate, setLastServiceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [lastServiceDate, setLastServiceDate] = useState(toLocalDateString());
   const [lastServiceHours, setLastServiceHours] = useState('0');
   const [notes, setNotes] = useState('');
   const [existingTask, setExistingTask] = useState<MaintenanceTask | null>(null);
@@ -42,7 +42,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setLastServiceDate(selectedDate.toISOString().split('T')[0]);
+      setLastServiceDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -204,7 +204,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(lastServiceDate)}
+            value={parseLocalDate(lastServiceDate)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}

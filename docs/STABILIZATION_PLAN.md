@@ -145,6 +145,13 @@ pull відкидати записи, чий `generatorId` не існує се�
 скрізь замість `toISOString()` / `new Date(str)`.
 **Перевірка:** unit-тести з `jest.setSystemTime` о 00:30 локально.
 
+> ✅ **Виправлено у 2.5.0** — `toLocalDateString` / `parseLocalDate` у `calculations.ts`; їх використовують
+> `getCurrentDate`, `formatDate`, підписи місяців у графіках, «сьогодні» для обслуговування за днями та всі
+> date-picker'и `Add*`. Jest тепер завжди працює з `TZ=America/New_York` (`jest.config.js`), де UTC-дата
+> ввечері вже завтрашня, — `localDates.test.ts` падає без виправлення. Уже збережені записи свідомо не
+> мігруються: запис, створений між 00:00 і 03:00 за Києвом, міг отримати вчорашню дату, але його не
+> відрізнити від дати, вибраної вручну, тож автоматичне «виправлення» могло б зіпсувати правильні дані.
+
 ### S-11. Стоп сесії довшої за 24 год втрачає добу
 **Де:** `GeneratorDetailScreen.handleStopSession` → `calculateHours(startTime, endTime)` рахує лише
 за часом доби (максимум < 24 год), тоді як картка активної сесії (`calculateActiveSessionHours`)

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../../navigation/types';
 import { Generator } from '../../models/types';
 import { saveGenerator, getGenerators } from '../../utils/storage';
-import { generateId, formatDate } from '../../utils/calculations';
+import { generateId, formatDate, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 
 type AddGeneratorScreenProps = {
@@ -25,7 +25,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
 
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
-  const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [purchaseDate, setPurchaseDate] = useState(toLocalDateString());
   const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -33,7 +33,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setPurchaseDate(selectedDate.toISOString().split('T')[0]);
+      setPurchaseDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -140,7 +140,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(purchaseDate)}
+            value={parseLocalDate(purchaseDate)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}
