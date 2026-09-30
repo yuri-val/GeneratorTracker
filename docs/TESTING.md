@@ -166,8 +166,10 @@ xcrun simctl openurl booted exp://127.0.0.1:8082
 
 Expo Go for SDK 54 must be installed in the simulator once (the Expo CLI normally does it): download the
 `iosClientUrl` for `54.0.0` from `https://api.expo.dev/v2/versions/latest`, unpack and
-`xcrun simctl install booted <dir>`. A native iOS build (`npx expo run:ios`) additionally needs CocoaPods,
-which is not installed.
+`xcrun simctl install booted <dir>`. A native iOS build (`npx expo prebuild -p ios` + `xcodebuild` or `npx expo run:ios`) works with CocoaPods
+(`brew install cocoapods`), but with Xcode 27 the app exits at launch: Expo SDK 54 does not adopt the UIScene life
+cycle that the iOS 27 SDK requires (see `docs/STABILIZATION_PLAN.md` S-35). Until the Expo SDK is upgraded, test
+iOS through Expo Go. Note that `expo prebuild` rewrites the `ios`/`android` scripts in `package.json` — revert that.
 
 ## Manual device testing
 
