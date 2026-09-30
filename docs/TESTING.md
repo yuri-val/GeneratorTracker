@@ -130,6 +130,45 @@ npx firebase-tools@14 login
 npx firebase-tools@14 deploy --only firestore:rules,firestore:indexes --project <real-project-id>
 ```
 
+## Native emulators on this Mac
+
+**Android** (Android SDK in `~/Library/Android/sdk`, emulator 37.1, system image Android 16 / API 36 arm64):
+
+| AVD | Screen | Use |
+|---|---|---|
+| `gt_phone_api36` | 1080×2400 | phone smoke tests |
+| `gt_tablet_api36` | 2560×1600, landscape | large-screen checks (S-34: Android 16 ignores the portrait lock here) |
+
+```bash
+~/Library/Android/sdk/emulator/emulator -avd gt_phone_api36
+```
+```bash
+adb install -r app.apk
+```
+
+With an emulator running, `npm run android` / `npx expo start --android --go` opens the app in Expo Go.
+The new `cmdline-tools` (`sdkmanager`/`avdmanager`) are Intel-only and need Rosetta, which is not installed —
+AVDs are plain `~/.android/avd/*.ini` + `config.ini` files, and SDK packages were installed from the official
+repository zips.
+
+**iOS** (Xcode 27, iOS 27 simulators). Xcode 27 replaced `Simulator.app` with `DeviceHub.app`, which the Expo CLI
+does not detect (`--ios` fails with "Can't determine id of Simulator app"). Until Expo catches up:
+
+```bash
+xcrun simctl boot "iPhone 17" && open -a /Applications/Xcode.app/Contents/Applications/DeviceHub.app
+```
+```bash
+npx expo start --go --port 8082
+```
+```bash
+xcrun simctl openurl booted exp://127.0.0.1:8082
+```
+
+Expo Go for SDK 54 must be installed in the simulator once (the Expo CLI normally does it): download the
+`iosClientUrl` for `54.0.0` from `https://api.expo.dev/v2/versions/latest`, unpack and
+`xcrun simctl install booted <dir>`. A native iOS build (`npx expo run:ios`) additionally needs CocoaPods,
+which is not installed.
+
 ## Manual device testing
 
 - **Dev client / Expo Go**: `npm start` and scan the QR code. Combine with `npm run start:emu` to test
