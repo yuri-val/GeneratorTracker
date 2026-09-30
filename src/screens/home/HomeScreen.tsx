@@ -185,6 +185,7 @@ export default function HomeScreen() {
     <ScreenHeader
       title={t('home.title')}
       largeTitle
+      scrollEdge
       trailing={<SyncStatusIndicator />}
       actions={
         isIOS

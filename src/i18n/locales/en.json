@@ -1,6 +1,7 @@
 {
     "common": {
         "error": "Error",
+        "more": "More",
         "success": "Success",
         "cancel": "Cancel",
         "delete": "Delete",
@@ -85,7 +86,6 @@
     },
     "detail": {
         "generatorNotFound": "Generator not found",
-        "tapToEdit": "Tap to edit",
         "activeSession": "Session Running",
         "startedAt": "Started",
         "stopSession": "STOP",

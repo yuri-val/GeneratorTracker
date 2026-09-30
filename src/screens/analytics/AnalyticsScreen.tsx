@@ -328,6 +328,7 @@ export default function AnalyticsScreen() {
     <ScreenHeader
       title={t('analytics.title')}
       largeTitle
+      scrollEdge
       menu={
         isIOS && generators.length > 1
           ? {

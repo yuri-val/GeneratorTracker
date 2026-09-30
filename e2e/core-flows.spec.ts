@@ -32,7 +32,7 @@ test.describe('Core flows (web e2e)', () => {
 
     // Delete with confirmation
     await page.getByTestId('detail-delete-generator').click();
-    await page.getByRole('button', { name: /^Delete$/ }).click();
+    await page.getByTestId('confirm-delete').click();
     await waitForEmptyHome(page);
   });
 

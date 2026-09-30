@@ -21,14 +21,15 @@ export interface HeaderAction {
 export interface HeaderMenuAction {
   key: string;
   label: string;
+  icon?: IconName;
+  /** Checkmark state for pickers (e.g. a filter); omit for plain commands. */
   selected?: boolean;
+  destructive?: boolean;
   onPress: () => void;
 }
 
 interface ScreenHeaderProps {
   title: string;
-  /** Android/web only; iOS navigation bars have no subtitle — show it in the content. */
-  subtitle?: string;
   /** iOS large title (tab root screens). */
   largeTitle?: boolean;
   /** `back` for pushed screens, `close` for modal forms. */
@@ -44,6 +45,12 @@ interface ScreenHeaderProps {
   onTitlePress?: () => void;
   titleTestID?: string;
   elevated?: boolean;
+  /**
+   * iOS: transparent bar over the content with the system scroll-edge effect (iOS 26+).
+   * Only for screens whose root is a ScrollView/FlatList with
+   * contentInsetAdjustmentBehavior="automatic"; other screens keep an opaque bar.
+   */
+  scrollEdge?: boolean;
 }
 
 /**
@@ -66,14 +73,15 @@ function NativeHeader(props: ScreenHeaderProps) {
   const latest = useRef(props);
   latest.current = props;
 
-  const { title, largeTitle, leading, actions = [], menu, trailing } = props;
+  const { title, largeTitle, leading, actions = [], menu, trailing, scrollEdge } = props;
   const signature = JSON.stringify({
     title,
     largeTitle,
     leading,
     actions: actions.map(({ key, label, icon, variant, destructive, testID }) => [key, label, icon, variant, destructive, testID]),
-    menu: menu && [menu.label, menu.icon, menu.actions.map(a => [a.key, a.label, a.selected])],
+    menu: menu && [menu.label, menu.icon, menu.actions.map(a => [a.key, a.label, a.icon, a.selected, a.destructive])],
     trailing: !!trailing,
+    scrollEdge,
     tint: theme.colors.primary,
     label: theme.colors.onBackground,
     error: theme.colors.error,
@@ -86,6 +94,10 @@ function NativeHeader(props: ScreenHeaderProps) {
       headerShown: true,
       title: current.title,
       headerLargeTitleEnabled: !!current.largeTitle,
+      headerTransparent: !!current.scrollEdge,
+      headerShadowVisible: !current.scrollEdge ? false : undefined,
+      // `automatic` resolves to the hard style (tinted band + divider) for these bars.
+      scrollEdgeEffects: current.scrollEdge ? { top: 'soft' } : undefined,
       // Brand tint for bar buttons only; titles keep the system label colour (HIG).
       headerTintColor: theme.colors.primary,
       headerTitleStyle: { color: theme.colors.onBackground },
@@ -118,7 +130,9 @@ function NativeHeader(props: ScreenHeaderProps) {
                   items: current.menu.actions.map(action => ({
                     type: 'action' as const,
                     label: action.label,
-                    state: action.selected ? ('on' as const) : ('off' as const),
+                    icon: action.icon && { type: 'sfSymbol' as const, name: ICONS[action.icon].sf },
+                    state: action.selected === undefined ? undefined : action.selected ? ('on' as const) : ('off' as const),
+                    destructive: action.destructive,
                     onPress: () => latest.current.menu?.actions.find(a => a.key === action.key)?.onPress(),
                   })),
                 },
@@ -146,7 +160,6 @@ function NativeHeader(props: ScreenHeaderProps) {
 
 function MaterialHeader({
   title,
-  subtitle,
   leading,
   onLeadingPress,
   leadingTestID,
@@ -165,7 +178,6 @@ function MaterialHeader({
       )}
       <Appbar.Content
         title={title}
-        subtitle={subtitle}
         titleStyle={{ fontWeight: leading ? '600' : '700' }}
         onPress={onTitlePress}
         testID={titleTestID}

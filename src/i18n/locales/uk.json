@@ -1,6 +1,7 @@
 {
     "common": {
         "error": "Помилка",
+        "more": "Ще",
         "success": "Успішно",
         "cancel": "Скасувати",
         "delete": "Видалити",
@@ -85,7 +86,6 @@
     },
     "detail": {
         "generatorNotFound": "Генератор не знайдено",
-        "tapToEdit": "Натисніть для редагування",
         "activeSession": "Сесія триває",
         "startedAt": "Запущено",
         "stopSession": "ЗУПИНИТИ",

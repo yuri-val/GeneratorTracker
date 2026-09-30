@@ -51,6 +51,8 @@ export const ICONS = {
   emulator: { sf: 'testtube.2', mci: 'test-tube' },
   chevron: { sf: 'chevron.right', mci: 'chevron-right' },
   filter: { sf: 'line.3.horizontal.decrease.circle', mci: 'filter-variant' },
+  more: { sf: 'ellipsis', mci: 'dots-vertical' },
+  markServiced: { sf: 'checkmark.circle', mci: 'check' },
 } as const satisfies Record<string, { sf: SFSymbol; mci: string }>;
 
 export type IconName = keyof typeof ICONS;

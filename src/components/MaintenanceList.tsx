@@ -2,10 +2,43 @@ import React from 'react';
 import { View, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { Card, Text, Button, Icon, Chip } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
-import { MaintenanceTask, MaintenanceStatusLevel } from '../models/types';
+import type { TFunction } from 'i18next';
+import { MaintenanceTask, MaintenanceStatusLevel, MaintenanceStatus } from '../models/types';
 import { calculateMaintenanceStatus } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
 import { appColors } from '../theme';
+
+/** The interval ("every 250 h · every 180 days") and remaining/overdue lines of a task. */
+export function describeMaintenance(
+  task: MaintenanceTask,
+  status: MaintenanceStatus,
+  t: TFunction
+): { interval?: string; remaining?: string } {
+  const intervalParts: string[] = [];
+  if (task.intervalHours) intervalParts.push(t('maintenance.everyHours', { hours: task.intervalHours }));
+  if (task.intervalDays) intervalParts.push(t('maintenance.everyDays', { days: task.intervalDays }));
+
+  const remainingParts: string[] = [];
+  if (status.hoursRemaining !== undefined) {
+    remainingParts.push(
+      status.hoursRemaining >= 0
+        ? t('maintenance.hoursLeft', { hours: Math.round(status.hoursRemaining * 10) / 10 })
+        : t('maintenance.hoursOverdue', { hours: Math.round(Math.abs(status.hoursRemaining) * 10) / 10 })
+    );
+  }
+  if (status.daysRemaining !== undefined) {
+    remainingParts.push(
+      status.daysRemaining >= 0
+        ? t('maintenance.daysLeft', { days: status.daysRemaining })
+        : t('maintenance.daysOverdue', { days: Math.abs(status.daysRemaining) })
+    );
+  }
+
+  return {
+    interval: intervalParts.join('  ·  ') || undefined,
+    remaining: remainingParts.join('  ·  ') || undefined,
+  };
+}
 
 interface MaintenanceListProps {
   tasks: MaintenanceTask[];
@@ -51,31 +84,13 @@ export const MaintenanceList: React.FC<MaintenanceListProps> = ({
     const status = calculateMaintenanceStatus(item, currentEngineHours);
     const color = statusColor(status.level);
 
-    const intervalParts: string[] = [];
-    if (item.intervalHours) intervalParts.push(t('maintenance.everyHours', { hours: item.intervalHours }));
-    if (item.intervalDays) intervalParts.push(t('maintenance.everyDays', { days: item.intervalDays }));
-
-    const remainingParts: string[] = [];
-    if (status.hoursRemaining !== undefined) {
-      remainingParts.push(
-        status.hoursRemaining >= 0
-          ? t('maintenance.hoursLeft', { hours: Math.round(status.hoursRemaining * 10) / 10 })
-          : t('maintenance.hoursOverdue', { hours: Math.round(Math.abs(status.hoursRemaining) * 10) / 10 })
-      );
-    }
-    if (status.daysRemaining !== undefined) {
-      remainingParts.push(
-        status.daysRemaining >= 0
-          ? t('maintenance.daysLeft', { days: status.daysRemaining })
-          : t('maintenance.daysOverdue', { days: Math.abs(status.daysRemaining) })
-      );
-    }
+    const { interval, remaining } = describeMaintenance(item, status, t);
 
     return (
       <Card mode="outlined" onPress={() => onTaskPress(item.id)} style={[styles.card, { borderColor: color }]}>
         <Card.Title
           title={item.title}
-          subtitle={intervalParts.join('  ·  ') || undefined}
+          subtitle={interval}
           titleVariant="titleMedium"
           left={(props) => <Icon {...props} source="wrench" size={24} color={color} />}
           right={() => (
@@ -90,9 +105,9 @@ export const MaintenanceList: React.FC<MaintenanceListProps> = ({
           )}
         />
         <Card.Content style={styles.cardContent}>
-          {remainingParts.length > 0 && (
+          {remaining && (
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-              {remainingParts.join('  ·  ')}
+              {remaining}
             </Text>
           )}
           {item.notes ? (

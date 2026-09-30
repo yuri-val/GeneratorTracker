@@ -168,7 +168,7 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: isIOS ? surfaces(theme).screen : theme.colors.background }]}>
-      <ScreenHeader title={t('settings.title')} largeTitle />
+      <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
 
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
