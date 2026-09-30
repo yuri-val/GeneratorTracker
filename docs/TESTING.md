@@ -166,10 +166,16 @@ xcrun simctl openurl booted exp://127.0.0.1:8082
 
 Expo Go for SDK 54 must be installed in the simulator once (the Expo CLI normally does it): download the
 `iosClientUrl` for `54.0.0` from `https://api.expo.dev/v2/versions/latest`, unpack and
-`xcrun simctl install booted <dir>`. A native iOS build (`npx expo prebuild -p ios` + `xcodebuild` or `npx expo run:ios`) works with CocoaPods
-(`brew install cocoapods`), but with Xcode 27 the app exits at launch: Expo SDK 54 does not adopt the UIScene life
-cycle that the iOS 27 SDK requires (see `docs/STABILIZATION_PLAN.md` S-35). Until the Expo SDK is upgraded, test
-iOS through Expo Go. Note that `expo prebuild` rewrites the `ios`/`android` scripts in `package.json` — revert that.
+`xcrun simctl install booted <dir>`. A native iOS build works with CocoaPods (`brew install cocoapods`, use `LANG=en_US.UTF-8`):
+
+```bash
+npx expo prebuild -p ios && cd ios && xcodebuild -workspace GeneratorTracker.xcworkspace -scheme GeneratorTracker \
+  -configuration Release -sdk iphonesimulator -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+```
+
+then `xcrun simctl install booted build/Build/Products/Release-iphonesimulator/GeneratorTracker.app`. Since 2.4.3
+(Expo SDK 57, UIScene enabled) the app launches on the iOS 27 SDK. `expo prebuild` rewrites the `ios`/`android`
+scripts in `package.json` — revert that. Expo Go for SDK 57 must match the SDK (`iosClientUrl` for `57.0.0`).
 
 ## Manual device testing
 
