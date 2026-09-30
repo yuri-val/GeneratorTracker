@@ -39,6 +39,25 @@ make digest           # Generate project digest using gitingest
 make help             # Show all available commands
 ```
 
+### Testing (see `docs/TESTING.md`)
+```bash
+npm run typecheck      # tsc --noEmit
+npm test               # Jest unit tests (src/**/__tests__)
+npm run check          # typecheck + unit (same as the pre-commit hook)
+npm run test:e2e       # Playwright against the Expo web build (offline flows)
+npm run test:e2e:emu   # Playwright + Firebase Auth/Firestore emulators (cloud sync flows)
+npm run emulators      # Firebase emulators for manual testing (UI at :4000)
+npm run start:emu      # Expo dev server wired to the emulators (never touches prod data)
+```
+Use Node 22 (`.nvmrc`). `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` forces the `demo-generatortracker`
+project, so emulator mode cannot reach production.
+
+## Current Phase: Stabilization
+
+The app is live on Google Play. The current goal is to **stabilize existing functionality — no new
+features**. The audit, prioritized backlog (`S-1` … `S-27`) and proposed order of work live in
+`docs/STABILIZATION_PLAN.md`; update that file when an item is fixed.
+
 ## Architecture
 
 ### Offline-First Data Flow (CRITICAL)
@@ -54,8 +73,10 @@ This is the most important architectural pattern in the app:
    - Queue persists across app restarts
 
 3. **Background sync**: `src/services/sync.ts` pushes queued changes to Firestore
-   - Triggered on auth state changes and periodic intervals
-   - Handles network failures with retry logic
+   - Triggered on sign-in (`performInitialSync`) and by "Sync Now" (`performManualSync`)
+   - Realtime `onSnapshot` listeners pull remote changes while signed in
+   - There is **no** periodic/foreground/network-reconnect trigger yet (see `docs/STABILIZATION_PLAN.md` S-5)
+   - Retries a failed queue item 3 times, then drops it (S-6)
 
 4. **Conflict resolution**: Last-write-wins using `lastModified` timestamp
    - See `resolveConflict()` in `src/services/sync.ts`
@@ -253,10 +274,11 @@ For Material Top Tabs (as in GeneratorDetailScreen):
 - Auth state triggers automatic sync
 
 ### Sync Behavior
-- Auto-sync on authentication
-- Auto-sync on app foreground (when network available)
-- Manual sync via pull-to-refresh on screens
+- Initial sync on authentication (push all local data, pull remote, start realtime listeners)
+- Realtime pull via Firestore listeners while signed in
+- Manual push+pull via "Sync Now" in Settings (pull-to-refresh only reloads local storage)
 - Sync status visible via `SyncStatusIndicator` component
+- Local testing: Firebase Emulator Suite (`npm run emulators` + `npm run start:emu`)
 
 ## Version Management
 
@@ -279,6 +301,7 @@ Follow this workflow for ALL changes to the project:
 2. **Discover and Validate Changes**
    - Run `git status` to see all modified/new files
    - Review the changes with `git diff` for modified files
+   - Run `npm run check` (typecheck + unit tests) and `npm run test:e2e` (web e2e); for sync changes also `npm run test:e2e:emu`
    - Test the changes in the development environment (`npm start`)
    - Verify no regressions or breaking changes
    - Check that the app builds successfully
@@ -289,7 +312,7 @@ Follow this workflow for ALL changes to the project:
      - **MINOR** for new features
      - **MAJOR** for breaking changes
    - Run: `make version-{patch|minor|major}`
-   - Update version display in `src/screens/settings/SettingsScreen.tsx`
+   - The Settings screen reads the version from `expo-constants` (`app.json`), no manual update needed
 
 4. **Update CHANGELOG.md**
    - Add new version section at the top (after "## [Unreleased]" if it exists)
@@ -387,7 +410,7 @@ make version-minor
 # - Update "Key Features" if needed
 
 # 6 & 7. Commit with changelog
-git add app.json package.json CHANGELOG.md description/*.md src/screens/settings/SettingsScreen.tsx [other files]
+git add app.json package.json CHANGELOG.md description/*.md [other files]
 git commit -m "Version 1.3.0: Add tab navigation to Generator Detail screen
 
 Separate Work Sessions and Refills into individual tabs using Material Top Tabs.

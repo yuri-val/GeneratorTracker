@@ -76,10 +76,11 @@ export const signInAnonymouslyUser = async (): Promise<User> => {
  * Sign in with Google using expo-auth-session
  */
 export const useGoogleAuth = () => {
+  // One OAuth client per platform (see .env.example). `expoClientId` no longer
+  // exists in expo-auth-session v7; the web client id covers web builds.
   const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     responseType: 'id_token',  // Request ID token for Firebase Auth
   });

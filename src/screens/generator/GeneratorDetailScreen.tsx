@@ -265,11 +265,13 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
           title={generator.name}
           subtitle={generator.model || t('detail.tapToEdit')}
           onPress={() => navigation.navigate('AddGenerator', { generatorId })}
+          testID="detail-edit-generator"
         />
         <Appbar.Action
           icon="delete"
           iconColor={theme.colors.error}
           onPress={handleDeleteGenerator}
+          testID="detail-delete-generator"
         />
       </Appbar.Header>
 
@@ -294,6 +296,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
                     textColor={theme.colors.onError}
                     icon="stop"
                     onPress={handleStopSession}
+                    testID="stop-session"
                   >
                     {t('detail.stopSession')}
                   </Button>
@@ -317,6 +320,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
             style={styles.startButton}
             contentStyle={styles.startButtonContent}
             labelStyle={styles.startButtonLabel}
+            testID="start-session"
           >
             {t('detail.startSession')}
           </Button>

@@ -121,6 +121,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
           placeholder={t('generator.modelPlaceholder')}
           left={<TextInput.Icon icon="tag" />}
           style={styles.input}
+          testID="input-generator-model"
         />
 
         <Pressable onPress={() => setShowDatePicker(true)}>

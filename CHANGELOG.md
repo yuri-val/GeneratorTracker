@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2026-09-30
+
+Stabilization phase kick-off: no functional changes for users. This release fixes the
+build health issues found in the audit and sets up the test environment used for the
+upcoming stabilization work (see `docs/STABILIZATION_PLAN.md`).
+
+### Fixed
+- TypeScript errors that broke `tsc --noEmit`: `getReactNativePersistence` typing for the React Native build of `firebase/auth`, and the obsolete `expoClientId` option in the Google OAuth request.
+- Google OAuth now uses the dedicated Android client id (`EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`) instead of the web client id.
+- Settings → About reads the version from `expo-constants` instead of a hard-coded string.
+
+### Changed
+- Expo SDK 54 dependencies aligned with `expo install --fix` (expo 54.0.37, expo-auth-session, expo-constants, expo-crypto, expo-dev-client, expo-font, expo-localization, expo-web-browser, jest-expo); added the `expo-localization` and `expo-web-browser` config plugins.
+- `@react-native-community/cli` pinned instead of `latest`; `engines.node >= 20.19`; `.nvmrc` = 22.
+- `CLAUDE.md` describes the actual sync triggers (sign-in and "Sync Now" only) and the testing commands; `README.md` prerequisites updated.
+
+### Added
+- **Firebase Emulator Suite support**: `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` wires the app to local Auth/Firestore emulators (forced `demo-generatortracker` project, host auto-detected for devices), with `firebase.json`, reference `firestore.rules` and `firestore.indexes.json`, an "Firebase Emulator" indicator in Settings, and `npm run emulators` / `start:emu` / `web:emu` scripts.
+- **Unit tests** for `storage`, `syncQueue`, `calculations`, `analytics` and the `sync` service (Firestore mocked): 64 tests in total.
+- **Web e2e** (`e2e/core-flows.spec.ts`): generator CRUD, start/stop session, refill → analytics, language switch persistence, seeded history/analytics; shared helpers in `e2e/helpers.ts`.
+- **Cloud-sync e2e** (`e2e/sync-emulator.spec.ts`, `npm run test:e2e:emu`): sign-up, push via "Sync Now" and realtime pull verified against the emulators.
+- `testID`s on key UI elements and stable bottom-tab ids (`tab-home`, `tab-analytics`, `tab-settings`).
+- GitHub Actions `ci.yml` (typecheck + unit + emulator e2e on every push/PR) and a husky pre-commit hook (`npm run typecheck && npm test`).
+- `docs/TESTING.md` (test environment guide) and `docs/STABILIZATION_PLAN.md` (audit findings S-1…S-27 with proposed fixes and order of work).
+
 ## [2.4.0] - 2026-06-29
 
 ### Added

@@ -78,7 +78,9 @@
         "ukrainian": "Українська",
         "sync": "Sync",
         "pendingChanges": "Pending Changes",
-        "about": "About"
+        "about": "About",
+        "emulatorTitle": "Firebase Emulator",
+        "emulatorDescription": "Connected to the local Auth and Firestore emulators (development only)"
     },
     "detail": {
         "generatorNotFound": "Generator not found",

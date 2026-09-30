@@ -1,0 +1,61 @@
+rules_version = '2';
+
+// Security rules for the Generator Tracker data model.
+//
+// Every document lives under users/{userId}/... and is readable/writable only by
+// that user. The sync service also runs collection-group queries
+// (`collectionGroup('workSessions').where('userId', '==', uid)` etc.), which need
+// the wildcard `/{path=**}/...` rules below; the query's own filter satisfies the
+// `resource.data.userId == request.auth.uid` condition.
+//
+// These rules are used by the local emulator (npm run emulators). They are also
+// the reference for the production project: keep the Firebase console in sync.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function ownsResource() {
+      return isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      match /generators/{generatorId} {
+        allow read, write: if isOwner(userId);
+
+        match /workSessions/{sessionId} {
+          allow read, write: if isOwner(userId);
+        }
+
+        match /refills/{refillId} {
+          allow read, write: if isOwner(userId);
+        }
+
+        match /maintenanceTasks/{taskId} {
+          allow read, write: if isOwner(userId);
+        }
+      }
+    }
+
+    // Collection-group reads used by pull sync and realtime listeners.
+    match /{path=**}/workSessions/{sessionId} {
+      allow read: if ownsResource();
+    }
+
+    match /{path=**}/refills/{refillId} {
+      allow read: if ownsResource();
+    }
+
+    match /{path=**}/maintenanceTasks/{taskId} {
+      allow read: if ownsResource();
+    }
+  }
+}

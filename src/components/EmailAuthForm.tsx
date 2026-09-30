@@ -62,6 +62,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
         disabled={loading}
         left={<TextInput.Icon icon="email" />}
         style={styles.input}
+        testID="input-email"
       />
 
       <TextInput
@@ -81,6 +82,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
           />
         }
         style={styles.input}
+        testID="input-password"
       />
 
       <Button
@@ -90,6 +92,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
         disabled={loading}
         style={styles.submitButton}
         contentStyle={styles.submitButtonContent}
+        testID="auth-submit"
       >
         {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
       </Button>
@@ -98,6 +101,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
         mode="text"
         onPress={() => setIsSignUp(!isSignUp)}
         disabled={loading}
+        testID="auth-toggle-mode"
       >
         {isSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
       </Button>

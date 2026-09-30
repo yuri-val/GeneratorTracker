@@ -78,7 +78,9 @@
         "ukrainian": "Українська",
         "sync": "Синхронізація",
         "pendingChanges": "Очікують на синхронізацію",
-        "about": "Про додаток"
+        "about": "Про додаток",
+        "emulatorTitle": "Емулятор Firebase",
+        "emulatorDescription": "Підключено до локальних емуляторів Auth і Firestore (лише для розробки)"
     },
     "detail": {
         "generatorNotFound": "Генератор не знайдено",

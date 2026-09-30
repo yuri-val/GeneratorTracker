@@ -184,7 +184,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
       <Appbar.Header elevated>
         <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
         <Appbar.Content title={title} titleStyle={styles.headerTitle} />
-        <Appbar.Action icon="check" onPress={handleSave} />
+        <Appbar.Action icon="check" onPress={handleSave} testID="save-session" />
       </Appbar.Header>
 
       {isActiveSession && (

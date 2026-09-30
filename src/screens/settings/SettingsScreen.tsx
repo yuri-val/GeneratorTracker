@@ -15,11 +15,14 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import Constants from 'expo-constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
 import { EmailAuthForm } from '../../components/EmailAuthForm';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { saveLanguage } from '../../utils/storage';
+import { isUsingFirebaseEmulator } from '../../config/firebase';
+import { appColors } from '../../theme';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -27,6 +30,9 @@ import {
   signInWithGoogleCredential,
   useGoogleAuth,
 } from '../../services/auth';
+
+// Read once from the app config so the About section never lags behind app.json.
+const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
@@ -240,6 +246,7 @@ export default function SettingsScreen() {
                   onPress={handleSignOut}
                   style={styles.authButton}
                   contentStyle={styles.authButtonContent}
+                  testID="sign-out"
                 >
                   {t('settings.signOut')}
                 </Button>
@@ -280,6 +287,7 @@ export default function SettingsScreen() {
                   disabled={syncStatus === 'syncing'}
                   style={{ marginTop: 8 }}
                   contentStyle={styles.authButtonContent}
+                  testID="sync-now"
                 >
                   {t('settings.syncNow')}
                 </Button>
@@ -296,8 +304,8 @@ export default function SettingsScreen() {
                 value={i18n.language.split('-')[0]}
                 onValueChange={handleLanguageChange}
                 buttons={[
-                  { value: 'en', label: t('settings.english') },
-                  { value: 'uk', label: t('settings.ukrainian') },
+                  { value: 'en', label: t('settings.english'), testID: 'lang-en' },
+                  { value: 'uk', label: t('settings.ukrainian'), testID: 'lang-uk' },
                 ]}
               />
             </Surface>
@@ -310,9 +318,16 @@ export default function SettingsScreen() {
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
                 title={t('home.title')}
-                description={t('settings.version', { version: '2.4.0' })}
+                description={t('settings.version', { version: APP_VERSION })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
+              {isUsingFirebaseEmulator && (
+                <List.Item
+                  title={t('settings.emulatorTitle')}
+                  description={t('settings.emulatorDescription')}
+                  left={(props) => <List.Icon {...props} icon="test-tube" color={appColors.warning} />}
+                />
+              )}
             </Surface>
           </List.Section>
         </Animated.View>

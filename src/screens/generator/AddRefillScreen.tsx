@@ -116,7 +116,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
           title={isEditing ? t('refill.editTitle') : t('refill.addTitle')}
           titleStyle={styles.headerTitle}
         />
-        <Appbar.Action icon="check" onPress={handleSave} />
+        <Appbar.Action icon="check" onPress={handleSave} testID="save-refill" />
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -154,6 +154,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
           left={<TextInput.Icon icon="fuel" />}
           right={<TextInput.Affix text={t('common.litersAbbr')} />}
           style={styles.input}
+          testID="input-refill-amount"
         />
 
         <TextInput
