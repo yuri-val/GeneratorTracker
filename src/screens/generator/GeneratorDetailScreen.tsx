@@ -332,7 +332,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
               <StatBlock
                 value={`${stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
                 label={t('home.totalHours')}
-                icon="clock-outline"
+                icon="clock"
                 color={theme.colors.secondary}
               />
               <Divider style={styles.statDivider} />

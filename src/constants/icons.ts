@@ -1,0 +1,56 @@
+import type { SFSymbol } from 'sf-symbols-typescript';
+
+/**
+ * Semantic icon names used across the app, mapped to the native icon set of each
+ * platform: SF Symbols on iOS, MaterialCommunityIcons (Material Design) on Android/web.
+ * Both columns are checked: SF names by the `SFSymbol` type, MCI names by icons.test.ts.
+ */
+export const ICONS = {
+  home: { sf: 'bolt.fill', mci: 'flash' },
+  analytics: { sf: 'chart.bar.fill', mci: 'chart-bar' },
+  settings: { sf: 'gearshape.fill', mci: 'cog' },
+  add: { sf: 'plus', mci: 'plus' },
+  edit: { sf: 'pencil', mci: 'pencil' },
+  delete: { sf: 'trash', mci: 'delete' },
+  close: { sf: 'xmark', mci: 'close' },
+  save: { sf: 'checkmark', mci: 'check' },
+  engine: { sf: 'engine.combustion.fill', mci: 'engine' },
+  engineOff: { sf: 'engine.combustion', mci: 'engine-off-outline' },
+  clock: { sf: 'clock', mci: 'clock-outline' },
+  clockStart: { sf: 'clock.arrow.circlepath', mci: 'clock-start' },
+  clockEnd: { sf: 'clock.badge.checkmark', mci: 'clock-end' },
+  timerOff: { sf: 'timer', mci: 'timer-off-outline' },
+  fuel: { sf: 'fuelpump.fill', mci: 'fuel' },
+  fuelOff: { sf: 'fuelpump', mci: 'gas-station-off-outline' },
+  wrench: { sf: 'wrench.and.screwdriver.fill', mci: 'wrench' },
+  wrenchOutline: { sf: 'wrench.and.screwdriver', mci: 'wrench-outline' },
+  calendar: { sf: 'calendar', mci: 'calendar' },
+  calendarCheck: { sf: 'calendar.badge.checkmark', mci: 'calendar-check' },
+  calendarRange: { sf: 'calendar.badge.clock', mci: 'calendar-range' },
+  notes: { sf: 'note.text', mci: 'note-text' },
+  tag: { sf: 'tag', mci: 'tag' },
+  chartLine: { sf: 'chart.line.uptrend.xyaxis', mci: 'chart-line' },
+  chartEmpty: { sf: 'chart.bar.xaxis', mci: 'chart-box-outline' },
+  chartNoData: { sf: 'chart.line.flattrend.xyaxis', mci: 'chart-line-variant' },
+  grid: { sf: 'square.grid.2x2', mci: 'view-grid' },
+  play: { sf: 'play.fill', mci: 'play' },
+  stop: { sf: 'stop.fill', mci: 'stop' },
+  statusDue: { sf: 'exclamationmark.circle.fill', mci: 'alert-circle' },
+  statusSoon: { sf: 'clock.badge.exclamationmark', mci: 'clock-alert-outline' },
+  statusOk: { sf: 'checkmark.circle', mci: 'check-circle-outline' },
+  syncing: { sf: 'arrow.triangle.2.circlepath.icloud', mci: 'cloud-sync' },
+  synced: { sf: 'checkmark.icloud', mci: 'cloud-check' },
+  syncError: { sf: 'exclamationmark.icloud', mci: 'cloud-alert' },
+  syncIdle: { sf: 'icloud', mci: 'cloud-outline' },
+  upload: { sf: 'icloud.and.arrow.up', mci: 'cloud-upload' },
+  info: { sf: 'info.circle', mci: 'information' },
+  signOut: { sf: 'rectangle.portrait.and.arrow.right', mci: 'logout' },
+  email: { sf: 'envelope', mci: 'email' },
+  lock: { sf: 'lock', mci: 'lock' },
+  language: { sf: 'globe', mci: 'translate' },
+  emulator: { sf: 'testtube.2', mci: 'test-tube' },
+  chevron: { sf: 'chevron.right', mci: 'chevron-right' },
+  filter: { sf: 'line.3.horizontal.decrease.circle', mci: 'filter-variant' },
+} as const satisfies Record<string, { sf: SFSymbol; mci: string }>;
+
+export type IconName = keyof typeof ICONS;

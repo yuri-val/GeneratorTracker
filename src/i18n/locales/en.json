@@ -28,7 +28,8 @@
         "totalHours": "Total Hours",
         "refills": "Refills",
         "noGenerators": "No generators yet",
-        "addFirstGenerator": "Tap the + button to add your first generator"
+        "addFirstGenerator": "Tap the + button to add your first generator",
+        "addFirstGeneratorIOS": "Tap + at the top to add your first generator"
     },
     "analytics": {
         "title": "Analytics",

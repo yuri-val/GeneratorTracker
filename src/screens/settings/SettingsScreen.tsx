@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import {
-  Appbar,
   Card,
   Button,
   Text,
@@ -15,7 +14,9 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { isIOS, surfaces } from '../../theme/platform';
 import Constants from 'expo-constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
@@ -37,7 +38,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarOverlap = useTabBarOverlap();
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
@@ -166,12 +167,13 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Content title={t('settings.title')} titleStyle={styles.headerTitle} />
-      </Appbar.Header>
+    <View style={[styles.container, { backgroundColor: isIOS ? surfaces(theme).screen : theme.colors.background }]}>
+      <ScreenHeader title={t('settings.title')} largeTitle />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 16 }]}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={[styles.content, { paddingBottom: tabBarOverlap + 16 }]}
+      >
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
             <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>

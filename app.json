@@ -5,7 +5,7 @@
     "version": "2.4.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "scheme": "generatortracker",
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -50,7 +50,8 @@
             "enableSceneSupport": true
           }
         }
-      ]
+      ],
+      "react-native-bottom-tabs"
     ]
   }
 }
