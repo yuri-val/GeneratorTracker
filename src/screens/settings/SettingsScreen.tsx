@@ -15,11 +15,14 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import Constants from 'expo-constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
 import { EmailAuthForm } from '../../components/EmailAuthForm';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { saveLanguage } from '../../utils/storage';
+import { isUsingFirebaseEmulator } from '../../config/firebase';
+import { appColors } from '../../theme';
 import {
   signInWithEmail,
   signUpWithEmail,
@@ -28,6 +31,9 @@ import {
   useGoogleAuth,
 } from '../../services/auth';
 
+// Read once from the app config so the About section never lags behind app.json.
+const APP_VERSION = Constants.expoConfig?.version ?? '';
+
 export default function SettingsScreen() {
   const theme = useAppTheme();
   const { t, i18n } = useTranslation();
@@ -35,7 +41,7 @@ export default function SettingsScreen() {
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
-  const { request, response, promptAsync } = useGoogleAuth();
+  const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
 
   const handleLanguageChange = async (newLang: string) => {
     await i18n.changeLanguage(newLang);
@@ -61,8 +67,8 @@ export default function SettingsScreen() {
   const handleGoogleSignIn = async (idToken: string) => {
     try {
       setSigningIn(true);
-      await signInWithGoogleCredential(idToken);
-      await performInitialSync();
+      const signedIn = await signInWithGoogleCredential(idToken);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Google sign in error:', error);
@@ -75,8 +81,8 @@ export default function SettingsScreen() {
   const handleAnonymousSignIn = async () => {
     try {
       setSigningIn(true);
-      await signInAnonymouslyUser();
-      await performInitialSync();
+      const signedIn = await signInAnonymouslyUser();
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInAnonymously'));
     } catch (error: any) {
       console.error('Anonymous sign in error:', error);
@@ -108,8 +114,8 @@ export default function SettingsScreen() {
 
   const handleEmailSignIn = async (email: string, password: string) => {
     try {
-      await signInWithEmail(email, password);
-      await performInitialSync();
+      const signedIn = await signInWithEmail(email, password);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Email sign in error:', error);
@@ -120,8 +126,8 @@ export default function SettingsScreen() {
 
   const handleEmailSignUp = async (email: string, password: string) => {
     try {
-      await signUpWithEmail(email, password);
-      await performInitialSync();
+      const signedIn = await signUpWithEmail(email, password);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.accountCreatedSuccess'));
     } catch (error: any) {
       console.error('Email sign up error:', error);
@@ -189,17 +195,19 @@ export default function SettingsScreen() {
                       <Divider style={styles.dividerLine} />
                     </View>
 
-                    <Button
-                      mode="elevated"
-                      icon="google"
-                      onPress={() => promptAsync()}
-                      disabled={!request || signingIn}
-                      loading={signingIn}
-                      style={styles.authButton}
-                      contentStyle={styles.authButtonContent}
-                    >
-                      {t('settings.signInWithGoogle')}
-                    </Button>
+                    {googleAvailable && (
+                      <Button
+                        mode="elevated"
+                        icon="google"
+                        onPress={() => promptAsync()}
+                        disabled={!request || signingIn}
+                        loading={signingIn}
+                        style={styles.authButton}
+                        contentStyle={styles.authButtonContent}
+                      >
+                        {t('settings.signInWithGoogle')}
+                      </Button>
+                    )}
 
                     <Button
                       mode="outlined"
@@ -240,6 +248,7 @@ export default function SettingsScreen() {
                   onPress={handleSignOut}
                   style={styles.authButton}
                   contentStyle={styles.authButtonContent}
+                  testID="sign-out"
                 >
                   {t('settings.signOut')}
                 </Button>
@@ -280,6 +289,7 @@ export default function SettingsScreen() {
                   disabled={syncStatus === 'syncing'}
                   style={{ marginTop: 8 }}
                   contentStyle={styles.authButtonContent}
+                  testID="sync-now"
                 >
                   {t('settings.syncNow')}
                 </Button>
@@ -296,8 +306,8 @@ export default function SettingsScreen() {
                 value={i18n.language.split('-')[0]}
                 onValueChange={handleLanguageChange}
                 buttons={[
-                  { value: 'en', label: t('settings.english') },
-                  { value: 'uk', label: t('settings.ukrainian') },
+                  { value: 'en', label: t('settings.english'), testID: 'lang-en' },
+                  { value: 'uk', label: t('settings.ukrainian'), testID: 'lang-uk' },
                 ]}
               />
             </Surface>
@@ -310,9 +320,16 @@ export default function SettingsScreen() {
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
                 title={t('home.title')}
-                description={t('settings.version', { version: '2.4.0' })}
+                description={t('settings.version', { version: APP_VERSION })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
+              {isUsingFirebaseEmulator && (
+                <List.Item
+                  title={t('settings.emulatorTitle')}
+                  description={t('settings.emulatorDescription')}
+                  left={(props) => <List.Icon {...props} icon="test-tube" color={appColors.warning} />}
+                />
+              )}
             </Surface>
           </List.Section>
         </Animated.View>

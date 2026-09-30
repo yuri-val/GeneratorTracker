@@ -2,7 +2,7 @@
   "expo": {
     "name": "GeneratorTracker",
     "slug": "GeneratorTracker",
-    "version": "2.4.0",
+    "version": "2.4.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -39,7 +39,9 @@
     },
     "plugins": [
       "expo-font",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-localization",
+      "expo-web-browser"
     ]
   }
 }

@@ -4,19 +4,18 @@ import {
   getSyncStatus,
   performManualSync,
   performInitialSync,
-  processSyncQueue,
   startRealtimeListeners,
   stopRealtimeListeners,
+  SyncStatus,
 } from '../services/sync';
-import { syncQueue } from '../utils/syncQueue';
-
-type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
+import { getPendingChangesCount } from '../utils/storage';
+import { getCurrentUser } from '../services/auth';
 
 interface UseSyncReturn {
   syncStatus: SyncStatus;
   pendingCount: number;
-  performManualSync: () => Promise<void>;
-  performInitialSync: () => Promise<void>;
+  performManualSync: (uid?: string) => Promise<void>;
+  performInitialSync: (uid?: string) => Promise<void>;
 }
 
 /**
@@ -39,8 +38,11 @@ export const useSync = (): UseSyncReturn => {
   // Update pending count
   useEffect(() => {
     const updatePendingCount = async () => {
-      const count = await syncQueue.getPendingCount();
-      setPendingCount(count);
+      try {
+        setPendingCount(await getPendingChangesCount());
+      } catch (error) {
+        console.error('Error counting pending changes:', error);
+      }
     };
 
     updatePendingCount();
@@ -62,20 +64,25 @@ export const useSync = (): UseSyncReturn => {
     };
   }, [user]);
 
-  const handleManualSync = async () => {
-    if (!user) {
+  /**
+   * Right after a sign-in the React auth state has not caught up yet (the auth listener
+   * fires later), so callers pass the new uid; otherwise fall back to the context user
+   * and finally to Firebase's own current user.
+   */
+  const resolveUid = (uid?: string): string => {
+    const resolved = uid ?? user?.uid ?? getCurrentUser()?.uid;
+    if (!resolved) {
       throw new Error('User must be authenticated to sync');
     }
-
-    await performManualSync(user.uid);
+    return resolved;
   };
 
-  const handleInitialSync = async () => {
-    if (!user) {
-      throw new Error('User must be authenticated to sync');
-    }
+  const handleManualSync = async (uid?: string) => {
+    await performManualSync(resolveUid(uid));
+  };
 
-    await performInitialSync(user.uid);
+  const handleInitialSync = async (uid?: string) => {
+    await performInitialSync(resolveUid(uid));
   };
 
   return {

@@ -12,3 +12,12 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Heavy: 'Heavy', Medium: 'Medium', Light: 'Light' },
   NotificationFeedbackType: { Success: 'Success', Warning: 'Warning', Error: 'Error' },
 }));
+
+// src/config/firebase initialises Firebase at import time (and throws without a
+// .env). Unit tests never talk to Firebase, so replace the singletons with stubs.
+jest.mock('./src/config/firebase', () => ({
+  app: {},
+  auth: { currentUser: null },
+  db: {},
+  isUsingFirebaseEmulator: false,
+}));

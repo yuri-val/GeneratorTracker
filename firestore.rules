@@ -1,0 +1,80 @@
+rules_version = '2';
+
+// Security rules for the Generator Tracker data model.
+//
+// users/{uid}/generators/{generatorId}/{workSessions|refills|maintenanceTasks}/{id}
+//
+// - Only the signed-in owner can read or write anything under users/{uid}.
+// - Written documents must be self-consistent with their path: `userId` equals the
+//   owner, `id` equals the document id and, for children, `generatorId` equals the
+//   parent generator. The collection-group queries used by sync filter on `userId`, so
+//   a document with a wrong `userId` would silently disappear from other devices.
+// - `lastModified` is the client's ISO string (app ≥ 2.4.2) or a server timestamp
+//   (older app versions still in use).
+// - Collection-group reads (`collectionGroup(x).where('userId', '==', uid)`) are allowed
+//   through the `/{path=**}/...` rules; the query's own filter satisfies them.
+//
+// Tested by rules-tests/firestore.rules.test.ts (`npm run test:rules`).
+// Deploy: npx firebase-tools@14 deploy --only firestore:rules,firestore:indexes --project <id>
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function ownsResource() {
+      return request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    function validLastModified(data) {
+      return data.lastModified is string || data.lastModified is timestamp;
+    }
+
+    function validDoc(userId, docId) {
+      let data = request.resource.data;
+      return data.userId == userId && data.id == docId && validLastModified(data);
+    }
+
+    function validChild(userId, generatorId, docId) {
+      return validDoc(userId, docId) && request.resource.data.generatorId == generatorId;
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+
+      match /generators/{generatorId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validDoc(userId, generatorId);
+
+        match /workSessions/{sessionId} {
+          allow read, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && validChild(userId, generatorId, sessionId);
+        }
+
+        match /refills/{refillId} {
+          allow read, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && validChild(userId, generatorId, refillId);
+        }
+
+        match /maintenanceTasks/{taskId} {
+          allow read, delete: if isOwner(userId);
+          allow create, update: if isOwner(userId) && validChild(userId, generatorId, taskId);
+        }
+      }
+    }
+
+    // Collection-group reads used by pull sync and realtime listeners.
+    match /{path=**}/workSessions/{sessionId} {
+      allow read: if ownsResource();
+    }
+
+    match /{path=**}/refills/{refillId} {
+      allow read: if ownsResource();
+    }
+
+    match /{path=**}/maintenanceTasks/{taskId} {
+      allow read: if ownsResource();
+    }
+  }
+}

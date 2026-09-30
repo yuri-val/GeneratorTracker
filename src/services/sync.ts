@@ -1,402 +1,230 @@
-import { onSnapshot, collection, collectionGroup, query, where } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import { Generator, WorkSession, Refill, MaintenanceTask } from '../models/types';
+import { onSnapshot, Query, CollectionReference, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { EntityType, SyncEntity } from '../models/types';
 import {
-  saveGeneratorToFirestore,
-  getAllGeneratorsFromFirestore,
-  saveWorkSessionToFirestore,
-  getAllWorkSessionsFromFirestore,
-  saveRefillToFirestore,
-  getAllRefillsFromFirestore,
-  saveMaintenanceTaskToFirestore,
-  getAllMaintenanceTasksFromFirestore,
-  deleteGeneratorFromFirestore,
-  deleteWorkSessionFromFirestore,
-  deleteRefillFromFirestore,
-  deleteMaintenanceTaskFromFirestore,
+  CHILD_TYPES,
+  fetchAllRemoteData,
+  writeEntities,
+  deleteRemoteEntities,
+  fromFirestoreDoc,
+  generatorsCollectionRef,
+  childCollectionGroupQuery,
+  EntityWrite,
 } from './firestore';
+import { applyRemoteChanges, RemoteChangeSet } from './syncMerge';
 import {
-  getGenerators,
-  saveGenerator,
-  getWorkSessions,
-  saveWorkSession,
-  getRefills,
-  saveRefill,
-  getMaintenanceTasks,
-  saveMaintenanceTask,
+  COLLECTION_FIELD,
+  getLocalData,
+  getTombstones,
+  markSynced,
+  removeTombstones,
+  updateLocalData,
 } from '../utils/storage';
-import { syncQueue } from '../utils/syncQueue';
+import { createMutex } from '../utils/mutex';
 
 /**
- * Sync Service
- * Orchestrates synchronization between local AsyncStorage and Firebase Firestore
+ * Sync Service — local AsyncStorage ⇄ Firestore.
+ *
+ * A full sync is: push (tombstones → cloud deletes, pending records → cloud writes),
+ * then pull (complete remote snapshot merged by `applyRemoteChanges`). Pending state is
+ * derived from the records themselves, so nothing is ever dropped after N failures —
+ * whatever did not reach the cloud stays pending and is retried by the next sync.
+ * Realtime listeners apply remote changes while signed in.
  */
 
-type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
-type EntityType = 'generator' | 'workSession' | 'refill' | 'maintenance';
+export type SyncStatus = 'idle' | 'syncing' | 'synced' | 'error';
 
 let syncStatus: SyncStatus = 'idle';
+const syncMutex = createMutex();
 let listenerUnsubscribers: (() => void)[] = [];
+let listenerGeneration = 0;
 
-/**
- * Get current sync status
- */
-export const getSyncStatus = (): SyncStatus => {
-  return syncStatus;
-};
+export const getSyncStatus = (): SyncStatus => syncStatus;
 
-/**
- * Resolve conflict between local and remote data using last-write-wins strategy
- */
-const resolveConflict = <T extends { lastModified: string }>(local: T, remote: T): T => {
-  const localTime = new Date(local.lastModified).getTime();
-  const remoteTime = new Date(remote.lastModified).getTime();
+/** A record must be uploaded if it changed locally or is not in this account's cloud yet. */
+const needsPush = (record: SyncEntity, uid: string): boolean =>
+  record.syncStatus !== 'synced' || record.userId !== uid;
 
-  // Last write wins
-  return remoteTime > localTime ? remote : local;
-};
-
-/**
- * Push a single entity to Firestore
- */
-export const pushEntityToFirestore = async (
-  entityType: EntityType,
-  data: any,
-  userId: string
-): Promise<void> => {
-  try {
-    switch (entityType) {
-      case 'generator':
-        await saveGeneratorToFirestore(data as Generator, userId);
-        break;
-      case 'workSession':
-        await saveWorkSessionToFirestore(data as WorkSession, userId);
-        break;
-      case 'refill':
-        await saveRefillToFirestore(data as Refill, userId);
-        break;
-      case 'maintenance':
-        await saveMaintenanceTaskToFirestore(data as MaintenanceTask, userId);
-        break;
-    }
-  } catch (error) {
-    console.error(`Error pushing ${entityType} to Firestore:`, error);
-    throw error;
+export class SyncError extends Error {
+  readonly causes: Error[];
+  constructor(causes: Error[]) {
+    super(causes.map(c => c.message).join('; '));
+    this.name = 'SyncError';
+    this.causes = causes;
   }
-};
+}
 
 /**
- * Delete entity from Firestore
+ * Push local changes. Returns the failures instead of throwing so the pull still runs;
+ * everything that failed stays pending/tombstoned for the next attempt.
  */
-export const deleteEntityFromFirestore = async (
-  entityType: EntityType,
-  entityId: string,
-  generatorId: string | undefined,
-  userId: string
-): Promise<void> => {
-  try {
-    switch (entityType) {
-      case 'generator':
-        await deleteGeneratorFromFirestore(userId, entityId);
-        break;
-      case 'workSession':
-        if (!generatorId) throw new Error('generatorId required for work session');
-        await deleteWorkSessionFromFirestore(userId, generatorId, entityId);
-        break;
-      case 'refill':
-        if (!generatorId) throw new Error('generatorId required for refill');
-        await deleteRefillFromFirestore(userId, generatorId, entityId);
-        break;
-      case 'maintenance':
-        if (!generatorId) throw new Error('generatorId required for maintenance task');
-        await deleteMaintenanceTaskFromFirestore(userId, generatorId, entityId);
-        break;
-    }
-  } catch (error) {
-    console.error(`Error deleting ${entityType} from Firestore:`, error);
-    throw error;
+export const pushLocalChanges = async (uid: string): Promise<Error[]> => {
+  const errors: Error[] = [];
+
+  // 1. Deletions first, so a following pull cannot bring deleted records back.
+  const tombstones = await getTombstones();
+  if (tombstones.length > 0) {
+    const result = await deleteRemoteEntities(uid, tombstones);
+    await removeTombstones(result.done.map(t => t.key));
+    if (result.error) errors.push(result.error);
   }
-};
 
-/**
- * Process sync queue - push pending changes to Firestore
- */
-export const processSyncQueue = async (userId: string): Promise<void> => {
-  const queue = await syncQueue.getQueue();
+  const local = await getLocalData();
+  const syncedAt = () => new Date().toISOString();
 
-  for (const item of queue) {
-    try {
-      if (item.operation === 'delete') {
-        const generatorId = item.data?.generatorId;
-        await deleteEntityFromFirestore(item.entityType, item.entityId, generatorId, userId);
-      } else {
-        // create or update
-        await pushEntityToFirestore(item.entityType, item.data, userId);
-      }
-
-      // Remove from queue on success
-      await syncQueue.removeFromQueue(item.id);
-    } catch (error) {
-      console.error('Error processing sync queue item:', error);
-
-      // Update retry count
-      if (item.retryCount < 3) {
-        await syncQueue.updateQueueItem(item.id, {
-          retryCount: item.retryCount + 1,
-        });
-      } else {
-        // Max retries reached, remove from queue
-        console.error('Max retries reached for sync item:', item);
-        await syncQueue.removeFromQueue(item.id);
-      }
-    }
+  // 2. Generators before their children.
+  const generatorWrites: EntityWrite[] = local.generators
+    .filter(g => needsPush(g, uid))
+    .map(entity => ({ entityType: 'generator', entity }));
+  const failedGenerators = new Set<string>();
+  if (generatorWrites.length > 0) {
+    const result = await writeEntities(uid, generatorWrites);
+    await markSynced(
+      result.done.map(w => ({ entityType: w.entityType, id: w.entity.id, lastModified: w.entity.lastModified })),
+      uid,
+      syncedAt()
+    );
+    const doneIds = new Set(result.done.map(w => w.entity.id));
+    generatorWrites.forEach(w => !doneIds.has(w.entity.id) && failedGenerators.add(w.entity.id));
+    if (result.error) errors.push(result.error);
   }
+
+  // 3. Children — only those whose generator exists in the cloud (never create orphans).
+  const cloudGeneratorIds = new Set(local.generators.map(g => g.id).filter(id => !failedGenerators.has(id)));
+  const childWrites: EntityWrite[] = CHILD_TYPES.flatMap(entityType =>
+    (local[COLLECTION_FIELD[entityType]] as Array<SyncEntity & { generatorId: string }>)
+      .filter(r => needsPush(r, uid) && cloudGeneratorIds.has(r.generatorId))
+      .map(entity => ({ entityType, entity }))
+  );
+  if (childWrites.length > 0) {
+    const result = await writeEntities(uid, childWrites);
+    await markSynced(
+      result.done.map(w => ({ entityType: w.entityType, id: w.entity.id, lastModified: w.entity.lastModified })),
+      uid,
+      syncedAt()
+    );
+    if (result.error) errors.push(result.error);
+  }
+
+  return errors;
 };
 
-/**
- * Perform initial sync on sign-in
- * Uploads all local data to Firestore and pulls remote data
- */
-export const performInitialSync = async (userId: string): Promise<void> => {
-  try {
+/** Download the complete remote state and merge it into local storage. */
+export const pullRemoteChanges = async (uid: string): Promise<void> => {
+  const { data, fetchedAt } = await fetchAllRemoteData(uid);
+  const syncedAt = new Date().toISOString();
+  const changeSets: RemoteChangeSet[] = [
+    { entityType: 'generator', upserts: data.generators, presentIds: data.generators.map(g => g.id) },
+    { entityType: 'workSession', upserts: data.workSessions, presentIds: data.workSessions.map(r => r.id) },
+    { entityType: 'refill', upserts: data.refills, presentIds: data.refills.map(r => r.id) },
+    { entityType: 'maintenance', upserts: data.maintenanceTasks, presentIds: data.maintenanceTasks.map(r => r.id) },
+  ];
+
+  await updateLocalData(state => {
+    const { tombstones, ...local } = state;
+    return applyRemoteChanges(local, changeSets, { uid, syncedAt, snapshotTime: fetchedAt, tombstones });
+  });
+};
+
+/** Push then pull. Syncs never overlap: concurrent calls run one after another. */
+export const performFullSync = (uid: string): Promise<void> =>
+  syncMutex.run(async () => {
     syncStatus = 'syncing';
-
-    // 1. Push all local data to Firestore
-    const localGenerators = await getGenerators();
-    for (const gen of localGenerators) {
-      const genWithUserId = { ...gen, userId };
-      await saveGeneratorToFirestore(genWithUserId, userId);
-
-      // Push related work sessions
-      const sessions = (await getWorkSessions(gen.id)).filter(s => s.generatorId === gen.id);
-      for (const session of sessions) {
-        const sessionWithUserId = { ...session, userId };
-        await saveWorkSessionToFirestore(sessionWithUserId, userId);
-      }
-
-      // Push related refills
-      const refills = (await getRefills(gen.id)).filter(r => r.generatorId === gen.id);
-      for (const refill of refills) {
-        const refillWithUserId = { ...refill, userId };
-        await saveRefillToFirestore(refillWithUserId, userId);
-      }
-
-      // Push related maintenance tasks
-      const tasks = (await getMaintenanceTasks(gen.id)).filter(m => m.generatorId === gen.id);
-      for (const task of tasks) {
-        const taskWithUserId = { ...task, userId };
-        await saveMaintenanceTaskToFirestore(taskWithUserId, userId);
-      }
+    try {
+      const pushErrors = await pushLocalChanges(uid);
+      await pullRemoteChanges(uid);
+      if (pushErrors.length > 0) throw new SyncError(pushErrors);
+      syncStatus = 'synced';
+    } catch (error) {
+      console.error('Sync error:', error);
+      syncStatus = 'error';
+      throw error;
     }
+  });
 
-    // 2. Pull remote data and merge with local
-    await pullAllDataFromFirestore(userId);
+/** After sign-in: full sync, then realtime listeners. */
+export const performInitialSync = async (userId: string): Promise<void> => {
+  await performFullSync(userId);
+  startRealtimeListeners(userId);
+};
 
-    // 3. Process any queued operations
-    await processSyncQueue(userId);
+/** "Sync Now". */
+export const performManualSync = (userId: string): Promise<void> => performFullSync(userId);
 
-    // 4. Start real-time listeners
-    startRealtimeListeners(userId);
+// ============= Realtime listeners =============
 
-    syncStatus = 'synced';
-  } catch (error) {
-    console.error('Initial sync error:', error);
-    syncStatus = 'error';
-    throw error;
+const toChangeSet = (
+  entityType: EntityType,
+  snapshot: QuerySnapshot<DocumentData>,
+  complete: boolean
+): RemoteChangeSet | null => {
+  if (complete) {
+    return {
+      entityType,
+      // Documents with pending local writes are this device's own un-acknowledged
+      // writes: count them as present, but do not treat them as confirmed remote data.
+      upserts: snapshot.docs.filter(d => !d.metadata.hasPendingWrites).map(d => fromFirestoreDoc(d.data(), d.id)),
+      presentIds: snapshot.docs.map(d => d.id),
+    };
   }
+
+  const upserts: SyncEntity[] = [];
+  const removedIds: string[] = [];
+  for (const change of snapshot.docChanges()) {
+    if (change.doc.metadata.hasPendingWrites) continue;
+    if (change.type === 'removed') removedIds.push(change.doc.id);
+    else upserts.push(fromFirestoreDoc(change.doc.data(), change.doc.id));
+  }
+  return upserts.length > 0 || removedIds.length > 0 ? { entityType, upserts, removedIds } : null;
 };
 
 /**
- * Pull all data from Firestore and merge with local
- */
-const pullAllDataFromFirestore = async (userId: string): Promise<void> => {
-  try {
-    // Pull generators
-    const remoteGenerators = await getAllGeneratorsFromFirestore(userId);
-    const localGenerators = await getGenerators();
-
-    for (const remoteGen of remoteGenerators) {
-      const localGen = localGenerators.find(g => g.id === remoteGen.id);
-
-      if (localGen) {
-        // Conflict resolution
-        const resolved = resolveConflict(localGen, remoteGen);
-        await saveGenerator({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      } else {
-        // No local copy, just save remote
-        await saveGenerator({ ...remoteGen, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      }
-    }
-
-    // Pull all work sessions
-    const remoteSessions = await getAllWorkSessionsFromFirestore(userId);
-    const localSessions = await getWorkSessions();
-
-    for (const remoteSession of remoteSessions) {
-      const localSession = localSessions.find(s => s.id === remoteSession.id);
-
-      if (localSession) {
-        const resolved = resolveConflict(localSession, remoteSession);
-        await saveWorkSession({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      } else {
-        await saveWorkSession({ ...remoteSession, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      }
-    }
-
-    // Pull all refills
-    const remoteRefills = await getAllRefillsFromFirestore(userId);
-    const localRefills = await getRefills();
-
-    for (const remoteRefill of remoteRefills) {
-      const localRefill = localRefills.find(r => r.id === remoteRefill.id);
-
-      if (localRefill) {
-        const resolved = resolveConflict(localRefill, remoteRefill);
-        await saveRefill({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      } else {
-        await saveRefill({ ...remoteRefill, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      }
-    }
-
-    // Pull all maintenance tasks
-    const remoteTasks = await getAllMaintenanceTasksFromFirestore(userId);
-    const localTasks = await getMaintenanceTasks();
-
-    for (const remoteTask of remoteTasks) {
-      const localTask = localTasks.find(t => t.id === remoteTask.id);
-
-      if (localTask) {
-        const resolved = resolveConflict(localTask, remoteTask);
-        await saveMaintenanceTask({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      } else {
-        await saveMaintenanceTask({ ...remoteTask, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-      }
-    }
-  } catch (error) {
-    console.error('Error pulling data from Firestore:', error);
-    throw error;
-  }
-};
-
-/**
- * Start real-time Firestore listeners for all collections
+ * Listen to all four collections. The first snapshot that comes from the server is
+ * treated as a complete snapshot (reconciles deletions made while this device was
+ * offline); cache-only snapshots never prune anything.
  */
 export const startRealtimeListeners = (userId: string): void => {
-  // Stop existing listeners first
   stopRealtimeListeners();
+  const generation = ++listenerGeneration;
 
-  // Listen to generators
-  const generatorsRef = collection(db, `users/${userId}/generators`);
-  const unsubGenerators = onSnapshot(generatorsRef, async (snapshot) => {
-    for (const change of snapshot.docChanges()) {
-      const remoteGen = change.doc.data() as Generator;
+  const subscribe = (entityType: EntityType, target: Query<DocumentData> | CollectionReference<DocumentData>) => {
+    let reconciled = false;
+    return onSnapshot(
+      target,
+      snapshot => {
+        if (generation !== listenerGeneration) return;
+        const complete = !reconciled && !snapshot.metadata.fromCache;
+        if (complete) reconciled = true;
 
-      if (change.type === 'added' || change.type === 'modified') {
-        const localGenerators = await getGenerators();
-        const localGen = localGenerators.find(g => g.id === remoteGen.id);
+        const changeSet = toChangeSet(entityType, snapshot, complete);
+        if (!changeSet) return;
 
-        if (localGen) {
-          const resolved = resolveConflict(localGen, remoteGen);
-          await saveGenerator({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        } else {
-          await saveGenerator({ ...remoteGen, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        }
+        const receivedAt = new Date().toISOString();
+        // Called synchronously so the write is queued in snapshot order.
+        updateLocalData(state => {
+          const { tombstones, ...local } = state;
+          return applyRemoteChanges(local, [changeSet], {
+            uid: userId,
+            syncedAt: receivedAt,
+            snapshotTime: receivedAt,
+            tombstones,
+          });
+        }).catch(error => console.error(`Error applying remote ${entityType} changes:`, error));
+      },
+      error => {
+        console.error(`Realtime listener for ${entityType} failed:`, error);
+        if (generation === listenerGeneration) syncStatus = 'error';
       }
-    }
-  });
+    );
+  };
 
-  // Listen to all work sessions using collection group
-  const sessionsQuery = collectionGroup(db, 'workSessions');
-  const sessionsUserQuery = query(sessionsQuery, where('userId', '==', userId));
-  const unsubSessions = onSnapshot(sessionsUserQuery, async (snapshot) => {
-    for (const change of snapshot.docChanges()) {
-      const remoteSession = change.doc.data() as WorkSession;
-
-      if (change.type === 'added' || change.type === 'modified') {
-        const localSessions = await getWorkSessions();
-        const localSession = localSessions.find(s => s.id === remoteSession.id);
-
-        if (localSession) {
-          const resolved = resolveConflict(localSession, remoteSession);
-          await saveWorkSession({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        } else {
-          await saveWorkSession({ ...remoteSession, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        }
-      }
-    }
-  });
-
-  // Listen to all refills using collection group
-  const refillsQuery = collectionGroup(db, 'refills');
-  const refillsUserQuery = query(refillsQuery, where('userId', '==', userId));
-  const unsubRefills = onSnapshot(refillsUserQuery, async (snapshot) => {
-    for (const change of snapshot.docChanges()) {
-      const remoteRefill = change.doc.data() as Refill;
-
-      if (change.type === 'added' || change.type === 'modified') {
-        const localRefills = await getRefills();
-        const localRefill = localRefills.find(r => r.id === remoteRefill.id);
-
-        if (localRefill) {
-          const resolved = resolveConflict(localRefill, remoteRefill);
-          await saveRefill({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        } else {
-          await saveRefill({ ...remoteRefill, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        }
-      }
-    }
-  });
-
-  // Listen to all maintenance tasks using collection group
-  const tasksQuery = collectionGroup(db, 'maintenanceTasks');
-  const tasksUserQuery = query(tasksQuery, where('userId', '==', userId));
-  const unsubTasks = onSnapshot(tasksUserQuery, async (snapshot) => {
-    for (const change of snapshot.docChanges()) {
-      const remoteTask = change.doc.data() as MaintenanceTask;
-
-      if (change.type === 'added' || change.type === 'modified') {
-        const localTasks = await getMaintenanceTasks();
-        const localTask = localTasks.find(t => t.id === remoteTask.id);
-
-        if (localTask) {
-          const resolved = resolveConflict(localTask, remoteTask);
-          await saveMaintenanceTask({ ...resolved, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        } else {
-          await saveMaintenanceTask({ ...remoteTask, syncStatus: 'synced', syncedAt: new Date().toISOString() });
-        }
-      }
-    }
-  });
-
-  // Store unsubscribers
-  listenerUnsubscribers = [unsubGenerators, unsubSessions, unsubRefills, unsubTasks];
+  listenerUnsubscribers = [
+    subscribe('generator', generatorsCollectionRef(userId)),
+    ...CHILD_TYPES.map(type => subscribe(type, childCollectionGroupQuery(type, userId))),
+  ];
 };
 
-/**
- * Stop all real-time listeners
- */
 export const stopRealtimeListeners = (): void => {
+  listenerGeneration++;
   listenerUnsubscribers.forEach(unsubscribe => unsubscribe());
   listenerUnsubscribers = [];
-};
-
-/**
- * Perform manual sync
- */
-export const performManualSync = async (userId: string): Promise<void> => {
-  try {
-    syncStatus = 'syncing';
-
-    // Process pending queue items
-    await processSyncQueue(userId);
-
-    // Pull latest from Firestore
-    await pullAllDataFromFirestore(userId);
-
-    syncStatus = 'synced';
-  } catch (error) {
-    console.error('Manual sync error:', error);
-    syncStatus = 'error';
-    throw error;
-  }
 };

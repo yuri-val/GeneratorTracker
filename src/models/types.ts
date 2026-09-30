@@ -80,10 +80,38 @@ export interface User {
   photoURL: string | null;
 }
 
-// Sync queue item for offline changes
-export interface SyncQueueItem {
+// ===== Sync =====
+
+export type EntityType = 'generator' | 'workSession' | 'refill' | 'maintenance';
+export type ChildEntityType = Exclude<EntityType, 'generator'>;
+
+export type SyncEntity = Generator | WorkSession | Refill | MaintenanceTask;
+
+/** Everything the app keeps offline, one array per entity type. */
+export interface LocalData {
+  generators: Generator[];
+  workSessions: WorkSession[];
+  refills: Refill[];
+  maintenanceTasks: MaintenanceTask[];
+}
+
+/**
+ * Local record of a deletion that still has to reach the cloud. Recorded for every
+ * delete (signed in or not) so a deleted record can never be resurrected by a pull.
+ * Deleting a generator records one tombstone; its children are removed with it.
+ */
+export interface Tombstone {
+  key: string; // `${entityType}:${entityId}`
+  entityType: EntityType;
+  entityId: string;
+  generatorId?: string; // parent generator, required for child entities
+  deletedAt: string; // ISO 8601 datetime
+}
+
+/** Pre-2.4.2 persisted sync queue item; only read to migrate old installs. */
+export interface LegacySyncQueueItem {
   id: string;
-  entityType: 'generator' | 'workSession' | 'refill' | 'maintenance';
+  entityType: EntityType;
   entityId: string;
   operation: 'create' | 'update' | 'delete';
   data: any;

@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
+import { Platform } from 'react-native';
 import { auth } from '../config/firebase';
 import { User } from '../models/types';
 
@@ -73,19 +74,52 @@ export const signInAnonymouslyUser = async (): Promise<User> => {
 };
 
 /**
- * Sign in with Google using expo-auth-session
+ * Google OAuth client ids, one per platform (see .env.example). `expoClientId` no
+ * longer exists in expo-auth-session v7; the web client id covers web builds.
  */
-export const useGoogleAuth = () => {
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-    responseType: 'id_token',  // Request ID token for Firebase Auth
-  });
-
-  return { request, response, promptAsync };
+const GOOGLE_CLIENT_IDS = {
+  ios: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+  android: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+  web: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
 };
+
+/**
+ * expo-auth-session throws *during render* when the current platform has no client
+ * id, which used to take the whole Settings screen down. Google sign-in is only
+ * offered when this build has an id for the platform it runs on.
+ */
+export const isGoogleAuthConfigured = !!Platform.select({
+  ios: GOOGLE_CLIENT_IDS.ios,
+  android: GOOGLE_CLIENT_IDS.android,
+  default: GOOGLE_CLIENT_IDS.web,
+});
+
+const useConfiguredGoogleAuth = () => {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: GOOGLE_CLIENT_IDS.ios,
+    androidClientId: GOOGLE_CLIENT_IDS.android,
+    webClientId: GOOGLE_CLIENT_IDS.web,
+    responseType: 'id_token', // Request ID token for Firebase Auth
+  });
+  return { request, response, promptAsync, available: true as const };
+};
+
+type GoogleAuth = Omit<ReturnType<typeof useConfiguredGoogleAuth>, 'available'> & { available: boolean };
+
+const useUnavailableGoogleAuth = (): GoogleAuth => ({
+  request: null,
+  response: null,
+  promptAsync: async () => ({ type: 'dismiss' }),
+  available: false,
+});
+
+/**
+ * Sign in with Google using expo-auth-session. The implementation is chosen once per
+ * build (the client ids are inlined at build time), so the hook order never changes.
+ */
+export const useGoogleAuth: () => GoogleAuth = isGoogleAuthConfigured
+  ? useConfiguredGoogleAuth
+  : useUnavailableGoogleAuth;
 
 /**
  * Complete Google sign in with the response from OAuth

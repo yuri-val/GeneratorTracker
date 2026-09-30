@@ -7,13 +7,13 @@ React Native/Expo mobile app for tracking generator operating hours and fuel ref
 
 ### Data Flow (Offline-First Pattern)
 1. **Local-first**: All data operations go through `src/utils/storage.ts` → AsyncStorage
-2. **Sync queue**: Changes queue in `src/utils/syncQueue.ts` when user is authenticated
-3. **Background sync**: `src/services/sync.ts` pushes queued changes to Firestore
-4. **Conflict resolution**: Last-write-wins using `lastModified` timestamp (see `resolveConflict` in sync.ts)
+2. **Change tracking**: local edits are stored `syncStatus: 'pending'`; local deletes record tombstones (no queue)
+3. **Sync**: `src/services/sync.ts` pushes pending records/tombstones, then pulls a complete remote snapshot
+4. **Conflict resolution**: Last-write-wins on the client `lastModified` (pure rules in `src/services/syncMerge.ts`)
 
 ### Key Layers
 - **Models** (`src/models/types.ts`): All entities extend `SyncMetadata` with `lastModified`, `syncStatus`, `syncedAt`, `userId`
-- **Storage** (`src/utils/storage.ts`): CRUD operations that auto-queue for sync when user authenticated
+- **Storage** (`src/utils/storage.ts`): CRUD operations serialized by a mutex; mark records pending and record tombstones
 - **Firestore** (`src/services/firestore.ts`): Firebase document operations
 - **Sync** (`src/services/sync.ts`): Orchestrates local↔cloud synchronization
 
@@ -22,6 +22,7 @@ React Native/Expo mobile app for tracking generator operating hours and fuel ref
 users/{userId}/generators/{generatorId}
 users/{userId}/generators/{generatorId}/workSessions/{sessionId}
 users/{userId}/generators/{generatorId}/refills/{refillId}
+users/{userId}/generators/{generatorId}/maintenanceTasks/{taskId}
 ```
 
 ## Navigation Structure
@@ -80,7 +81,7 @@ Firebase config via `EXPO_PUBLIC_FIREBASE_*` in `.env` (see `src/config/firebase
 
 ### Adding New Entity Type
 1. Add interface extending `SyncMetadata` in `src/models/types.ts`
-2. Add CRUD functions in `src/utils/storage.ts` (follow existing pattern for sync queue integration)
+2. Add CRUD functions in `src/utils/storage.ts` via `saveEntity`/`deleteEntity`
 3. Add Firestore operations in `src/services/firestore.ts`
 4. Update sync service in `src/services/sync.ts`
 

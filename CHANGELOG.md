@@ -5,6 +5,62 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2026-09-30
+
+Stabilization stage 1 — sync data integrity (`docs/STABILIZATION_PLAN.md` S-1, S-2, S-3, S-8, S-9, S-28).
+No new features; Firestore structure unchanged (one added field, `serverUpdatedAt`), compatible with
+devices still on 2.4.0/2.4.1.
+
+### Fixed
+- **Initial sync after sign-in never ran** (S-28): the Settings screen called it before the auth state reached React, so it threw "User must be authenticated"; data created before signing in was never uploaded. The signed-in uid is now passed explicitly.
+- **Cross-device edits stopped arriving** (S-1): Firestore replaced `lastModified` with a server timestamp and realtime listeners stored it unconverted, so last-write-wins compared `NaN` and the local copy won forever. The client ISO time is now kept (server time goes to `serverUpdatedAt`), Timestamps are converted everywhere, and values already stored by older versions are normalized when read.
+- **Cleared fields were never cleared in the cloud**: documents are written with a full `set` instead of `merge`.
+- **Deletions did not sync and deleted records came back** (S-2): every local delete now records a tombstone (also while signed out) that is pushed before any pull; realtime `removed` events are applied; complete snapshots reconcile deletions made elsewhere, touching only records confirmed in this account's cloud.
+- **Deleting a generator left its sessions/refills/tasks in Firestore** (S-3): cascade delete in batches; orphaned cloud records are never stored locally; Analytics only counts records of existing generators.
+- **Concurrent storage writes could overwrite each other** (S-8): all writes go through one FIFO mutex and `multiSet`; syncs never overlap.
+- **Queued changes were dropped after 3 failed attempts** (S-6): replaced by state-based change tracking — failures stay pending and are retried.
+- **Sync could hang forever offline** (S-7, partial): network operations time out after 30 s; reconciliation reads come from the server only (`getDocsFromServer`), never from an empty offline cache.
+- Unreadable local data is backed up under `<key>.corrupt-<timestamp>` before being reset.
+- **Settings screen crashed when the build had no Google OAuth client id for its platform** (S-31): expo-auth-session throws during render in that case. Google sign-in is now only offered when the id is present; the rest of Settings always works. Store builds carry all three ids, so released apps were not affected.
+- CI: pull requests no longer run the workflow twice (push + pull_request), and Playwright fails a missing element after 15 s instead of waiting for the whole test timeout.
+
+### Changed
+- The persisted sync queue (`src/utils/syncQueue.ts`) was removed; old installs migrate automatically (queued deletes → tombstones, queued updates → pending).
+- Local saves always set `syncStatus: 'pending'` and a monotonic `lastModified`, keeping the stored `syncedAt`/`userId`.
+- New modules: `src/services/syncMerge.ts` (pure merge rules), `src/utils/mutex.ts`, `src/utils/syncMeta.ts`.
+
+### Security
+- `firestore.rules`: writes must be self-consistent with their path (`userId`, `id`, `generatorId`) and carry a `lastModified`; covered by 11 emulator tests (`npm run test:rules`, new CI job). Deploying to the production project is still a manual step.
+
+### Tests
+- 105 unit tests (new: `syncMerge`, `firestore`, `mutex`, `syncMeta`; rewritten: `storage`, `sync`).
+- Emulator e2e extended to 7 cloud-sync scenarios (cross-device edits incl. legacy server timestamps, cleared fields, remote deletion, deletion while signed out, cascade delete, cloud orphans).
+
+## [2.4.1] - 2026-09-30
+
+Stabilization phase kick-off: no functional changes for users. This release fixes the
+build health issues found in the audit and sets up the test environment used for the
+upcoming stabilization work (see `docs/STABILIZATION_PLAN.md`).
+
+### Fixed
+- TypeScript errors that broke `tsc --noEmit`: `getReactNativePersistence` typing for the React Native build of `firebase/auth`, and the obsolete `expoClientId` option in the Google OAuth request.
+- Google OAuth now uses the dedicated Android client id (`EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`) instead of the web client id.
+- Settings → About reads the version from `expo-constants` instead of a hard-coded string.
+
+### Changed
+- Expo SDK 54 dependencies aligned with `expo install --fix` (expo 54.0.37, expo-auth-session, expo-constants, expo-crypto, expo-dev-client, expo-font, expo-localization, expo-web-browser, jest-expo); added the `expo-localization` and `expo-web-browser` config plugins.
+- `@react-native-community/cli` pinned instead of `latest`; `engines.node >= 20.19`; `.nvmrc` = 22.
+- `CLAUDE.md` describes the actual sync triggers (sign-in and "Sync Now" only) and the testing commands; `README.md` prerequisites updated.
+
+### Added
+- **Firebase Emulator Suite support**: `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true` wires the app to local Auth/Firestore emulators (forced `demo-generatortracker` project, host auto-detected for devices), with `firebase.json`, reference `firestore.rules` and `firestore.indexes.json`, an "Firebase Emulator" indicator in Settings, and `npm run emulators` / `start:emu` / `web:emu` scripts.
+- **Unit tests** for `storage`, `syncQueue`, `calculations`, `analytics` and the `sync` service (Firestore mocked): 64 tests in total.
+- **Web e2e** (`e2e/core-flows.spec.ts`): generator CRUD, start/stop session, refill → analytics, language switch persistence, seeded history/analytics; shared helpers in `e2e/helpers.ts`.
+- **Cloud-sync e2e** (`e2e/sync-emulator.spec.ts`, `npm run test:e2e:emu`): sign-up, push via "Sync Now" and realtime pull verified against the emulators.
+- `testID`s on key UI elements and stable bottom-tab ids (`tab-home`, `tab-analytics`, `tab-settings`).
+- GitHub Actions `ci.yml` (typecheck + unit + emulator e2e on every push/PR) and a husky pre-commit hook (`npm run typecheck && npm test`).
+- `docs/TESTING.md` (test environment guide) and `docs/STABILIZATION_PLAN.md` (audit findings S-1…S-27 with proposed fixes and order of work).
+
 ## [2.4.0] - 2026-06-29
 
 ### Added

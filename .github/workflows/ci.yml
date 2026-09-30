@@ -1,0 +1,132 @@
+name: CI
+
+# Pull requests run through `pull_request`; pushes only for main, so a push to a PR
+# branch does not start a second, identical run.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit:
+    name: 🔎 Typecheck & unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧭 Typecheck
+        run: npm run typecheck
+
+      - name: 🧪 Unit tests
+        run: npm test -- --ci --coverage
+
+      - name: 📤 Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage
+          retention-days: 7
+
+  rules:
+    name: 🔐 Firestore security rules
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: ☕ Setup Java (Firestore emulator)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧰 Cache Firebase emulator binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ runner.os }}
+
+      - name: 🔐 Rules tests
+        run: npm run test:rules
+
+  e2e:
+    name: 🌐 Web e2e (Playwright + Firebase emulators)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # The web bundle only needs a syntactically complete config; in emulator mode
+      # src/config/firebase.ts ignores these values and targets the local emulators.
+      # Google OAuth client ids are deliberately absent: the app must work without them.
+      EXPO_PUBLIC_FIREBASE_API_KEY: ci-dummy-key
+      EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: localhost
+      EXPO_PUBLIC_FIREBASE_PROJECT_ID: demo-generatortracker
+      EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: demo-generatortracker.appspot.com
+      EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: '0'
+      EXPO_PUBLIC_FIREBASE_APP_ID: '1:0:web:ci'
+    steps:
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: ☕ Setup Java (Firestore emulator)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧰 Cache Firebase emulator binaries
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: firebase-emulators-${{ runner.os }}
+
+      - name: 🧰 Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: 🌐 Run e2e suite inside the emulators
+        run: npm run test:e2e:emu
+
+      - name: 📤 Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

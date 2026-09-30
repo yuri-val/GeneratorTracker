@@ -1,0 +1,7 @@
+# Pick a modern Node when nvm is available (the login shell may default to an old one).
+if [ -s "$HOME/.nvm/nvm.sh" ]; then
+  . "$HOME/.nvm/nvm.sh"
+  nvm use --silent >/dev/null 2>&1 || true
+fi
+
+npm run typecheck && npm test -- --bail --silent

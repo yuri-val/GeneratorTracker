@@ -17,7 +17,7 @@ A mobile app for tracking generator operating hours and fuel refills. Built with
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js 20.19+ (22 recommended — see `.nvmrc`)
 - npm or yarn
 - Expo Go app on your mobile device (for testing)
 
@@ -36,6 +36,16 @@ npm start
 3. Run on your device:
 - Scan the QR code with Expo Go (Android) or Camera app (iOS)
 - Or press `i` for iOS simulator or `a` for Android emulator
+
+## Testing
+
+```bash
+npm run check          # typecheck + unit tests
+npm run test:e2e       # web e2e (Playwright)
+npm run test:e2e:emu   # cloud-sync e2e against local Firebase emulators
+```
+
+See [docs/TESTING.md](docs/TESTING.md) for the full test environment (unit, web e2e, Firebase Emulator Suite, CI) and [docs/STABILIZATION_PLAN.md](docs/STABILIZATION_PLAN.md) for the current stabilization backlog.
 
 ## Usage
 

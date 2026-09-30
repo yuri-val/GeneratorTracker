@@ -53,6 +53,8 @@ export function PaperBottomTabBar({ navigation, state, descriptors, insets }: Bo
           if (options.title) return options.title;
           return route.name;
         }}
+        // Stable, locale-independent ids for e2e tests (tab-home / tab-analytics / tab-settings)
+        getTestID={({ route }) => `tab-${route.name.toLowerCase()}`}
         style={styles.bar}
         activeIndicatorStyle={{ backgroundColor: theme.colors.primaryContainer }}
       />
