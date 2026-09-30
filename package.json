@@ -1,6 +1,6 @@
 {
   "name": "generatortracker",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -18,7 +18,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:emu": "FIREBASE_EMULATOR=1 npx -y firebase-tools@14 emulators:exec --only auth,firestore --project demo-generatortracker \"playwright test\"",
     "check": "npm run typecheck && npm test",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:rules": "npx -y firebase-tools@14 emulators:exec --only firestore --project demo-generatortracker \"jest -c jest.rules.config.js\""
   },
   "engines": {
     "node": ">=20.19.0"
@@ -63,6 +64,7 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@playwright/test": "^1.61.1",
     "@react-native-community/cli": "^20.1.0",
     "@react-native/metro-config": "0.83.1",

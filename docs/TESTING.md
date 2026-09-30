@@ -8,7 +8,8 @@
 | Layer | Tool | Command | Covers |
 |---|---|---|---|
 | Types | TypeScript | `npm run typecheck` | Whole project incl. `e2e/` |
-| Unit | Jest (`jest-expo`) | `npm test` / `npm run test:coverage` | `calculations`, `analytics`, `storage` (AsyncStorage mock), `syncQueue`, `sync` service (Firestore mocked) |
+| Unit | Jest (`jest-expo`) | `npm test` / `npm run test:coverage` | `calculations`, `analytics`, `storage` (AsyncStorage mock: mutex, tombstones, migration), `syncMerge` (pure merge rules), `firestore` (batching/cascade with a fake SDK), `sync` service, `mutex`, `syncMeta` |
+| Security rules | `@firebase/rules-unit-testing` + Firestore emulator | `npm run test:rules` | `firestore.rules`: owner isolation, document shape, collection-group queries |
 | Web e2e | Playwright (Chromium) | `npm run test:e2e` | Core UI flows on the Expo web build, offline only |
 | Cloud sync e2e | Playwright + Firebase Emulator Suite | `npm run test:e2e:emu` | Sign-up, push via *Sync Now*, realtime pull — against local emulators |
 | Manual, device | Expo dev server / EAS preview APK | `npm start`, `npm run start:emu`, `make eas-build-preview` | Real devices, Play *closed testing* track |
@@ -46,6 +47,15 @@ Conventions:
 - Time-dependent helpers use `jest.useFakeTimers()` + `jest.setSystemTime()` with **local** dates so
   the suite is timezone-independent.
 
+## Security rules tests
+
+```bash
+npm run test:rules
+```
+
+Runs `rules-tests/*.test.ts` (separate Jest config `jest.rules.config.js`, Node environment) inside
+`firebase emulators:exec --only firestore`. Every change to `firestore.rules` needs a matching case.
+
 ## Web e2e (Playwright)
 
 ```bash
@@ -75,9 +85,11 @@ This wraps Playwright in `firebase emulators:exec`: it boots the **Auth** (`:909
 `EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true`, runs *all* specs (including `e2e/sync-emulator.spec.ts`, which
 is skipped otherwise), then shuts everything down. No real Firebase project or credentials are used.
 
-The emulator spec creates a throw-away account through the app's own sign-up form, pushes a generator
-with *Sync Now*, then writes a document straight into the emulator through its REST API and asserts the
-realtime listener delivers it to the device.
+The emulator spec creates throw-away accounts through the app's own forms and simulates a second device by
+writing straight into Firestore through the emulator REST API. It covers: initial push on sign-up, push via
+*Sync Now*, realtime pull, edits from another device (incl. the server-time `lastModified` of old app
+versions), clearing an optional field, remote deletion, deletion while signed out, cascade delete of a
+generator's subcollections, and cloud orphans not reaching Analytics.
 
 ## Running the app against the emulators (manual testing)
 
@@ -122,7 +134,8 @@ npx firebase-tools@14 deploy --only firestore:rules,firestore:indexes --project 
 `.github/workflows/ci.yml` runs on every push and pull request:
 
 1. **unit** — `npm ci`, `npm run typecheck`, `npm test -- --ci --coverage` (coverage uploaded as an artifact).
-2. **e2e** — installs Chromium and Java, caches the emulator binaries, runs `npm run test:e2e:emu`;
+2. **rules** — Firestore security rules tests on the emulator (`npm run test:rules`).
+3. **e2e** — installs Chromium and Java, caches the emulator binaries, runs `npm run test:e2e:emu`;
    the Playwright report is uploaded on failure.
 
 Locally, the husky **pre-commit** hook runs `npm run typecheck && npm test -- --bail` (`.husky/pre-commit`).

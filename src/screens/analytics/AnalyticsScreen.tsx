@@ -34,8 +34,11 @@ export default function AnalyticsScreen() {
   const loadAnalytics = async () => {
     try {
       const gens = await getGenerators();
-      const sessions = await getWorkSessions();
-      const refills = await getRefills();
+      // Only count records of generators that exist: stray records of a deleted
+      // generator must never inflate the totals.
+      const generatorIds = new Set(gens.map(g => g.id));
+      const sessions = (await getWorkSessions()).filter(s => generatorIds.has(s.generatorId));
+      const refills = (await getRefills()).filter(r => generatorIds.has(r.generatorId));
 
       const gensWithStats: GeneratorWithStats[] = gens.map(g => {
         const genSessions = sessions.filter(s => s.generatorId === g.id);

@@ -67,8 +67,8 @@ export default function SettingsScreen() {
   const handleGoogleSignIn = async (idToken: string) => {
     try {
       setSigningIn(true);
-      await signInWithGoogleCredential(idToken);
-      await performInitialSync();
+      const signedIn = await signInWithGoogleCredential(idToken);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Google sign in error:', error);
@@ -81,8 +81,8 @@ export default function SettingsScreen() {
   const handleAnonymousSignIn = async () => {
     try {
       setSigningIn(true);
-      await signInAnonymouslyUser();
-      await performInitialSync();
+      const signedIn = await signInAnonymouslyUser();
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInAnonymously'));
     } catch (error: any) {
       console.error('Anonymous sign in error:', error);
@@ -114,8 +114,8 @@ export default function SettingsScreen() {
 
   const handleEmailSignIn = async (email: string, password: string) => {
     try {
-      await signInWithEmail(email, password);
-      await performInitialSync();
+      const signedIn = await signInWithEmail(email, password);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.signedInSuccess'));
     } catch (error: any) {
       console.error('Email sign in error:', error);
@@ -126,8 +126,8 @@ export default function SettingsScreen() {
 
   const handleEmailSignUp = async (email: string, password: string) => {
     try {
-      await signUpWithEmail(email, password);
-      await performInitialSync();
+      const signedIn = await signUpWithEmail(email, password);
+      await performInitialSync(signedIn.uid);
       Alert.alert(t('common.success'), t('settings.accountCreatedSuccess'));
     } catch (error: any) {
       console.error('Email sign up error:', error);

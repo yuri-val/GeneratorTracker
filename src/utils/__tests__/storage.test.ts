@@ -1,14 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Generator, WorkSession, Refill, MaintenanceTask } from '../../models/types';
-import { syncQueue } from '../syncQueue';
-
-// storage.ts asks the auth service for the current user to decide whether a change
-// must be queued for cloud sync. Control that per test.
-const mockGetCurrentUser = jest.fn();
-jest.mock('../../services/auth', () => ({
-  getCurrentUser: () => mockGetCurrentUser(),
-}));
-
 import {
   getGenerators,
   saveGenerator,
@@ -25,16 +16,22 @@ import {
   deleteMaintenanceTask,
   getSavedLanguage,
   saveLanguage,
+  getLocalData,
+  getTombstones,
+  removeTombstones,
+  markSynced,
+  getPendingChangesCount,
+  updateLocalData,
 } from '../storage';
 
-const NOW = '2026-06-29T10:00:00.000Z';
+const OLD = '2026-06-01T00:00:00.000Z';
 
 const makeGenerator = (overrides: Partial<Generator> = {}): Generator => ({
   id: 'g1',
   name: 'Honda',
   purchaseDate: '2026-01-01',
-  createdAt: NOW,
-  lastModified: NOW,
+  createdAt: OLD,
+  lastModified: OLD,
   syncStatus: 'pending',
   ...overrides,
 });
@@ -46,8 +43,8 @@ const makeSession = (overrides: Partial<WorkSession> = {}): WorkSession => ({
   startTime: '09:00',
   endTime: '11:00',
   hours: 2,
-  createdAt: NOW,
-  lastModified: NOW,
+  createdAt: OLD,
+  lastModified: OLD,
   syncStatus: 'pending',
   ...overrides,
 });
@@ -57,8 +54,8 @@ const makeRefill = (overrides: Partial<Refill> = {}): Refill => ({
   generatorId: 'g1',
   date: '2026-06-29',
   amount: 5,
-  createdAt: NOW,
-  lastModified: NOW,
+  createdAt: OLD,
+  lastModified: OLD,
   syncStatus: 'pending',
   ...overrides,
 });
@@ -70,169 +67,232 @@ const makeTask = (overrides: Partial<MaintenanceTask> = {}): MaintenanceTask => 
   intervalHours: 250,
   lastServiceHours: 0,
   lastServiceDate: '2026-01-01',
-  createdAt: NOW,
-  lastModified: NOW,
+  createdAt: OLD,
+  lastModified: OLD,
   syncStatus: 'pending',
   ...overrides,
 });
 
+const seed = async (key: string, value: unknown) => AsyncStorage.setItem(key, JSON.stringify(value));
+
+let errorSpy: jest.SpyInstance;
+
 beforeEach(async () => {
   await AsyncStorage.clear();
-  mockGetCurrentUser.mockReturnValue(null);
+  errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-describe('generators', () => {
-  it('starts empty', async () => {
-    expect(await getGenerators()).toEqual([]);
-  });
+afterEach(() => {
+  errorSpy.mockRestore();
+});
 
+describe('local saves', () => {
   it('creates, then updates in place by id', async () => {
     await saveGenerator(makeGenerator());
     await saveGenerator(makeGenerator({ id: 'g2', name: 'Second' }));
     await saveGenerator(makeGenerator({ name: 'Honda EU22' }));
 
-    const generators = await getGenerators();
-    expect(generators.map(g => g.name)).toEqual(['Honda EU22', 'Second']);
+    expect((await getGenerators()).map(g => g.name)).toEqual(['Honda EU22', 'Second']);
   });
 
-  it('fills in lastModified and a pending syncStatus when they are missing', async () => {
-    const bare = { ...makeGenerator(), lastModified: '', syncStatus: undefined } as unknown as Generator;
-    await saveGenerator(bare);
+  it('always marks a local edit pending, even if the caller passed "synced"', async () => {
+    await saveGenerator(makeGenerator({ syncStatus: 'synced' }));
+    expect((await getGenerators())[0].syncStatus).toBe('pending');
+  });
+
+  it('stamps a fresh lastModified that is strictly newer than the stored one', async () => {
+    const future = '2099-01-01T00:00:00.000Z'; // e.g. written by a device with a fast clock
+    await seed('@generators', [makeGenerator({ lastModified: future, syncStatus: 'synced' })]);
+
+    await saveGenerator(makeGenerator({ name: 'Edited', lastModified: OLD }));
 
     const [saved] = await getGenerators();
-    expect(saved.syncStatus).toBe('pending');
-    expect(new Date(saved.lastModified).getTime()).not.toBeNaN();
+    expect(Date.parse(saved.lastModified)).toBeGreaterThan(Date.parse(future));
   });
 
-  it('keeps explicit sync metadata untouched', async () => {
-    await saveGenerator(makeGenerator({ syncStatus: 'synced', syncedAt: NOW, userId: 'u1' }));
+  it('keeps the cloud metadata of the stored version (syncedAt, userId)', async () => {
+    await seed('@generators', [makeGenerator({ syncStatus: 'synced', syncedAt: OLD, userId: 'u1' })]);
 
-    const [saved] = await getGenerators();
-    expect(saved).toMatchObject({ syncStatus: 'synced', syncedAt: NOW, userId: 'u1', lastModified: NOW });
+    await saveGenerator(makeGenerator({ name: 'Edited' }));
+
+    expect((await getGenerators())[0]).toMatchObject({ name: 'Edited', syncStatus: 'pending', syncedAt: OLD, userId: 'u1' });
   });
 
-  it('cascades a delete to sessions, refills and maintenance tasks', async () => {
+  it('does not lose writes that run concurrently (S-8)', async () => {
+    await Promise.all([
+      saveGenerator(makeGenerator({ id: 'a' })),
+      saveGenerator(makeGenerator({ id: 'b' })),
+      saveWorkSession(makeSession({ id: 's-a', generatorId: 'a' })),
+      saveGenerator(makeGenerator({ id: 'c' })),
+      deleteGenerator('b'),
+      saveRefill(makeRefill({ id: 'r-c', generatorId: 'c' })),
+    ]);
+
+    expect((await getGenerators()).map(g => g.id).sort()).toEqual(['a', 'c']);
+    expect((await getWorkSessions()).map(s => s.id)).toEqual(['s-a']);
+    expect((await getRefills()).map(r => r.id)).toEqual(['r-c']);
+  });
+});
+
+describe('deletes and tombstones', () => {
+  it('cascades a generator delete locally and records a single tombstone', async () => {
     await saveGenerator(makeGenerator());
     await saveGenerator(makeGenerator({ id: 'g2', name: 'Keep me' }));
     await saveWorkSession(makeSession());
     await saveWorkSession(makeSession({ id: 's2', generatorId: 'g2' }));
     await saveRefill(makeRefill());
-    await saveRefill(makeRefill({ id: 'r2', generatorId: 'g2' }));
     await saveMaintenanceTask(makeTask());
-    await saveMaintenanceTask(makeTask({ id: 'm2', generatorId: 'g2' }));
+    await deleteWorkSession('s1'); // child tombstone, superseded by the generator's
 
     await deleteGenerator('g1');
 
     expect((await getGenerators()).map(g => g.id)).toEqual(['g2']);
     expect((await getWorkSessions()).map(s => s.id)).toEqual(['s2']);
-    expect((await getRefills()).map(r => r.id)).toEqual(['r2']);
-    expect((await getMaintenanceTasks()).map(m => m.id)).toEqual(['m2']);
+    expect(await getRefills()).toEqual([]);
+    expect(await getMaintenanceTasks()).toEqual([]);
+    const tombstones = await getTombstones();
+    expect(tombstones).toHaveLength(1);
+    expect(tombstones[0]).toMatchObject({ key: 'generator:g1', entityType: 'generator', entityId: 'g1' });
   });
 
-  it('returns [] instead of throwing when the stored JSON is corrupted', async () => {
-    const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  it('records child tombstones with their parent generator, whether signed in or not', async () => {
+    await saveWorkSession(makeSession());
+    await saveRefill(makeRefill());
+    await saveMaintenanceTask(makeTask());
+
+    await deleteWorkSession('s1');
+    await deleteRefill('r1');
+    await deleteMaintenanceTask('m1');
+
+    expect((await getTombstones()).map(t => [t.key, t.generatorId])).toEqual([
+      ['workSession:s1', 'g1'],
+      ['refill:r1', 'g1'],
+      ['maintenance:m1', 'g1'],
+    ]);
+  });
+
+  it('ignores deletes of unknown ids', async () => {
+    await deleteGenerator('missing');
+    expect(await getTombstones()).toEqual([]);
+  });
+
+  it('removes tombstones once their deletion reached the cloud', async () => {
+    await saveWorkSession(makeSession());
+    await saveRefill(makeRefill());
+    await deleteWorkSession('s1');
+    await deleteRefill('r1');
+
+    await removeTombstones(['workSession:s1']);
+
+    expect((await getTombstones()).map(t => t.key)).toEqual(['refill:r1']);
+  });
+});
+
+describe('markSynced', () => {
+  it('marks the pushed version synced with the account and time', async () => {
+    await saveGenerator(makeGenerator());
+    const [pending] = await getGenerators();
+
+    await markSynced([{ entityType: 'generator', id: 'g1', lastModified: pending.lastModified }], 'u1', OLD);
+
+    expect((await getGenerators())[0]).toMatchObject({ syncStatus: 'synced', syncedAt: OLD, userId: 'u1' });
+  });
+
+  it('leaves a record pending if it was edited again after the push started', async () => {
+    await saveGenerator(makeGenerator());
+    const [pushed] = await getGenerators();
+    await saveGenerator(makeGenerator({ name: 'Edited during push' }));
+
+    await markSynced([{ entityType: 'generator', id: 'g1', lastModified: pushed.lastModified }], 'u1', OLD);
+
+    expect((await getGenerators())[0]).toMatchObject({ name: 'Edited during push', syncStatus: 'pending' });
+  });
+});
+
+describe('pending changes count', () => {
+  it('counts pending records and tombstones', async () => {
+    await seed('@generators', [makeGenerator({ syncStatus: 'synced' }), makeGenerator({ id: 'g2' })]);
+    await seed('@work_sessions', [makeSession({ syncStatus: 'synced' })]);
+    await deleteWorkSession('s1');
+
+    expect(await getPendingChangesCount()).toBe(2); // g2 + the deletion
+  });
+});
+
+describe('reading data written by older versions', () => {
+  it('normalizes Firestore Timestamp objects stored as lastModified (S-1)', async () => {
+    await seed('@generators', [
+      makeGenerator({ lastModified: { seconds: 1780000000, nanoseconds: 500000000 } as unknown as string }),
+    ]);
+
+    const [generator] = await getGenerators();
+    expect(generator.lastModified).toBe(new Date(1780000000500).toISOString());
+  });
+
+  it('treats records without a syncStatus as pending', async () => {
+    const { syncStatus: _omit, ...legacy } = makeGenerator();
+    await seed('@generators', [legacy]);
+
+    expect((await getGenerators())[0].syncStatus).toBe('pending');
+  });
+
+  it('keeps a backup of unreadable data and carries on with an empty list', async () => {
     await AsyncStorage.setItem('@generators', '{not json');
 
     await expect(getGenerators()).resolves.toEqual([]);
-    errorSpy.mockRestore();
+    const keys = await AsyncStorage.getAllKeys();
+    const backupKey = keys.find(k => k.startsWith('@generators.corrupt-'));
+    expect(backupKey).toBeDefined();
+    expect(await AsyncStorage.getItem(backupKey as string)).toBe('{not json');
+  });
+
+  it('migrates the pre-2.4.2 sync queue: deletes → tombstones, updates → pending', async () => {
+    await seed('@generators', [makeGenerator({ syncStatus: 'synced', userId: 'u1' })]);
+    await seed('@sync_queue', [
+      { id: 'q1', entityType: 'generator', entityId: 'g1', operation: 'update', data: {}, timestamp: OLD, retryCount: 0 },
+      {
+        id: 'q2', entityType: 'workSession', entityId: 's-gone', operation: 'delete',
+        data: { id: 's-gone', generatorId: 'g1' }, timestamp: OLD, retryCount: 2,
+      },
+    ]);
+
+    expect(await getPendingChangesCount()).toBe(2);
+    expect(await getTombstones()).toEqual([
+      { key: 'workSession:s-gone', entityType: 'workSession', entityId: 's-gone', generatorId: 'g1', deletedAt: OLD },
+    ]);
+    expect((await getGenerators())[0].syncStatus).toBe('pending');
+    expect(await AsyncStorage.getItem('@sync_queue')).toBeNull();
   });
 });
 
-describe('work sessions', () => {
-  it('filters by generator when asked', async () => {
+describe('queries', () => {
+  it('filters by generator and finds the active session', async () => {
     await saveWorkSession(makeSession());
     await saveWorkSession(makeSession({ id: 's2', generatorId: 'g2' }));
-
-    expect((await getWorkSessions()).map(s => s.id)).toEqual(['s1', 's2']);
-    expect((await getWorkSessions('g2')).map(s => s.id)).toEqual(['s2']);
-  });
-
-  it('finds the active session of a generator, or null', async () => {
-    await saveWorkSession(makeSession());
-    expect(await getActiveWorkSession('g1')).toBeNull();
-
     await saveWorkSession(makeSession({ id: 's-active', endTime: undefined, hours: 0, isActive: true }));
+
+    expect((await getWorkSessions('g2')).map(s => s.id)).toEqual(['s2']);
     expect((await getActiveWorkSession('g1'))?.id).toBe('s-active');
-    expect(await getActiveWorkSession('other')).toBeNull();
+    expect(await getActiveWorkSession('g2')).toBeNull();
   });
 
-  it('deletes a single session', async () => {
-    await saveWorkSession(makeSession());
-    await saveWorkSession(makeSession({ id: 's2' }));
-    await deleteWorkSession('s1');
-
-    expect((await getWorkSessions()).map(s => s.id)).toEqual(['s2']);
-  });
-});
-
-describe('refills and maintenance tasks', () => {
-  it('round-trip and delete refills', async () => {
-    await saveRefill(makeRefill());
-    await saveRefill(makeRefill({ amount: 7.5 }));
-    expect(await getRefills('g1')).toHaveLength(1);
-    expect((await getRefills())[0].amount).toBe(7.5);
-
-    await deleteRefill('r1');
-    expect(await getRefills()).toEqual([]);
-  });
-
-  it('round-trip and delete maintenance tasks', async () => {
-    await saveMaintenanceTask(makeTask());
-    await saveMaintenanceTask(makeTask({ title: 'Air filter' }));
-    expect((await getMaintenanceTasks('g1'))[0].title).toBe('Air filter');
-
-    await deleteMaintenanceTask('m1');
-    expect(await getMaintenanceTasks()).toEqual([]);
-  });
-});
-
-describe('sync queue integration', () => {
-  it('queues nothing while signed out', async () => {
+  it('getLocalData returns every collection', async () => {
     await saveGenerator(makeGenerator());
-    await saveWorkSession(makeSession());
-    await deleteGenerator('g1');
-
-    expect(await syncQueue.getPendingCount()).toBe(0);
-  });
-
-  it('queues create, update and delete operations while signed in', async () => {
-    mockGetCurrentUser.mockReturnValue({ uid: 'u1' });
-
-    await saveGenerator(makeGenerator());
-    await saveGenerator(makeGenerator({ name: 'Renamed' }));
-    await deleteGenerator('g1');
-
-    const queue = await syncQueue.getQueue();
-    expect(queue.map(item => [item.entityType, item.operation])).toEqual([
-      ['generator', 'create'],
-      ['generator', 'update'],
-      ['generator', 'delete'],
-    ]);
-    expect(queue[1].data.name).toBe('Renamed');
-    // The delete keeps a snapshot so the sync service knows the parent generator.
-    expect(queue[2].data.id).toBe('g1');
-  });
-
-  it('queues every entity type with its generator reference', async () => {
-    mockGetCurrentUser.mockReturnValue({ uid: 'u1' });
-
-    await saveWorkSession(makeSession());
     await saveRefill(makeRefill());
     await saveMaintenanceTask(makeTask());
-    await deleteWorkSession('s1');
 
-    const queue = await syncQueue.getQueue();
-    expect(queue.map(item => item.entityType)).toEqual(['workSession', 'refill', 'maintenance', 'workSession']);
-    expect(queue.every(item => item.data.generatorId === 'g1')).toBe(true);
+    const data = await getLocalData();
+    expect(Object.keys(data).sort()).toEqual(['generators', 'maintenanceTasks', 'refills', 'workSessions']);
+    expect(data.refills).toHaveLength(1);
+    expect(data.maintenanceTasks).toHaveLength(1);
   });
 
-  it('does not re-queue records that arrive already synced (the pull path)', async () => {
-    mockGetCurrentUser.mockReturnValue({ uid: 'u1' });
+  it('updateLocalData persists only what the updater returns', async () => {
+    await saveGenerator(makeGenerator());
+    await updateLocalData(state => ({ refills: [...state.refills, makeRefill({ syncStatus: 'synced' })] }));
 
-    await saveGenerator(makeGenerator({ syncStatus: 'synced' }));
-    await saveWorkSession(makeSession({ syncStatus: 'synced' }));
-
-    expect(await syncQueue.getPendingCount()).toBe(0);
+    expect(await getGenerators()).toHaveLength(1);
+    expect((await getRefills())[0].syncStatus).toBe('synced');
   });
 });
 

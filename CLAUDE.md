@@ -46,6 +46,7 @@ npm test               # Jest unit tests (src/**/__tests__)
 npm run check          # typecheck + unit (same as the pre-commit hook)
 npm run test:e2e       # Playwright against the Expo web build (offline flows)
 npm run test:e2e:emu   # Playwright + Firebase Auth/Firestore emulators (cloud sync flows)
+npm run test:rules     # Firestore security rules tests (emulator)
 npm run emulators      # Firebase emulators for manual testing (UI at :4000)
 npm run start:emu      # Expo dev server wired to the emulators (never touches prod data)
 ```
@@ -68,19 +69,35 @@ This is the most important architectural pattern in the app:
    - AsyncStorage is the source of truth, not Firebase
    - UI always reads from and writes to local storage first
 
-2. **Sync queue**: When user is authenticated, changes automatically queue in `src/utils/syncQueue.ts`
-   - Operations (create/update/delete) are queued for background sync
-   - Queue persists across app restarts
+2. **State-based change tracking** (since 2.4.2 — there is no sync queue any more):
+   - Every local create/update is stored with `syncStatus: 'pending'` and a fresh, monotonic
+     `lastModified` (set by storage, not by the caller). Cloud metadata (`syncedAt`, `userId`) is kept.
+   - Every local delete records a **tombstone** (`@sync_tombstones`) — signed in or not — so the
+     deletion reaches the cloud later and a pull can never resurrect the record. Deleting a generator
+     cascades locally and records one tombstone.
+   - All storage writes are serialized by one FIFO mutex (`updateLocalData`); never write AsyncStorage
+     keys directly.
+   - Old installs' `@sync_queue` is migrated automatically (deletes → tombstones, updates → pending).
 
-3. **Background sync**: `src/services/sync.ts` pushes queued changes to Firestore
-   - Triggered on sign-in (`performInitialSync`) and by "Sync Now" (`performManualSync`)
-   - Realtime `onSnapshot` listeners pull remote changes while signed in
-   - There is **no** periodic/foreground/network-reconnect trigger yet (see `docs/STABILIZATION_PLAN.md` S-5)
-   - Retries a failed queue item 3 times, then drops it (S-6)
+3. **Sync** (`src/services/sync.ts`): `performFullSync` = push then pull, never two at once
+   - Push: tombstones → cloud deletes (a generator with all its subcollections), then pending generators,
+     then pending children of generators that made it to the cloud. Successes are marked synced only if
+     the record was not edited meanwhile. Failures stay pending and are retried by the next sync.
+   - Pull: complete snapshot via `getDocsFromServer` (children before generators), merged by the pure
+     `applyRemoteChanges` in `src/services/syncMerge.ts`.
+   - Realtime `onSnapshot` listeners apply added/modified/removed changes; the first *server* snapshot of
+     each listener reconciles deletions made while offline; cache-only snapshots never prune.
+   - Triggered on sign-in (`performInitialSync`) and by "Sync Now" (`performManualSync`). There is **no**
+     periodic/foreground/network-reconnect trigger yet (`docs/STABILIZATION_PLAN.md` S-5).
+   - Network calls time out after 30 s (`withTimeout` in `firestore.ts`).
 
-4. **Conflict resolution**: Last-write-wins using `lastModified` timestamp
-   - See `resolveConflict()` in `src/services/sync.ts`
-   - More recent `lastModified` wins during bidirectional sync
+4. **Conflict resolution** (`syncMerge.ts`): last write wins on the client ISO `lastModified`
+   - Firestore stores the client `lastModified` unchanged (server time goes to `serverUpdatedAt`);
+     documents are written with a full `set` so cleared fields propagate.
+   - Equal timestamps = the remote copy is this version → synced.
+   - A local tombstone wins; a remote deletion wins. Absence from a snapshot only deletes records known to
+     be in this account's cloud (`userId === uid` and synced before the snapshot).
+   - Remote children without an existing generator (orphans) are never stored.
 
 ### Data Models Layer
 
@@ -195,16 +212,16 @@ Example flow:
 
 2. **Storage** (`src/utils/storage.ts`):
    - Add CRUD functions: `getNewEntities()`, `saveNewEntity()`, `deleteNewEntity()`
-   - Follow existing pattern with sync queue integration
-   - Always set `lastModified` and `syncStatus: 'pending'`
+   - Add the key to `STORAGE_KEYS`/`COLLECTION_FIELD` and go through `saveEntity`/`deleteEntity`
+     (pending status, monotonic `lastModified` and tombstones are handled there)
 
 3. **Firestore** (`src/services/firestore.ts`):
-   - Add collection operations: `saveNewEntityToFirestore()`, etc.
-   - Follow subcollection pattern under generators
+   - Add the subcollection to `CHILD_COLLECTIONS`/`CHILD_TYPES` (fetch, write, cascade delete follow)
+   - Add a rule block to `firestore.rules` and a case to `rules-tests/firestore.rules.test.ts`
 
-4. **Sync** (`src/services/sync.ts`):
-   - Add to `syncAllData()` function
-   - Handle push/pull for new entity type
+4. **Sync** (`src/services/sync.ts`, `src/services/syncMerge.ts`):
+   - Add the entity to `LocalData`, the pull change sets and a realtime listener
+   - Extend `sync.test.ts` / `syncMerge.test.ts`
 
 ### Adding a New Screen
 
@@ -301,7 +318,7 @@ Follow this workflow for ALL changes to the project:
 2. **Discover and Validate Changes**
    - Run `git status` to see all modified/new files
    - Review the changes with `git diff` for modified files
-   - Run `npm run check` (typecheck + unit tests) and `npm run test:e2e` (web e2e); for sync changes also `npm run test:e2e:emu`
+   - Run `npm run check` (typecheck + unit tests) and `npm run test:e2e` (web e2e); for sync changes also `npm run test:e2e:emu`, for rules changes `npm run test:rules`
    - Test the changes in the development environment (`npm start`)
    - Verify no regressions or breaking changes
    - Check that the app builds successfully
@@ -440,12 +457,14 @@ src/
 │   └── settings/
 ├── services/        # External services (Firebase, sync)
 │   ├── auth.ts
-│   ├── firestore.ts
-│   └── sync.ts
+│   ├── firestore.ts   # Firestore I/O (batches, cascade deletes, timeouts)
+│   ├── sync.ts        # push/pull orchestration + realtime listeners
+│   └── syncMerge.ts   # pure merge rules (last-write-wins, tombstones, orphans)
 └── utils/           # Helper functions and storage
     ├── calculations.ts
-    ├── storage.ts     # PRIMARY data access layer
-    └── syncQueue.ts
+    ├── storage.ts     # PRIMARY data access layer (+ tombstones, mutex)
+    ├── mutex.ts       # FIFO async mutex
+    └── syncMeta.ts    # timestamp normalization / comparison
 ```
 
 ## Key Files to Understand

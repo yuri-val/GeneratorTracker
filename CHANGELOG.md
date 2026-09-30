@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2026-09-30
+
+Stabilization stage 1 — sync data integrity (`docs/STABILIZATION_PLAN.md` S-1, S-2, S-3, S-8, S-9, S-28).
+No new features; Firestore structure unchanged (one added field, `serverUpdatedAt`), compatible with
+devices still on 2.4.0/2.4.1.
+
+### Fixed
+- **Initial sync after sign-in never ran** (S-28): the Settings screen called it before the auth state reached React, so it threw "User must be authenticated"; data created before signing in was never uploaded. The signed-in uid is now passed explicitly.
+- **Cross-device edits stopped arriving** (S-1): Firestore replaced `lastModified` with a server timestamp and realtime listeners stored it unconverted, so last-write-wins compared `NaN` and the local copy won forever. The client ISO time is now kept (server time goes to `serverUpdatedAt`), Timestamps are converted everywhere, and values already stored by older versions are normalized when read.
+- **Cleared fields were never cleared in the cloud**: documents are written with a full `set` instead of `merge`.
+- **Deletions did not sync and deleted records came back** (S-2): every local delete now records a tombstone (also while signed out) that is pushed before any pull; realtime `removed` events are applied; complete snapshots reconcile deletions made elsewhere, touching only records confirmed in this account's cloud.
+- **Deleting a generator left its sessions/refills/tasks in Firestore** (S-3): cascade delete in batches; orphaned cloud records are never stored locally; Analytics only counts records of existing generators.
+- **Concurrent storage writes could overwrite each other** (S-8): all writes go through one FIFO mutex and `multiSet`; syncs never overlap.
+- **Queued changes were dropped after 3 failed attempts** (S-6): replaced by state-based change tracking — failures stay pending and are retried.
+- **Sync could hang forever offline** (S-7, partial): network operations time out after 30 s; reconciliation reads come from the server only (`getDocsFromServer`), never from an empty offline cache.
+- Unreadable local data is backed up under `<key>.corrupt-<timestamp>` before being reset.
+
+### Changed
+- The persisted sync queue (`src/utils/syncQueue.ts`) was removed; old installs migrate automatically (queued deletes → tombstones, queued updates → pending).
+- Local saves always set `syncStatus: 'pending'` and a monotonic `lastModified`, keeping the stored `syncedAt`/`userId`.
+- New modules: `src/services/syncMerge.ts` (pure merge rules), `src/utils/mutex.ts`, `src/utils/syncMeta.ts`.
+
+### Security
+- `firestore.rules`: writes must be self-consistent with their path (`userId`, `id`, `generatorId`) and carry a `lastModified`; covered by 11 emulator tests (`npm run test:rules`, new CI job). Deploying to the production project is still a manual step.
+
+### Tests
+- 105 unit tests (new: `syncMerge`, `firestore`, `mutex`, `syncMeta`; rewritten: `storage`, `sync`).
+- Emulator e2e extended to 7 cloud-sync scenarios (cross-device edits incl. legacy server timestamps, cleared fields, remote deletion, deletion while signed out, cascade delete, cloud orphans).
+
 ## [2.4.1] - 2026-09-30
 
 Stabilization phase kick-off: no functional changes for users. This release fixes the
