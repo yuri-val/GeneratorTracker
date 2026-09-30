@@ -111,6 +111,11 @@ npm run start:emu        # terminal 2 — Expo dev server in emulator mode (add 
 
 ### Rules and indexes
 
+> The emulator does **not** enforce composite/collection-group index requirements. A query that works in
+> e2e can still fail in production with FAILED_PRECONDITION — keep `firestore.indexes.json` in sync with
+> every collection-group query and deploy it before releasing (see S-30).
+
+
 `firestore.rules` and `firestore.indexes.json` are loaded by the emulator and are the reference for the
 production project (they were reconstructed from the data model — **compare them with the Firebase
 console before relying on them**). To deploy them to the real project:
