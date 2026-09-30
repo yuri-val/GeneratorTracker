@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
-import { Appbar, TextInput, HelperText } from 'react-native-paper';
+import { TextInput, HelperText } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -11,6 +11,9 @@ import { Generator } from '../../models/types';
 import { saveGenerator, getGenerators } from '../../utils/storage';
 import { generateId, formatDate, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { NativeForm } from '../../components/form/NativeForm';
+import { isIOS } from '../../theme/platform';
 
 type AddGeneratorScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddGenerator'>;
@@ -86,16 +89,58 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
     }
   };
 
+  const header = (
+    <ScreenHeader
+      title={isEdit ? t('generator.editTitle') : t('generator.addTitle')}
+      leading="close"
+      onLeadingPress={() => navigation.goBack()}
+      actions={[
+        { key: 'save', label: t('common.save'), icon: 'save', variant: 'done', onPress: handleSave, testID: 'save-generator' },
+      ]}
+      scrollEdge={isIOS}
+    />
+  );
+
+  if (isIOS) {
+    return (
+      <>
+        {header}
+        <NativeForm
+          sections={[
+            {
+              key: 'generator',
+              error: submitted && !name.trim() ? t('generator.nameRequired') : undefined,
+              fields: [
+                {
+                  kind: 'text',
+                  key: 'name',
+                  label: t('form.name'),
+                  value: name,
+                  onChange: setName,
+                  placeholder: t('form.required'),
+                  testID: 'input-generator-name',
+                },
+                {
+                  kind: 'text',
+                  key: 'model',
+                  label: t('form.model'),
+                  value: model,
+                  onChange: setModel,
+                  placeholder: t('form.optional'),
+                  testID: 'input-generator-model',
+                },
+                { kind: 'date', key: 'purchaseDate', label: t('form.purchaseDate'), value: purchaseDate, onChange: setPurchaseDate },
+              ],
+            },
+          ]}
+        />
+      </>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
-        <Appbar.Content
-          title={isEdit ? t('generator.editTitle') : t('generator.addTitle')}
-          titleStyle={styles.headerTitle}
-        />
-        <Appbar.Action icon="check" onPress={handleSave} testID="save-generator" />
-      </Appbar.Header>
+      {header}
 
       <ScrollView contentContainerStyle={styles.content}>
         <TextInput
@@ -155,9 +200,6 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerTitle: {
-    fontWeight: '600',
   },
   content: {
     padding: 16,

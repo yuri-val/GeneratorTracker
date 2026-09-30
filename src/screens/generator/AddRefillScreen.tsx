@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
-import { Appbar, TextInput, HelperText, Button } from 'react-native-paper';
+import { TextInput, HelperText, Button } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,9 @@ import { saveRefill, getRefills, deleteRefill } from '../../utils/storage';
 import { generateId, formatDate, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { NativeForm, type FormSection } from '../../components/form/NativeForm';
+import { isIOS } from '../../theme/platform';
 
 type AddRefillScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddRefill'>;
@@ -108,16 +111,73 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
     }
   };
 
+  const header = (
+    <ScreenHeader
+      title={isEditing ? t('refill.editTitle') : t('refill.addTitle')}
+      leading="close"
+      onLeadingPress={() => navigation.goBack()}
+      actions={[
+        { key: 'save', label: t('common.save'), icon: 'save', variant: 'done', onPress: handleSave, testID: 'save-refill' },
+      ]}
+      scrollEdge={isIOS}
+    />
+  );
+
+  const deleteDialog = (
+    <DeleteConfirmDialog
+      visible={showDeleteDialog}
+      title={t('refill.deleteTitle')}
+      message={t('refill.deleteConfirm')}
+      onDismiss={() => setShowDeleteDialog(false)}
+      onConfirm={handleDelete}
+    />
+  );
+
+  if (isIOS) {
+    const sections: FormSection[] = [
+      {
+        key: 'refill',
+        fields: [
+          { kind: 'date', key: 'date', label: t('form.date'), value: date, onChange: setDate },
+          {
+            kind: 'text',
+            key: 'amount',
+            label: t('form.amount'),
+            value: amount,
+            onChange: setAmount,
+            placeholder: t('form.required'),
+            keyboard: 'decimal',
+            suffix: t('common.litersAbbr'),
+            testID: 'input-refill-amount',
+          },
+        ],
+      },
+      {
+        key: 'notes',
+        title: t('form.notes'),
+        fields: [{ kind: 'notes', key: 'notes', value: notes, onChange: setNotes, placeholder: t('refill.notesPlaceholder') }],
+      },
+    ];
+    if (isEditing) {
+      sections.push({
+        key: 'delete',
+        fields: [
+          { kind: 'button', key: 'delete', label: t('refill.deleteButton'), destructive: true, onPress: () => setShowDeleteDialog(true) },
+        ],
+      });
+    }
+    return (
+      <>
+        {header}
+        <NativeForm sections={sections} />
+        {deleteDialog}
+      </>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
-        <Appbar.Content
-          title={isEditing ? t('refill.editTitle') : t('refill.addTitle')}
-          titleStyle={styles.headerTitle}
-        />
-        <Appbar.Action icon="check" onPress={handleSave} testID="save-refill" />
-      </Appbar.Header>
+      {header}
 
       <ScrollView contentContainerStyle={styles.content}>
         <Pressable onPress={() => setShowDatePicker(true)}>
@@ -184,13 +244,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
         )}
       </ScrollView>
 
-      <DeleteConfirmDialog
-        visible={showDeleteDialog}
-        title={t('refill.deleteTitle')}
-        message={t('refill.deleteConfirm')}
-        onDismiss={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-      />
+      {deleteDialog}
     </View>
   );
 }
@@ -198,9 +252,6 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerTitle: {
-    fontWeight: '600',
   },
   content: {
     padding: 16,

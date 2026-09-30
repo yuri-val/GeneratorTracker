@@ -219,5 +219,27 @@
         "failedToSignOut": "Failed to sign out",
         "failedToSignIn": "Failed to sign in",
         "failedToCreateAccount": "Failed to create account"
+    },
+    "form": {
+        "required": "Required",
+        "optional": "Optional",
+        "name": "Name",
+        "model": "Model",
+        "purchaseDate": "Purchase date",
+        "time": "Time",
+        "date": "Date",
+        "start": "Start",
+        "end": "End",
+        "duration": "Duration",
+        "running": "Running",
+        "endNow": "End Now",
+        "notes": "Notes",
+        "amount": "Amount",
+        "task": "Task",
+        "interval": "Interval",
+        "engineHours": "Engine hours",
+        "days": "Days",
+        "daysSuffix": "days",
+        "lastService": "Last service"
     }
 }

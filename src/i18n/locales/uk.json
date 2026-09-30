@@ -219,5 +219,27 @@
         "failedToSignOut": "Не вдалося вийти",
         "failedToSignIn": "Не вдалося увійти",
         "failedToCreateAccount": "Не вдалося створити обліковий запис"
+    },
+    "form": {
+        "required": "Обов'язково",
+        "optional": "Необов'язково",
+        "name": "Назва",
+        "model": "Модель",
+        "purchaseDate": "Дата покупки",
+        "time": "Час",
+        "date": "Дата",
+        "start": "Початок",
+        "end": "Кінець",
+        "duration": "Тривалість",
+        "running": "Триває",
+        "endNow": "Завершити зараз",
+        "notes": "Нотатки",
+        "amount": "Кількість",
+        "task": "Завдання",
+        "interval": "Інтервал",
+        "engineHours": "Мотогодини",
+        "days": "Дні",
+        "daysSuffix": "дн.",
+        "lastService": "Останнє обслуговування"
     }
 }

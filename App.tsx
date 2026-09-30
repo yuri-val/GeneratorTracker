@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -48,11 +49,14 @@ export default function App() {
           <StatusBar style={isDark ? 'light' : 'dark'} />
           <Stack.Navigator
             screenOptions={{
-              headerShown: false,
+              // iOS: native navigation bars, configured by each screen's ScreenHeader. Modal
+              // screens only get a bar when it is enabled at mount, so enable it up front.
+              // Android/web draw a Material app bar inside the screen instead.
+              headerShown: Platform.OS === 'ios',
               contentStyle: { backgroundColor: paperTheme.colors.background },
             }}
           >
-            <Stack.Screen name="MainTabs" component={MainTabs} />
+            <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
             <Stack.Screen
               name="GeneratorDetail"
               component={GeneratorDetailScreen}
