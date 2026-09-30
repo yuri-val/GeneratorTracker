@@ -1,8 +1,8 @@
 /**
- * Xcode 27 rejects pod targets whose IPHONEOS_DEPLOYMENT_TARGET is below 15.0
+ * Xcode 27 rejects pod targets whose IPHONEOS_DEPLOYMENT_TARGET is below 15.0 (Expo SDK 57 itself requires 16.4)
  * (e.g. RNCAsyncStorage and RNSVG resource bundles still declare 12.4/13.4), which
  * fails `pod install` + `xcodebuild` with "deployment target ... is set to 13.4".
- * Raise every pod target that is below the app's minimum to that minimum.
+ * Raise every pod target that is below the app's minimum to that minimum (16.4, the Expo SDK 57 floor).
  */
 const { withDangerousMod } = require('expo/config-plugins');
 const fs = require('fs');
@@ -10,7 +10,7 @@ const path = require('path');
 
 const MARKER = '# withPodsDeploymentTarget';
 
-module.exports = function withPodsDeploymentTarget(config, { minimum = '15.1' } = {}) {
+module.exports = function withPodsDeploymentTarget(config, { minimum = '16.4' } = {}) {
   return withDangerousMod(config, [
     'ios',
     async cfg => {
