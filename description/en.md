@@ -41,11 +41,11 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 - Offline-first architecture - works without internet
 - Your data syncs when connection is available
 
-**Modern Design**
-- Beautiful dark mode interface
+**Modern, Native Design**
+- Looks and feels native: Material 3 on Android, native iOS design on iPhone and iPad
+- Light and dark themes that follow your system setting
 - Energy-themed orange and blue color scheme
-- Intuitive card-based layout
-- Smooth animations and interactions
+- Comfortable layout on tablets and foldables
 
 **Professional Features**
 - Edit any session or refill record
@@ -76,11 +76,12 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.4.0
+### 🆕 What's New in Version 2.5.0
 
-- **Maintenance & Service Tracking**: Create recurring service tasks per generator with intervals by engine hours, days, or both.
-- **Due Status & Badges**: Each task shows OK / Due soon / Due now, and generators with pending service are flagged right on the home screen.
-- **Mark Serviced**: Reset a task to today and the current engine hours with a single tap.
+- **Native Design**: native Material 3 navigation on Android; native iOS navigation, forms and settings on iPhone and iPad.
+- **Dark Theme**: the app now follows your device's light/dark setting.
+- **Tablets**: a comfortable, centred layout on tablets and foldables; charts fit the screen.
+- **Correct Dates After Midnight**: records created shortly after midnight now get the right date.
 
 ### 📱 Technical Excellence
 
@@ -88,8 +89,8 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 - TypeScript for reliability
 - AsyncStorage for local persistence
 - Firebase for cloud features
-- Material Top Tabs navigation
-- Responsive design
+- Native navigation on each platform
+- Responsive design for phones, tablets and foldables
 
 ### 🌐 Multilingual Support
 
