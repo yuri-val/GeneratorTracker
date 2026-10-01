@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, useWindowDimensions } from 'react-native';
 import { Chip, Surface, Text } from 'react-native-paper';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
@@ -20,14 +20,20 @@ import {
   getGeneratorComparison,
   getFuelDistribution,
 } from '../../utils/analytics';
+import { contentColumn, CONTENT_MAX_WIDTH } from '../../theme/layout';
 
 type GeneratorWithStats = Generator & { stats: GeneratorStats };
 
-const screenWidth = Dimensions.get('window').width;
+// A bar chart draws its y-axis labels to the left of `width`, so the plot must leave room
+// for them inside the card: content padding + card padding on both sides + the label column.
+// The x-axis line is clamped to the plot (it defaults to width + endSpacing and overflows).
+const Y_AXIS_LABEL_WIDTH = 35;
+const CHART_HORIZONTAL_INSET = 16 * 2 + 20 * 2 + Y_AXIS_LABEL_WIDTH;
 
 export default function AnalyticsScreen() {
   const theme = useAppTheme();
   const tabBarOverlap = useTabBarOverlap();
+  const { width: windowWidth } = useWindowDimensions();
   const surface = surfaces(theme);
   const text = textColors(theme);
   const { t, i18n } = useTranslation();
@@ -121,7 +127,8 @@ export default function AnalyticsScreen() {
     [generators, refillsList, t]
   );
 
-  const chartWidth = screenWidth - 96;
+  // Follows rotation/resizing and the content column (S-34).
+  const chartWidth = Math.min(windowWidth, CONTENT_MAX_WIDTH) - CHART_HORIZONTAL_INSET;
 
   const renderOverview = () => (
     <>
@@ -210,6 +217,8 @@ export default function AnalyticsScreen() {
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -234,6 +243,8 @@ export default function AnalyticsScreen() {
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -258,6 +269,8 @@ export default function AnalyticsScreen() {
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -363,7 +376,7 @@ export default function AnalyticsScreen() {
         <ScrollView
           contentInsetAdjustmentBehavior="automatic"
           style={{ backgroundColor: surface.screen }}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, contentColumn]}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
           }
@@ -378,10 +391,10 @@ export default function AnalyticsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {header}
-      {viewSwitcher}
+      <View style={contentColumn}>{viewSwitcher}</View>
 
       {generators.length > 1 && (
-        <View style={styles.filterContainer}>
+        <View style={[styles.filterContainer, contentColumn]}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -409,7 +422,7 @@ export default function AnalyticsScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: tabBarOverlap + 16 }]}
+        contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
         }

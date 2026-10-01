@@ -15,6 +15,7 @@ import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm, type FormSection } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddRefillScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddRefill'>;
@@ -179,7 +180,7 @@ export default function AddRefillScreen({ navigation, route }: AddRefillScreenPr
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {header}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <Pressable onPress={() => setShowDatePicker(true)}>
           <View pointerEvents="none">
             <TextInput

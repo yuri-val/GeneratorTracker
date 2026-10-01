@@ -1,0 +1,65 @@
+# Native iOS UI flow (SwiftUI forms, native bars, UIAlertController).
+# Run against a dev or release build already open on Home: npm run test:native:ios
+appId: com.yuri-val.generatortracker
+name: iOS core flows
+---
+- tapOn: "Home" # bottom (iPhone) or top (iPad) tab bar
+# Create a generator (nav-bar "+" -> SwiftUI form sheet)
+- tapOn: "New Generator"
+- tapOn:
+    id: input-generator-name
+- inputText: Maestro Gen
+- tapOn:
+    id: input-generator-model
+- inputText: EU22i
+- tapOn: "Save"
+- assertVisible: ".*Maestro Gen.*"
+
+# Start and stop a work session
+- tapOn: ".*Maestro Gen.*"
+- tapOn:
+    id: start-session
+- tapOn: "OK"
+- tapOn:
+    id: stop-session
+- tapOn: "OK"
+- assertVisible: "Sessions \\(1\\)"
+
+# Add a refill through the native form
+- tapOn:
+    text: "Refills \\(.*"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible: "Add Refill"
+    timeout: 15000
+- tapOn: "Add Refill"
+- tapOn:
+    id: input-refill-amount
+- inputText: "4.5"
+- tapOn: "Save"
+- assertVisible: ".*4.5L.*"
+
+# Add a maintenance task
+- tapOn:
+    text: "Maintenance \\(.*"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible: "Add Maintenance Task"
+    timeout: 15000
+- tapOn: "Add Maintenance Task"
+- tapOn:
+    id: input-maintenance-title
+- inputText: Oil change
+- tapOn:
+    id: input-maintenance-hours
+- inputText: "100"
+- tapOn: "Save"
+- assertVisible: ".*Oil change.*"
+
+# Delete the generator via the "More" menu and the destructive alert
+- tapOn: "More"
+- tapOn: "Delete"
+- tapOn: "Delete" # the alert's destructive action
+- tapOn: "OK" # "Generator deleted" confirmation
+- assertVisible: "Generator Tracker"
+- assertNotVisible: ".*Maestro Gen.*"

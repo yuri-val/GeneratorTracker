@@ -12,6 +12,7 @@
 | Security rules | `@firebase/rules-unit-testing` + Firestore emulator | `npm run test:rules` | `firestore.rules`: owner isolation, document shape, collection-group queries |
 | Web e2e | Playwright (Chromium) | `npm run test:e2e` | Core UI flows on the Expo web build, offline only |
 | Cloud sync e2e | Playwright + Firebase Emulator Suite | `npm run test:e2e:emu` | Sign-up, push via *Sync Now*, realtime pull — against local emulators |
+| Native UI (iOS, Android) | Maestro | `npm run test:native:ios` / `npm run test:native:android` | Native chrome and forms: create generator, session start/stop, refill, maintenance, delete via the platform alert |
 | Manual, device | Expo dev server / EAS preview APK | `npm start`, `npm run start:emu`, `make eas-build-preview` | Real devices, Play *closed testing* track |
 | Everything local | — | `npm run check` | typecheck + unit (same as the pre-commit hook) |
 
@@ -177,6 +178,24 @@ then `xcrun simctl install booted build/Build/Products/Release-iphonesimulator/G
 (Expo SDK 57, UIScene enabled) the app launches on the iOS 27 SDK. `expo prebuild` rewrites the `ios`/`android`
 scripts in `package.json` — revert that. Expo Go for SDK 57 must match the SDK (`iosClientUrl` for `57.0.0`).
 
+## Native UI tests (Maestro)
+
+Web e2e can't see the native iOS/Android UI (native tabs and bars, SwiftUI forms, system alerts), so
+`.maestro/ios/core-flows.yaml` and `.maestro/android/core-flows.yaml` drive the real apps.
+
+- Install once: `brew tap mobile-dev-inc/tap && brew install mobile-dev-inc/tap/maestro` (needs Java 17+).
+- Start Metro **without** `CI=1` (`npx expo start --dev-client`; `CI=1` disables file watching), open the
+  dev build (or a release build) on a simulator/emulator, leave it on Home, then
+  `npm run test:native:ios` or `npm run test:native:android` (add `--device <id>` via `npx maestro test`
+  when several devices are booted). The flows create and finally delete a generator named "Maestro Gen".
+- Locators: native bar buttons by accessibility label ("New Generator", "Save", "More", "Close");
+  RN/Paper and SwiftUI fields by `testID` (`input-…`, `save-…`); cards by regex (`.*Name.*`).
+- Dev builds only: turn off the floating dev-menu "Tools button" — it can sit over header actions.
+  On Android the first load of a debug APK may raise an ANR dialog from `expo-dev-menu`
+  (main-thread SoLoader scan of the large debug APK) — tap *Wait*; release builds don't contain it.
+- Verified 2026-10-01: iPhone 17 and iPad Pro 13" (iOS 27), Android 16 phone and tablet (2560×1600),
+  light and dark appearance.
+
 ## Manual device testing
 
 - **Dev client / Expo Go**: `npm start` and scan the QR code. Combine with `npm run start:emu` to test
@@ -200,7 +219,7 @@ Skip it in an emergency with `git commit --no-verify`.
 
 ## Not covered yet
 
-- Native-only behaviour (date pickers, haptics, Android edge-to-edge, Google Sign-In) needs a device
-  or a native e2e runner (Maestro / Detox) — a candidate for a later phase.
+- Native-only behaviour not in the Maestro flows (date picker interaction, haptics, Google Sign-In)
+  still needs a device; Maestro doesn't run in CI yet (needs macOS runners with simulators).
 - Component rendering tests: `@testing-library/react-native` was removed because it broke EAS
   `npm ci`; reintroduce it only with a matching `react-test-renderer` version.

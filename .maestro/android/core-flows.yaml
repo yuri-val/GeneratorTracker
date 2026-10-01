@@ -1,0 +1,72 @@
+# Native Android UI flow (Material 3 navigation, Paper forms, system dialogs).
+# Run against a dev or release build already open on Home: npm run test:native:android
+appId: com.yurival.GeneratorTracker
+name: Android core flows
+---
+- tapOn:
+    id: tab-home
+# Create a generator (FAB -> modal form)
+- tapOn:
+    id: fab-add-generator
+- tapOn:
+    id: input-generator-name
+- runFlow:
+    when:
+      visible: "Try out your stylus"
+    commands:
+      - tapOn: "Cancel"
+- inputText: Maestro Gen
+- tapOn:
+    id: save-generator
+- assertVisible: ".*Maestro Gen.*"
+
+# Start and stop a work session
+- tapOn: ".*Maestro Gen.*"
+- tapOn:
+    id: start-session
+- tapOn: "OK"
+- tapOn:
+    id: stop-session
+- tapOn: "OK"
+- assertVisible: "Sessions \\(1\\)"
+
+# Add a refill
+- tapOn:
+    text: "Refills \\(.*"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible: "Add Refill"
+    timeout: 15000
+- tapOn: "Add Refill"
+- tapOn:
+    id: input-refill-amount
+- inputText: "4.5"
+- tapOn:
+    id: save-refill
+- assertVisible: ".*4.5L.*"
+
+# Add a maintenance task
+- tapOn:
+    text: "Maintenance \\(.*"
+    retryTapIfNoChange: true
+- extendedWaitUntil:
+    visible: "Add Maintenance Task"
+    timeout: 15000
+- tapOn: "Add Maintenance Task"
+- tapOn:
+    id: input-maintenance-title
+- inputText: Oil change
+- tapOn:
+    id: input-maintenance-hours
+- inputText: "100"
+- tapOn:
+    id: save-maintenance
+- assertVisible: ".*Oil change.*"
+
+# Delete the generator (top app bar action -> Material alert dialog)
+- tapOn:
+    id: detail-delete-generator
+- tapOn: "Delete"
+- tapOn: "OK" # "Generator deleted" confirmation
+- assertVisible: "Generator Tracker"
+- assertNotVisible: ".*Maestro Gen.*"

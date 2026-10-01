@@ -14,6 +14,7 @@ import { useAppTheme } from '../../theme/useAppTheme';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddGeneratorScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddGenerator'>;
@@ -142,7 +143,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {header}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <TextInput
           mode="outlined"
           label={t('generator.nameLabel')}

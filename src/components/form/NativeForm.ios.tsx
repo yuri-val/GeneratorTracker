@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { PlatformColor, View } from 'react-native';
 import {
   Host,
   Form,
@@ -30,6 +31,7 @@ import {
   disabled,
 } from '@expo/ui/swift-ui/modifiers';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { contentColumn } from '../../theme/layout';
 import { parseLocalDate, toLocalDateString } from '../../utils/calculations';
 import type { FormField, FormSection } from './types';
 
@@ -213,26 +215,29 @@ export function NativeForm({ sections }: { sections: FormSection[] }) {
   const theme = useAppTheme();
 
   return (
-    <Host style={{ flex: 1 }}>
-      <Form modifiers={[tint(theme.colors.primary), scrollDismissesKeyboard('interactively')]}>
-        {sections.map(section => (
-          <Section
-            key={section.key}
-            title={section.title}
-            footer={
-              section.error ? (
-                <Text modifiers={[foregroundStyle(theme.colors.error)]}>{section.error}</Text>
-              ) : section.footer ? (
-                <Text>{section.footer}</Text>
-              ) : undefined
-            }
-          >
-            {section.fields.map(field => (
-              <Field key={field.key} field={field} />
-            ))}
-          </Section>
-        ))}
-      </Form>
-    </Host>
+    // Centred readable column on iPad; the grouped background fills the rest.
+    <View style={{ flex: 1, backgroundColor: PlatformColor('systemGroupedBackground') }}>
+      <Host style={[{ flex: 1 }, contentColumn]}>
+        <Form modifiers={[tint(theme.colors.primary), scrollDismissesKeyboard('interactively')]}>
+          {sections.map(section => (
+            <Section
+              key={section.key}
+              title={section.title}
+              footer={
+                section.error ? (
+                  <Text modifiers={[foregroundStyle(theme.colors.error)]}>{section.error}</Text>
+                ) : section.footer ? (
+                  <Text>{section.footer}</Text>
+                ) : undefined
+              }
+            >
+              {section.fields.map(field => (
+                <Field key={field.key} field={field} />
+              ))}
+            </Section>
+          ))}
+        </Form>
+      </Host>
+    </View>
   );
 }

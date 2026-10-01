@@ -20,6 +20,7 @@ import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm, type FormSection } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddMaintenanceScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddMaintenance'>;
@@ -255,7 +256,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {header}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <TextInput
           mode="outlined"
           label={t('maintenance.titleLabel')}

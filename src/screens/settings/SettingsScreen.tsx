@@ -33,6 +33,7 @@ import {
   signInWithGoogleCredential,
   useGoogleAuth,
 } from '../../services/auth';
+import { contentColumn } from '../../theme/layout';
 
 // Read once from the app config so the About section never lags behind app.json.
 const APP_VERSION = Constants.expoConfig?.version ?? '';
@@ -194,7 +195,7 @@ export default function SettingsScreen() {
       <ScreenHeader title={t('settings.title')} largeTitle />
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: tabBarOverlap + 16 }]}
+        contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
       >
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>

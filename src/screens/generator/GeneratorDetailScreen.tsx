@@ -48,6 +48,7 @@ import { AppIcon } from '../../components/AppIcon';
 import { describeMaintenance } from '../../components/MaintenanceList';
 import { ICONS } from '../../constants/icons';
 import { isIOS, surfaces, textColors } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type GeneratorDetailScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'GeneratorDetail'>;
@@ -446,7 +447,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         ]}
       />
 
-      {summary}
+      <View style={contentColumn}>{summary}</View>
 
       <Tab.Navigator
         screenOptions={{
@@ -637,7 +638,7 @@ function GeneratorDetailIOS(props: GeneratorDetailIOSProps) {
         renderItem={renderItem}
         contentInsetAdjustmentBehavior="automatic"
         style={{ backgroundColor: surface.screen }}
-        contentContainerStyle={styles.iosContent}
+        contentContainerStyle={[styles.iosContent, contentColumn]}
         refreshControl={<RefreshControl refreshing={props.refreshing} onRefresh={props.onRefresh} />}
         ListHeaderComponent={
           <View>

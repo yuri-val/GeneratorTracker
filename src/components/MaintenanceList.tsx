@@ -7,6 +7,7 @@ import { MaintenanceTask, MaintenanceStatusLevel, MaintenanceStatus } from '../m
 import { calculateMaintenanceStatus } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
 import { appColors } from '../theme';
+import { contentColumn } from '../theme/layout';
 
 /** The interval ("every 250 h · every 180 days") and remaining/overdue lines of a task. */
 export function describeMaintenance(
@@ -135,7 +136,7 @@ export const MaintenanceList: React.FC<MaintenanceListProps> = ({
       data={tasks}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={[styles.listContent, contentColumn]}
       style={{ backgroundColor: theme.colors.background }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />

@@ -15,6 +15,7 @@ import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm, type FormField, type FormSection } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddWorkSessionScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddWorkSession'>;
@@ -279,7 +280,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         </Banner>
       )}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <Pressable onPress={() => setShowDatePicker(true)}>
           <View pointerEvents="none">
             <TextInput

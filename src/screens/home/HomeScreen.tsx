@@ -19,6 +19,7 @@ import { useAppTheme } from '../../theme/useAppTheme';
 import { appColors } from '../../theme';
 import { isIOS, surfaces, textColors } from '../../theme/platform';
 import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
+import { contentColumn } from '../../theme/layout';
 
 type GeneratorWithStats = Generator & { stats: GeneratorStats; maintenance: MaintenanceSummary };
 
@@ -163,7 +164,7 @@ export default function HomeScreen() {
       keyExtractor={item => item.id}
       contentInsetAdjustmentBehavior="automatic"
       style={isIOS ? { backgroundColor: surface.screen } : undefined}
-      contentContainerStyle={[styles.listContent, !isIOS && { paddingBottom: tabBarOverlap + FAB_CLEARANCE }]}
+      contentContainerStyle={[styles.listContent, contentColumn, !isIOS && { paddingBottom: tabBarOverlap + FAB_CLEARANCE }]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
       }
