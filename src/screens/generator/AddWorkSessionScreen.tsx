@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Platform, Pressable } from 'react-native';
-import { Appbar, TextInput, HelperText, Button, Surface, Text, Banner, Chip } from 'react-native-paper';
+import { TextInput, HelperText, Button, Surface, Text, Banner, Chip } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,13 @@ import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
 import { WorkSession } from '../../models/types';
 import { saveWorkSession, getWorkSessions, deleteWorkSession } from '../../utils/storage';
-import { generateId, calculateHours, getCurrentTime, formatDate, formatTime } from '../../utils/calculations';
+import { generateId, calculateHours, getCurrentTime, formatDate, formatTime, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { NativeForm, type FormField, type FormSection } from '../../components/form/NativeForm';
+import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddWorkSessionScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddWorkSession'>;
@@ -24,7 +28,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const { generatorId, sessionId } = route.params;
 
   const [existingSession, setExistingSession] = useState<WorkSession | null>(null);
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(toLocalDateString());
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
   const [notes, setNotes] = useState('');
@@ -38,7 +42,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setDate(selectedDate.toISOString().split('T')[0]);
+      setDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -179,13 +183,91 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
     ? (isActiveSession ? t('workSession.editActiveTitle') : t('workSession.editTitle'))
     : t('workSession.addTitle');
 
+  const header = (
+    <ScreenHeader
+      title={title}
+      leading="close"
+      onLeadingPress={() => navigation.goBack()}
+      actions={[
+        { key: 'save', label: t('common.save'), icon: 'save', variant: 'done', onPress: handleSave, testID: 'save-session' },
+      ]}
+      scrollEdge={isIOS}
+    />
+  );
+
+  const deleteDialog = (
+    <DeleteConfirmDialog
+      visible={showDeleteDialog}
+      title={t('workSession.deleteTitle')}
+      message={t('workSession.deleteConfirm')}
+      onDismiss={() => setShowDeleteDialog(false)}
+      onConfirm={handleDelete}
+    />
+  );
+
+  if (isIOS) {
+    // An active session keeps running until an end time is set ("End Now").
+    const running = !!isActiveSession && keepActive;
+    const endFields: FormField[] = running
+      ? [
+          { kind: 'info', key: 'end', label: t('form.end'), value: t('form.running'), tone: 'accent' },
+          {
+            kind: 'button',
+            key: 'endNow',
+            label: t('form.endNow'),
+            systemImage: 'clock',
+            onPress: () => {
+              setEndTime(getCurrentTime());
+              setKeepActive(false);
+            },
+          },
+        ]
+      : [
+          { kind: 'time', key: 'end', label: t('form.end'), value: endTime, onChange: setEndTime },
+          {
+            kind: 'info',
+            key: 'duration',
+            label: t('form.duration'),
+            value: hours > 0 ? `${hours.toFixed(1)} ${t('common.hours')}` : t('workSession.invalidTimeRange'),
+            tone: hours > 0 ? 'accent' : 'error',
+          },
+        ];
+    const sections: FormSection[] = [
+      {
+        key: 'time',
+        footer: running ? t('workSession.editActiveBanner') : undefined,
+        fields: [
+          { kind: 'date', key: 'date', label: t('form.date'), value: date, onChange: setDate },
+          { kind: 'time', key: 'start', label: t('form.start'), value: startTime, onChange: setStartTime },
+          ...endFields,
+        ],
+      },
+      {
+        key: 'notes',
+        title: t('form.notes'),
+        fields: [{ kind: 'notes', key: 'notes', value: notes, onChange: setNotes, placeholder: t('workSession.notesPlaceholder') }],
+      },
+    ];
+    if (isEditing) {
+      sections.push({
+        key: 'delete',
+        fields: [
+          { kind: 'button', key: 'delete', label: t('workSession.deleteButton'), destructive: true, onPress: () => setShowDeleteDialog(true) },
+        ],
+      });
+    }
+    return (
+      <>
+        {header}
+        <NativeForm sections={sections} />
+        {deleteDialog}
+      </>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
-        <Appbar.Content title={title} titleStyle={styles.headerTitle} />
-        <Appbar.Action icon="check" onPress={handleSave} testID="save-session" />
-      </Appbar.Header>
+      {header}
 
       {isActiveSession && (
         <Banner
@@ -198,7 +280,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         </Banner>
       )}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <Pressable onPress={() => setShowDatePicker(true)}>
           <View pointerEvents="none">
             <TextInput
@@ -243,7 +325,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(date)}
+            value={parseLocalDate(date)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}
@@ -329,13 +411,7 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
         )}
       </ScrollView>
 
-      <DeleteConfirmDialog
-        visible={showDeleteDialog}
-        title={t('workSession.deleteTitle')}
-        message={t('workSession.deleteConfirm')}
-        onDismiss={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-      />
+      {deleteDialog}
     </View>
   );
 }
@@ -343,9 +419,6 @@ export default function AddWorkSessionScreen({ navigation, route }: AddWorkSessi
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerTitle: {
-    fontWeight: '600',
   },
   content: {
     padding: 16,

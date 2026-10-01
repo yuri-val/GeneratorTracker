@@ -1,6 +1,7 @@
 {
     "common": {
         "error": "Помилка",
+        "more": "Ще",
         "success": "Успішно",
         "cancel": "Скасувати",
         "delete": "Видалити",
@@ -28,7 +29,8 @@
         "totalHours": "Всього годин",
         "refills": "Заправки",
         "noGenerators": "Генераторів ще немає",
-        "addFirstGenerator": "Натисніть +, щоб додати свій перший генератор"
+        "addFirstGenerator": "Натисніть +, щоб додати свій перший генератор",
+        "addFirstGeneratorIOS": "Натисніть + угорі, щоб додати перший генератор"
     },
     "analytics": {
         "title": "Аналітика",
@@ -84,7 +86,6 @@
     },
     "detail": {
         "generatorNotFound": "Генератор не знайдено",
-        "tapToEdit": "Натисніть для редагування",
         "activeSession": "Сесія триває",
         "startedAt": "Запущено",
         "stopSession": "ЗУПИНИТИ",
@@ -218,5 +219,27 @@
         "failedToSignOut": "Не вдалося вийти",
         "failedToSignIn": "Не вдалося увійти",
         "failedToCreateAccount": "Не вдалося створити обліковий запис"
+    },
+    "form": {
+        "required": "Обов'язково",
+        "optional": "Необов'язково",
+        "name": "Назва",
+        "model": "Модель",
+        "purchaseDate": "Дата покупки",
+        "time": "Час",
+        "date": "Дата",
+        "start": "Початок",
+        "end": "Кінець",
+        "duration": "Тривалість",
+        "running": "Триває",
+        "endNow": "Завершити зараз",
+        "notes": "Нотатки",
+        "amount": "Кількість",
+        "task": "Завдання",
+        "interval": "Інтервал",
+        "engineHours": "Мотогодини",
+        "days": "Дні",
+        "daysSuffix": "дн.",
+        "lastService": "Останнє обслуговування"
     }
 }

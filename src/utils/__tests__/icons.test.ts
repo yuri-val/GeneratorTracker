@@ -2,10 +2,13 @@
  * react-native-paper renders a "?" for any MaterialCommunityIcons name that does not
  * exist in the installed font (e.g. the empty states once used "clock-off" and
  * "fuel-off"). Scan the sources and check every literal icon name against the glyph map
- * of the icon set Paper resolves (@expo/vector-icons).
+ * of the icon set Paper resolves (@expo/vector-icons). Semantic names (keys of ICONS,
+ * rendered through AppIcon/ScreenHeader) are type-checked; their MCI fallbacks are
+ * checked here.
  */
 import fs from 'fs';
 import path from 'path';
+import { ICONS } from '../../constants/icons';
 
 const glyphMap: Record<string, number> = require('@expo/vector-icons/build/vendor/react-native-vector-icons/glyphmaps/MaterialCommunityIcons.json');
 
@@ -46,7 +49,16 @@ describe('MaterialCommunityIcons names', () => {
   });
 
   it('uses only names that exist in the installed icon font', () => {
-    const missing = [...collectIconNames()].filter(([name]) => !(name in glyphMap)).map(([name, file]) => `${name} (${file})`);
+    const missing = [...collectIconNames()]
+      .filter(([name]) => !(name in ICONS) && !(name in glyphMap))
+      .map(([name, file]) => `${name} (${file})`);
+    expect(missing).toEqual([]);
+  });
+
+  it('maps every semantic icon to an existing MaterialCommunityIcons glyph', () => {
+    const missing = Object.entries(ICONS)
+      .filter(([, icon]) => !(icon.mci in glyphMap))
+      .map(([name, icon]) => `${name} -> ${icon.mci}`);
     expect(missing).toEqual([]);
   });
 });

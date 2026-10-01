@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
-import { Appbar, Button, Surface, Text, Divider, Chip } from 'react-native-paper';
+import { View, StyleSheet, Alert, FlatList, Pressable, RefreshControl } from 'react-native';
+import { Button, Surface, Text, Divider, Chip } from 'react-native-paper';
 import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/types';
-import { Generator, WorkSession, Refill, MaintenanceTask } from '../../models/types';
+import { Generator, WorkSession, Refill, MaintenanceTask, MaintenanceStatusLevel } from '../../models/types';
 import {
   getGenerators,
   getWorkSessions,
@@ -30,6 +30,8 @@ import {
   calculateHours,
   getGeneratorMaintenanceSummary,
   markTaskServiced,
+  calculateMaintenanceStatus,
+  formatDate,
 } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { StatBlock } from '../../components/StatBlock';
@@ -39,6 +41,14 @@ import { RefillsList } from '../../components/RefillsList';
 import { MaintenanceList } from '../../components/MaintenanceList';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
 import { appColors } from '../../theme';
+import { ScreenHeader, type HeaderAction } from '../../components/ScreenHeader';
+import { PlatformSegmented } from '../../components/PlatformSegmented';
+import { GroupedListRow } from '../../components/GroupedListRow';
+import { AppIcon } from '../../components/AppIcon';
+import { describeMaintenance } from '../../components/MaintenanceList';
+import { ICONS } from '../../constants/icons';
+import { isIOS, surfaces, textColors } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type GeneratorDetailScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'GeneratorDetail'>;
@@ -46,6 +56,8 @@ type GeneratorDetailScreenProps = {
 };
 
 const Tab = createMaterialTopTabNavigator();
+
+type Segment = 'sessions' | 'refills' | 'maintenance';
 
 export default function GeneratorDetailScreen({ navigation, route }: GeneratorDetailScreenProps) {
   const theme = useAppTheme();
@@ -60,6 +72,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
   const [refreshing, setRefreshing] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [segment, setSegment] = useState<Segment>('sessions');
 
   useEffect(() => {
     if (activeSession) {
@@ -195,10 +208,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
   if (!generator) {
     return (
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        <Appbar.Header>
-          <Appbar.BackAction onPress={() => navigation.goBack()} />
-          <Appbar.Content title={t('common.notFound')} />
-        </Appbar.Header>
+        <ScreenHeader title={t('common.notFound')} leading="back" onLeadingPress={() => navigation.goBack()} />
         <View style={styles.errorContainer}>
           <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
             {t('detail.generatorNotFound')}
@@ -225,9 +235,162 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
       ? appColors.warning
       : appColors.success;
 
+  const completedSessions = workSessions.filter(s => !s.isActive);
+  const openGeneratorEditor = () => navigation.navigate('AddGenerator', { generatorId });
+
+  const summary = (
+    <View>
+      {!!generator.model && (
+        <Text variant="bodyLarge" style={[styles.model, { color: textColors(theme).secondary }]}>
+          {generator.model}
+        </Text>
+      )}
+      {activeSession ? (
+        <Animated.View entering={FadeIn.duration(400)}>
+          <GradientCard colors={[appColors.activeSession, appColors.activeSessionDark]}>
+            <View style={styles.activeContent}>
+              <Text variant="titleMedium" style={styles.whiteText}>
+                {t('detail.activeSession')}
+              </Text>
+              <Text variant="displaySmall" style={[styles.whiteText, { fontWeight: '700' }]}>
+                {activeHours.toFixed(1)}{t('common.hoursAbbr')}
+              </Text>
+              <Text variant="bodyMedium" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                {t('detail.startedAt')}: {formatTime(activeSession.startTime, i18n.language)}
+              </Text>
+              <View style={styles.activeButtons}>
+                <Button
+                  mode="contained"
+                  buttonColor={theme.colors.error}
+                  textColor={theme.colors.onError}
+                  icon={ICONS.stop.mci}
+                  onPress={handleStopSession}
+                  testID="stop-session"
+                >
+                  {t('detail.stopSession')}
+                </Button>
+                <Button
+                  mode="outlined"
+                  textColor="#fff"
+                  style={{ borderColor: '#fff' }}
+                  onPress={handleOpenActiveSession}
+                >
+                  {t('common.edit')}
+                </Button>
+              </View>
+            </View>
+          </GradientCard>
+        </Animated.View>
+      ) : (
+        <Button
+          mode="contained"
+          icon={ICONS.play.mci}
+          onPress={handleStartSession}
+          style={styles.startButton}
+          contentStyle={styles.startButtonContent}
+          labelStyle={styles.startButtonLabel}
+          testID="start-session"
+        >
+          {t('detail.startSession')}
+        </Button>
+      )}
+
+      <Animated.View entering={FadeInUp.delay(200)}>
+        <Surface
+          elevation={isIOS ? 0 : 2}
+          style={[styles.statsCard, isIOS && { backgroundColor: surfaces(theme).card }]}
+        >
+          <View style={styles.statsRow}>
+            <StatBlock
+              value={`${stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
+              label={t('home.totalHours')}
+              icon="clock"
+              color={theme.colors.secondary}
+            />
+            <Divider style={styles.statDivider} />
+            <StatBlock
+              value={stats.totalRefills.toString()}
+              label={t('home.refills')}
+              icon="fuel"
+              color={theme.colors.primary}
+            />
+          </View>
+          {stats.averageFuelPerHour > 0 && (
+            <>
+              <Divider style={{ marginVertical: 12 }} />
+              <Chip
+                icon={({ size, color }) => <AppIcon name="chartLine" size={size} color={color} />}
+                compact
+                style={{ alignSelf: 'center' }}
+              >
+                {t('common.avg')}: {stats.averageFuelPerHour.toFixed(2)} {t('common.litersPerHour')}
+              </Chip>
+            </>
+          )}
+          {maintenanceSummary.level !== 'ok' && (
+            <>
+              <Divider style={{ marginVertical: 12 }} />
+              <Chip
+                icon={({ size }) => <AppIcon name="wrench" size={size} color={maintenanceColor} />}
+                compact
+                style={{ alignSelf: 'center', backgroundColor: maintenanceColor + '22' }}
+                textStyle={{ color: maintenanceColor }}
+              >
+                {maintenanceSummary.dueCount > 0
+                  ? t('maintenance.badgeDue', { count: maintenanceSummary.dueCount })
+                  : t('maintenance.badgeSoon', { count: maintenanceSummary.soonCount })}
+              </Chip>
+            </>
+          )}
+        </Surface>
+      </Animated.View>
+    </View>
+  );
+
+  const deleteDialog = (
+    <DeleteConfirmDialog
+      visible={showDeleteDialog}
+      title={t('detail.deleteGeneratorTitle')}
+      message={t('detail.deleteGeneratorConfirm')}
+      onDismiss={() => setShowDeleteDialog(false)}
+      onConfirm={confirmDelete}
+    />
+  );
+
+  if (isIOS) {
+    return (
+      <GeneratorDetailIOS
+        generatorName={generator.name}
+        summary={summary}
+        segment={segment}
+        onSegmentChange={setSegment}
+        sessions={completedSessions}
+        refills={refills}
+        tasks={maintenanceTasks}
+        engineHours={stats.totalHours}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onEdit={openGeneratorEditor}
+        onDelete={handleDeleteGenerator}
+        onOpenSession={sessionId => navigation.navigate('AddWorkSession', { generatorId, sessionId })}
+        onOpenRefill={refillId => navigation.navigate('AddRefill', { generatorId, refillId })}
+        onOpenTask={taskId => navigation.navigate('AddMaintenance', { generatorId, taskId })}
+        onAdd={() =>
+          segment === 'sessions'
+            ? navigation.navigate('AddWorkSession', { generatorId })
+            : segment === 'refills'
+            ? navigation.navigate('AddRefill', { generatorId })
+            : navigation.navigate('AddMaintenance', { generatorId })
+        }
+        onMarkServiced={handleMarkServiced}
+        deleteDialog={deleteDialog}
+      />
+    );
+  }
+
   const WorkSessionsTab = () => (
     <WorkSessionsList
-      sessions={workSessions.filter(s => !s.isActive)}
+      sessions={completedSessions}
       onSessionPress={(sessionId) => navigation.navigate('AddWorkSession', { generatorId, sessionId })}
       onRefresh={onRefresh}
       refreshing={refreshing}
@@ -259,116 +422,32 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content
-          title={generator.name}
-          subtitle={generator.model || t('detail.tapToEdit')}
-          onPress={() => navigation.navigate('AddGenerator', { generatorId })}
-          testID="detail-edit-generator"
-        />
-        <Appbar.Action
-          icon="delete"
-          iconColor={theme.colors.error}
-          onPress={handleDeleteGenerator}
-          testID="detail-delete-generator"
-        />
-      </Appbar.Header>
+      <ScreenHeader
+        title={generator.name}
+        leading="back"
+        onLeadingPress={() => navigation.goBack()}
+        onTitlePress={openGeneratorEditor}
+        titleTestID="detail-edit-generator"
+        actions={[
+          {
+            key: 'edit',
+            label: t('common.edit'),
+            icon: 'edit',
+            onPress: openGeneratorEditor,
+            testID: 'detail-edit-action',
+          },
+          {
+            key: 'delete',
+            label: t('common.delete'),
+            icon: 'delete',
+            destructive: true,
+            onPress: handleDeleteGenerator,
+            testID: 'detail-delete-generator',
+          },
+        ]}
+      />
 
-      <View>
-        {activeSession ? (
-          <Animated.View entering={FadeIn.duration(400)}>
-            <GradientCard colors={[appColors.activeSession, appColors.activeSessionDark]}>
-              <View style={styles.activeContent}>
-                <Text variant="titleMedium" style={styles.whiteText}>
-                  {t('detail.activeSession')}
-                </Text>
-                <Text variant="displaySmall" style={[styles.whiteText, { fontWeight: '700' }]}>
-                  {activeHours.toFixed(1)}{t('common.hoursAbbr')}
-                </Text>
-                <Text variant="bodyMedium" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  {t('detail.startedAt')}: {formatTime(activeSession.startTime, i18n.language)}
-                </Text>
-                <View style={styles.activeButtons}>
-                  <Button
-                    mode="contained"
-                    buttonColor={theme.colors.error}
-                    textColor={theme.colors.onError}
-                    icon="stop"
-                    onPress={handleStopSession}
-                    testID="stop-session"
-                  >
-                    {t('detail.stopSession')}
-                  </Button>
-                  <Button
-                    mode="outlined"
-                    textColor="#fff"
-                    style={{ borderColor: '#fff' }}
-                    onPress={handleOpenActiveSession}
-                  >
-                    {t('common.edit')}
-                  </Button>
-                </View>
-              </View>
-            </GradientCard>
-          </Animated.View>
-        ) : (
-          <Button
-            mode="contained"
-            icon="play"
-            onPress={handleStartSession}
-            style={styles.startButton}
-            contentStyle={styles.startButtonContent}
-            labelStyle={styles.startButtonLabel}
-            testID="start-session"
-          >
-            {t('detail.startSession')}
-          </Button>
-        )}
-
-        <Animated.View entering={FadeInUp.delay(200)}>
-          <Surface elevation={2} style={styles.statsCard}>
-            <View style={styles.statsRow}>
-              <StatBlock
-                value={`${stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
-                label={t('home.totalHours')}
-                icon="clock-outline"
-                color={theme.colors.secondary}
-              />
-              <Divider style={styles.statDivider} />
-              <StatBlock
-                value={stats.totalRefills.toString()}
-                label={t('home.refills')}
-                icon="fuel"
-                color={theme.colors.primary}
-              />
-            </View>
-            {stats.averageFuelPerHour > 0 && (
-              <>
-                <Divider style={{ marginVertical: 12 }} />
-                <Chip icon="chart-line" compact style={{ alignSelf: 'center' }}>
-                  {t('common.avg')}: {stats.averageFuelPerHour.toFixed(2)} {t('common.litersPerHour')}
-                </Chip>
-              </>
-            )}
-            {maintenanceSummary.level !== 'ok' && (
-              <>
-                <Divider style={{ marginVertical: 12 }} />
-                <Chip
-                  icon="wrench"
-                  compact
-                  style={{ alignSelf: 'center', backgroundColor: maintenanceColor + '22' }}
-                  textStyle={{ color: maintenanceColor }}
-                >
-                  {maintenanceSummary.dueCount > 0
-                    ? t('maintenance.badgeDue', { count: maintenanceSummary.dueCount })
-                    : t('maintenance.badgeSoon', { count: maintenanceSummary.soonCount })}
-                </Chip>
-              </>
-            )}
-          </Surface>
-        </Animated.View>
-      </View>
+      <View style={contentColumn}>{summary}</View>
 
       <Tab.Navigator
         screenOptions={{
@@ -390,7 +469,7 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
           name="Work Sessions"
           component={WorkSessionsTab}
           options={{
-            tabBarLabel: `${t('detail.workSessions')} (${workSessions.filter(s => !s.isActive).length})`,
+            tabBarLabel: `${t('detail.workSessions')} (${completedSessions.length})`,
           }}
         />
         <Tab.Screen
@@ -409,14 +488,185 @@ export default function GeneratorDetailScreen({ navigation, route }: GeneratorDe
         />
       </Tab.Navigator>
 
-      <DeleteConfirmDialog
-        visible={showDeleteDialog}
-        title={t('detail.deleteGeneratorTitle')}
-        message={t('detail.deleteGeneratorConfirm')}
-        onDismiss={() => setShowDeleteDialog(false)}
-        onConfirm={confirmDelete}
-      />
+      {deleteDialog}
     </View>
+  );
+}
+
+type ListRow =
+  | { kind: 'session'; item: WorkSession }
+  | { kind: 'refill'; item: Refill }
+  | { kind: 'task'; item: MaintenanceTask };
+
+interface GeneratorDetailIOSProps {
+  generatorName: string;
+  summary: React.ReactNode;
+  segment: Segment;
+  onSegmentChange: (segment: Segment) => void;
+  sessions: WorkSession[];
+  refills: Refill[];
+  tasks: MaintenanceTask[];
+  engineHours: number;
+  refreshing: boolean;
+  onRefresh: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  onAdd: () => void;
+  onOpenSession: (id: string) => void;
+  onOpenRefill: (id: string) => void;
+  onOpenTask: (id: string) => void;
+  onMarkServiced: (task: MaintenanceTask) => void;
+  deleteDialog: React.ReactNode;
+}
+
+/**
+ * iOS layout (HIG): one scrolling inset-grouped list — the summary, a segmented control
+ * for the record type and the records as grouped rows; add/edit/delete live in the
+ * navigation bar ("+" and a "More" pull-down menu).
+ */
+function GeneratorDetailIOS(props: GeneratorDetailIOSProps) {
+  const { segment, sessions, refills, tasks, engineHours } = props;
+  const theme = useAppTheme();
+  const { t, i18n } = useTranslation();
+  const surface = surfaces(theme);
+  const text = textColors(theme);
+
+  const rows: ListRow[] =
+    segment === 'sessions'
+      ? sessions.map(item => ({ kind: 'session' as const, item }))
+      : segment === 'refills'
+      ? refills.map(item => ({ kind: 'refill' as const, item }))
+      : tasks.map(item => ({ kind: 'task' as const, item }));
+
+  const addLabel =
+    segment === 'sessions' ? t('workSession.addButton') : segment === 'refills' ? t('refill.addButton') : t('maintenance.addButton');
+
+  const actions: HeaderAction[] = [{ key: 'add', label: addLabel, icon: 'add', onPress: props.onAdd, testID: 'detail-add' }];
+
+  const statusColor = (level: MaintenanceStatusLevel) =>
+    level === 'due' ? theme.colors.error : level === 'soon' ? appColors.warning : appColors.success;
+  const statusLabel = (level: MaintenanceStatusLevel) =>
+    level === 'due' ? t('maintenance.statusDue') : level === 'soon' ? t('maintenance.statusSoon') : t('maintenance.statusOk');
+
+  const renderItem = ({ item: row, index }: { item: ListRow; index: number }) => {
+    const position = { first: index === 0, last: index === rows.length - 1 };
+    if (row.kind === 'session') {
+      const s = row.item;
+      return (
+        <GroupedListRow
+          {...position}
+          title={formatDate(s.date, i18n.language)}
+          subtitle={`${formatTime(s.startTime, i18n.language)} – ${s.endTime ? formatTime(s.endTime, i18n.language) : t('workSession.inProgress')}`}
+          detail={s.notes || undefined}
+          icon="clock"
+          iconColor={theme.colors.secondary}
+          value={`${s.hours.toFixed(1)}${t('common.hoursAbbr')}`}
+          onPress={() => props.onOpenSession(s.id)}
+        />
+      );
+    }
+    if (row.kind === 'refill') {
+      const r = row.item;
+      return (
+        <GroupedListRow
+          {...position}
+          title={formatDate(r.date, i18n.language)}
+          subtitle={r.notes || undefined}
+          icon="fuel"
+          iconColor={theme.colors.primary}
+          value={`${r.amount}${t('common.litersAbbr')}`}
+          onPress={() => props.onOpenRefill(r.id)}
+        />
+      );
+    }
+    const task = row.item;
+    const status = calculateMaintenanceStatus(task, engineHours);
+    const color = statusColor(status.level);
+    const { interval, remaining } = describeMaintenance(task, status, t);
+    return (
+      <GroupedListRow
+        {...position}
+        title={task.title}
+        subtitle={remaining ?? interval}
+        detail={task.notes || undefined}
+        icon="wrench"
+        iconColor={color}
+        value={statusLabel(status.level)}
+        valueColor={color}
+        accessory={
+          <Pressable
+            onPress={() => props.onMarkServiced(task)}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={t('maintenance.markServiced')}
+            style={({ pressed }) => pressed && { opacity: 0.5 }}
+          >
+            <AppIcon name="markServiced" size={24} color={theme.colors.primary} />
+          </Pressable>
+        }
+        onPress={() => props.onOpenTask(task.id)}
+      />
+    );
+  };
+
+  const empty =
+    segment === 'sessions'
+      ? { icon: 'timerOff' as const, text: t('workSession.emptyState') }
+      : segment === 'refills'
+      ? { icon: 'fuelOff' as const, text: t('refill.emptyState') }
+      : { icon: 'wrenchOutline' as const, text: t('maintenance.emptyState') };
+
+  return (
+    <>
+      <ScreenHeader
+        title={props.generatorName}
+        leading="back"
+        scrollEdge
+        actions={actions}
+        menu={{
+          label: t('common.more'),
+          icon: 'more',
+          actions: [
+            { key: 'edit', label: t('common.edit'), icon: 'edit', onPress: props.onEdit },
+            { key: 'delete', label: t('common.delete'), icon: 'delete', destructive: true, onPress: props.onDelete },
+          ],
+        }}
+      />
+      <FlatList
+        data={rows}
+        keyExtractor={row => `${row.kind}-${row.item.id}`}
+        renderItem={renderItem}
+        contentInsetAdjustmentBehavior="automatic"
+        style={{ backgroundColor: surface.screen }}
+        contentContainerStyle={[styles.iosContent, contentColumn]}
+        refreshControl={<RefreshControl refreshing={props.refreshing} onRefresh={props.onRefresh} />}
+        ListHeaderComponent={
+          <View>
+            {props.summary}
+            <PlatformSegmented
+              value={segment}
+              onValueChange={props.onSegmentChange}
+              options={[
+                { value: 'sessions', label: `${t('detail.workSessions')} (${sessions.length})` },
+                { value: 'refills', label: `${t('detail.refills')} (${refills.length})` },
+                { value: 'maintenance', label: `${t('maintenance.tabLabel')} (${tasks.length})` },
+              ]}
+              style={styles.iosSegmented}
+              testID="detail-segments"
+            />
+          </View>
+        }
+        ListEmptyComponent={
+          <View style={styles.iosEmpty}>
+            <AppIcon name={empty.icon} size={44} color={theme.colors.outline} />
+            <Text variant="bodyLarge" style={{ color: text.secondary, marginTop: 12, textAlign: 'center' }}>
+              {empty.text}
+            </Text>
+          </View>
+        }
+      />
+      {props.deleteDialog}
+    </>
   );
 }
 
@@ -464,5 +714,22 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 40,
+  },
+  iosContent: {
+    paddingBottom: 32,
+  },
+  model: {
+    marginHorizontal: 20,
+    marginTop: 12,
+  },
+  iosSegmented: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  iosEmpty: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 32,
   },
 });

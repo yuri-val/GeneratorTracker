@@ -233,7 +233,7 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await goToTab(page, 'Home');
     await openGenerator(page, 'Offline Deleted');
     await page.getByTestId('detail-delete-generator').click();
-    await page.getByRole('button', { name: /^Delete$/ }).click();
+    await page.getByTestId('confirm-delete').click();
     await waitForEmptyHome(page);
 
     await signIn(page, email); // before 2.4.2 the initial sync brought it straight back
@@ -265,7 +265,7 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await goToTab(page, 'Home');
     await openGenerator(page, 'Cascade Gen');
     await page.getByTestId('detail-delete-generator').click();
-    await page.getByRole('button', { name: /^Delete$/ }).click();
+    await page.getByTestId('confirm-delete').click();
     await waitForEmptyHome(page);
     await syncNow(page);
 

@@ -1,6 +1,7 @@
 {
     "common": {
         "error": "Error",
+        "more": "More",
         "success": "Success",
         "cancel": "Cancel",
         "delete": "Delete",
@@ -28,7 +29,8 @@
         "totalHours": "Total Hours",
         "refills": "Refills",
         "noGenerators": "No generators yet",
-        "addFirstGenerator": "Tap the + button to add your first generator"
+        "addFirstGenerator": "Tap the + button to add your first generator",
+        "addFirstGeneratorIOS": "Tap + at the top to add your first generator"
     },
     "analytics": {
         "title": "Analytics",
@@ -84,7 +86,6 @@
     },
     "detail": {
         "generatorNotFound": "Generator not found",
-        "tapToEdit": "Tap to edit",
         "activeSession": "Session Running",
         "startedAt": "Started",
         "stopSession": "STOP",
@@ -218,5 +219,27 @@
         "failedToSignOut": "Failed to sign out",
         "failedToSignIn": "Failed to sign in",
         "failedToCreateAccount": "Failed to create account"
+    },
+    "form": {
+        "required": "Required",
+        "optional": "Optional",
+        "name": "Name",
+        "model": "Model",
+        "purchaseDate": "Purchase date",
+        "time": "Time",
+        "date": "Date",
+        "start": "Start",
+        "end": "End",
+        "duration": "Duration",
+        "running": "Running",
+        "endNow": "End Now",
+        "notes": "Notes",
+        "amount": "Amount",
+        "task": "Task",
+        "interval": "Interval",
+        "engineHours": "Engine hours",
+        "days": "Days",
+        "daysSuffix": "days",
+        "lastService": "Last service"
     }
 }

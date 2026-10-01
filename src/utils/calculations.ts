@@ -52,8 +52,22 @@ export const calculateGeneratorStats = (
   };
 };
 
+/** A local calendar date as 'YYYY-MM-DD' (not the UTC date that toISOString() gives). */
+export const toLocalDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+/** Local midnight of a 'YYYY-MM-DD' date (new Date('YYYY-MM-DD') is UTC midnight). */
+export const parseLocalDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const formatDate = (dateString: string, locale: string = 'en-US'): string => {
-  const date = new Date(dateString);
+  const date = parseLocalDate(dateString);
   return date.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'short',
@@ -84,10 +98,7 @@ export const getCurrentTime = (): string => {
   return `${hours}:${minutes}`;
 };
 
-export const getCurrentDate = (): string => {
-  const now = new Date();
-  return now.toISOString().split('T')[0];
-};
+export const getCurrentDate = (): string => toLocalDateString();
 
 export const calculateActiveSessionHours = (startTime: string, startDate: string): number => {
   const sessionStart = new Date(`${startDate}T${startTime}`);
@@ -110,8 +121,9 @@ const parseDateUTC = (dateString: string): number => {
 
 const toDateStringUTC = (ms: number): string => new Date(ms).toISOString().split('T')[0];
 
+// Today's local calendar date, as UTC midnight to match parseDateUTC.
 const startOfDayUTC = (date: Date): number =>
-  Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
 
 const worstLevel = (a: MaintenanceStatusLevel, b: MaintenanceStatusLevel): MaintenanceStatusLevel => {
   const rank: Record<MaintenanceStatusLevel, number> = { ok: 0, soon: 1, due: 2 };

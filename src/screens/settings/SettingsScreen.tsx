@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import {
-  Appbar,
   Card,
   Button,
   Text,
@@ -15,11 +14,14 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { isIOS } from '../../theme/platform';
 import Constants from 'expo-constants';
 import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
-import { EmailAuthForm } from '../../components/EmailAuthForm';
+import { EmailAuthForm, useEmailAuth } from '../../components/EmailAuthForm';
+import { NativeForm, type FormSection } from '../../components/form/NativeForm';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { saveLanguage } from '../../utils/storage';
 import { isUsingFirebaseEmulator } from '../../config/firebase';
@@ -31,13 +33,14 @@ import {
   signInWithGoogleCredential,
   useGoogleAuth,
 } from '../../services/auth';
+import { contentColumn } from '../../theme/layout';
 
 // Read once from the app config so the About section never lags behind app.json.
 const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 export default function SettingsScreen() {
   const theme = useAppTheme();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarOverlap = useTabBarOverlap();
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuth();
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
@@ -165,13 +168,35 @@ export default function SettingsScreen() {
     }
   };
 
+  if (isIOS) {
+    return (
+      <SettingsIOS
+        user={user}
+        syncText={getSyncText()}
+        syncTone={syncStatus === 'error' ? 'error' : syncStatus === 'synced' ? 'accent' : 'muted'}
+        syncing={syncStatus === 'syncing'}
+        pendingCount={pendingCount}
+        signingIn={signingIn}
+        googleAvailable={googleAvailable && !!request}
+        onGoogleSignIn={() => promptAsync()}
+        onAnonymousSignIn={handleAnonymousSignIn}
+        onEmailSignIn={handleEmailSignIn}
+        onEmailSignUp={handleEmailSignUp}
+        onSignOut={handleSignOut}
+        onSync={handleManualSync}
+        language={i18n.language.split('-')[0]}
+        onLanguageChange={handleLanguageChange}
+      />
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Content title={t('settings.title')} titleStyle={styles.headerTitle} />
-      </Appbar.Header>
+      <ScreenHeader title={t('settings.title')} largeTitle />
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 16 }]}>
+      <ScrollView
+        contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
+      >
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
             <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>
@@ -337,6 +362,178 @@ export default function SettingsScreen() {
         </Animated.View>
       </ScrollView>
     </View>
+  );
+}
+
+interface SettingsIOSProps {
+  user: ReturnType<typeof useAuth>['user'];
+  syncText: string;
+  syncTone: 'accent' | 'muted' | 'error';
+  syncing: boolean;
+  pendingCount: number;
+  signingIn: boolean;
+  googleAvailable: boolean;
+  onGoogleSignIn: () => void;
+  onAnonymousSignIn: () => void;
+  onEmailSignIn: (email: string, password: string) => Promise<void>;
+  onEmailSignUp: (email: string, password: string) => Promise<void>;
+  onSignOut: () => void;
+  onSync: () => void;
+  language: string;
+  onLanguageChange: (language: string) => void;
+}
+
+/** iOS: Settings as a native grouped form (SwiftUI Form) under the large-title bar. */
+function SettingsIOS(props: SettingsIOSProps) {
+  const { t } = useTranslation();
+  const { user } = props;
+  const emailAuth = useEmailAuth({ onSignIn: props.onEmailSignIn, onSignUp: props.onEmailSignUp });
+  const busy = emailAuth.loading || props.signingIn;
+
+  const sections: FormSection[] = user
+    ? [
+        {
+          key: 'account',
+          title: t('settings.account'),
+          fields: [
+            { kind: 'info', key: 'user', label: user.email || t('settings.anonymousUser'), value: user.displayName || '' },
+            {
+              kind: 'button',
+              key: 'signOut',
+              label: t('settings.signOut'),
+              destructive: true,
+              systemImage: 'rectangle.portrait.and.arrow.right',
+              onPress: props.onSignOut,
+              testID: 'sign-out',
+            },
+          ],
+        },
+        {
+          key: 'sync',
+          title: t('settings.sync'),
+          fields: [
+            { kind: 'info', key: 'status', label: t('settings.status'), value: props.syncText, tone: props.syncTone },
+            ...(props.pendingCount > 0
+              ? [
+                  {
+                    kind: 'info' as const,
+                    key: 'pending',
+                    label: t('settings.pendingChanges'),
+                    value: String(props.pendingCount),
+                  },
+                ]
+              : []),
+            {
+              kind: 'button',
+              key: 'syncNow',
+              label: t('settings.syncNow'),
+              systemImage: 'arrow.clockwise',
+              disabled: props.syncing,
+              onPress: props.onSync,
+              testID: 'sync-now',
+            },
+          ],
+        },
+      ]
+    : [
+        {
+          key: 'account',
+          title: emailAuth.isSignUp ? t('auth.createAccount') : t('auth.signInEmail'),
+          footer: t('settings.syncDescription'),
+          fields: [
+            {
+              kind: 'text',
+              key: 'email',
+              label: t('auth.email'),
+              value: emailAuth.email,
+              onChange: emailAuth.setEmail,
+              placeholder: 'name@example.com',
+              keyboard: 'email',
+              testID: 'input-email',
+            },
+            {
+              kind: 'text',
+              key: 'password',
+              label: t('auth.password'),
+              value: emailAuth.password,
+              onChange: emailAuth.setPassword,
+              placeholder: t('form.required'),
+              secure: true,
+              testID: 'input-password',
+            },
+            {
+              kind: 'button',
+              key: 'submit',
+              label: emailAuth.isSignUp ? t('auth.createAccount') : t('auth.signIn'),
+              disabled: busy,
+              onPress: emailAuth.submit,
+              testID: 'auth-submit',
+            },
+            {
+              kind: 'button',
+              key: 'toggle',
+              label: emailAuth.isSignUp ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount'),
+              disabled: busy,
+              onPress: emailAuth.toggleMode,
+              testID: 'auth-toggle-mode',
+            },
+          ],
+        },
+        {
+          key: 'otherSignIn',
+          fields: [
+            ...(props.googleAvailable
+              ? [
+                  {
+                    kind: 'button' as const,
+                    key: 'google',
+                    label: t('settings.signInWithGoogle'),
+                    disabled: busy,
+                    onPress: props.onGoogleSignIn,
+                  },
+                ]
+              : []),
+            {
+              kind: 'button',
+              key: 'anonymous',
+              label: t('settings.signInAnonymously'),
+              disabled: busy,
+              onPress: props.onAnonymousSignIn,
+            },
+          ],
+        },
+      ];
+
+  sections.push(
+    {
+      key: 'language',
+      fields: [
+        {
+          kind: 'picker',
+          key: 'language',
+          label: t('settings.language'),
+          value: props.language,
+          options: [
+            { value: 'en', label: t('settings.english') },
+            { value: 'uk', label: t('settings.ukrainian') },
+          ],
+          onChange: props.onLanguageChange,
+        },
+      ],
+    },
+    {
+      key: 'about',
+      title: t('settings.about'),
+      footer: isUsingFirebaseEmulator ? t('settings.emulatorDescription') : undefined,
+      fields: [{ kind: 'info', key: 'version', label: t('home.title'), value: APP_VERSION }],
+    }
+  );
+
+  return (
+    <>
+      <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
+      <NativeForm sections={sections} />
+    </>
   );
 }
 

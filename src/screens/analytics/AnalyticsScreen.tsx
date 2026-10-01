@@ -1,11 +1,15 @@
 import React, { useState, useCallback, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
-import { Appbar, Chip, Surface, Text, SegmentedButtons, Icon } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, RefreshControl, useWindowDimensions } from 'react-native';
+import { Chip, Surface, Text } from 'react-native-paper';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { BarChart, PieChart } from 'react-native-gifted-charts';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { PlatformSegmented } from '../../components/PlatformSegmented';
+import { AppIcon } from '../../components/AppIcon';
+import { isIOS, surfaces, textColors } from '../../theme/platform';
 import { Generator, WorkSession, Refill, GeneratorStats } from '../../models/types';
 import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
 import { calculateGeneratorStats } from '../../utils/calculations';
@@ -16,14 +20,22 @@ import {
   getGeneratorComparison,
   getFuelDistribution,
 } from '../../utils/analytics';
+import { contentColumn, CONTENT_MAX_WIDTH } from '../../theme/layout';
 
 type GeneratorWithStats = Generator & { stats: GeneratorStats };
 
-const screenWidth = Dimensions.get('window').width;
+// A bar chart draws its y-axis labels to the left of `width`, so the plot must leave room
+// for them inside the card: content padding + card padding on both sides + the label column.
+// The x-axis line is clamped to the plot (it defaults to width + endSpacing and overflows).
+const Y_AXIS_LABEL_WIDTH = 35;
+const CHART_HORIZONTAL_INSET = 16 * 2 + 20 * 2 + Y_AXIS_LABEL_WIDTH;
 
 export default function AnalyticsScreen() {
   const theme = useAppTheme();
-  const tabBarHeight = useBottomTabBarHeight();
+  const tabBarOverlap = useTabBarOverlap();
+  const { width: windowWidth } = useWindowDimensions();
+  const surface = surfaces(theme);
+  const text = textColors(theme);
   const { t, i18n } = useTranslation();
 
   const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
@@ -115,54 +127,55 @@ export default function AnalyticsScreen() {
     [generators, refillsList, t]
   );
 
-  const chartWidth = screenWidth - 96;
+  // Follows rotation/resizing and the content column (S-34).
+  const chartWidth = Math.min(windowWidth, CONTENT_MAX_WIDTH) - CHART_HORIZONTAL_INSET;
 
   const renderOverview = () => (
     <>
       <View style={styles.statsGrid}>
         <Animated.View entering={FadeInUp.delay(0).springify()} style={styles.statHalf}>
-          <Surface elevation={2} style={styles.statCard}>
-            <Icon source="engine" size={24} color={theme.colors.primary} />
+          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
+            <AppIcon name="engine" size={24} color={theme.colors.primary} />
             <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.primary }]}>
               {totalGenerators}
             </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
+            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
               {t('analytics.generators')}
             </Text>
           </Surface>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(80).springify()} style={styles.statHalf}>
-          <Surface elevation={2} style={styles.statCard}>
-            <Icon source="clock-outline" size={24} color={theme.colors.secondary} />
+          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
+            <AppIcon name="clock" size={24} color={theme.colors.secondary} />
             <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.secondary }]}>
               {totalHours.toFixed(1)}
             </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
+            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
               {t('analytics.totalHours')}
             </Text>
           </Surface>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(160).springify()} style={styles.statHalf}>
-          <Surface elevation={2} style={styles.statCard}>
-            <Icon source="fuel" size={24} color={theme.colors.primary} />
+          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
+            <AppIcon name="fuel" size={24} color={theme.colors.primary} />
             <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.primary }]}>
               {totalFuel.toFixed(1)}
             </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
+            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
               {t('analytics.litersUsed')}
             </Text>
           </Surface>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.delay(240).springify()} style={styles.statHalf}>
-          <Surface elevation={2} style={styles.statCard}>
-            <Icon source="chart-line" size={24} color={theme.colors.secondary} />
+          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
+            <AppIcon name="chartLine" size={24} color={theme.colors.secondary} />
             <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.secondary }]}>
               {avgHours.toFixed(1)}
             </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>
+            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
               {t('analytics.avgHoursPerGen')}
             </Text>
           </Surface>
@@ -171,11 +184,11 @@ export default function AnalyticsScreen() {
 
       {totalGenerators === 0 && (
         <View style={styles.emptyContainer}>
-          <Icon source="chart-box-outline" size={64} color={theme.colors.onSurfaceVariant} />
-          <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
+          <AppIcon name="chartEmpty" size={64} color={text.secondary} />
+          <Text variant="titleMedium" style={{ color: text.secondary as string, marginTop: 16 }}>
             {t('analytics.noDataAvailable')}
           </Text>
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
+          <Text variant="bodyMedium" style={{ color: text.secondary as string, textAlign: 'center' }}>
             {t('analytics.addGeneratorsHint')}
           </Text>
         </View>
@@ -187,7 +200,7 @@ export default function AnalyticsScreen() {
     <>
       {hoursChartData.length > 0 && (
         <Animated.View entering={FadeInUp.delay(0).springify()}>
-          <Surface elevation={1} style={styles.chartCard}>
+          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.operatingHours')}</Text>
             <BarChart
               data={hoursChartData}
@@ -197,13 +210,15 @@ export default function AnalyticsScreen() {
               noOfSections={4}
               yAxisColor="transparent"
               xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 10 }}
+              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
+              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 10 }}
               hideRules
               isAnimated
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -211,7 +226,7 @@ export default function AnalyticsScreen() {
 
       {fuelChartData.length > 0 && (
         <Animated.View entering={FadeInUp.delay(100).springify()}>
-          <Surface elevation={1} style={styles.chartCard}>
+          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelConsumption')}</Text>
             <BarChart
               data={fuelChartData}
@@ -221,13 +236,15 @@ export default function AnalyticsScreen() {
               noOfSections={4}
               yAxisColor="transparent"
               xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 10 }}
+              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
+              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 10 }}
               hideRules
               isAnimated
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -235,7 +252,7 @@ export default function AnalyticsScreen() {
 
       {!selectedGeneratorId && comparisonData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(200).springify()}>
-          <Surface elevation={1} style={styles.chartCard}>
+          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.generatorComparison')}</Text>
             <BarChart
               data={comparisonData}
@@ -245,13 +262,15 @@ export default function AnalyticsScreen() {
               noOfSections={4}
               yAxisColor="transparent"
               xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: theme.colors.onSurfaceVariant, fontSize: 9 }}
+              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
+              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 9 }}
               hideRules
               isAnimated
               animationDuration={600}
               height={160}
               width={chartWidth}
+              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
+              xAxisLength={chartWidth}
             />
           </Surface>
         </Animated.View>
@@ -259,7 +278,7 @@ export default function AnalyticsScreen() {
 
       {!selectedGeneratorId && pieData.length > 1 && (
         <Animated.View entering={FadeInUp.delay(300).springify()}>
-          <Surface elevation={1} style={styles.chartCard}>
+          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
             <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelDistribution')}</Text>
             <View style={styles.pieContainer}>
               <PieChart
@@ -269,7 +288,7 @@ export default function AnalyticsScreen() {
                 innerRadius={50}
                 innerCircleColor={theme.colors.elevation.level1}
                 centerLabelComponent={() => (
-                  <Text variant="labelMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                  <Text variant="labelMedium" style={{ color: text.secondary as string }}>
                     {totalFuel.toFixed(0)}{t('common.liters')}
                   </Text>
                 )}
@@ -278,7 +297,7 @@ export default function AnalyticsScreen() {
                 {pieData.map((item, i) => (
                   <View key={i} style={styles.legendItem}>
                     <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-                    <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, flex: 1 }}>
+                    <Text variant="bodySmall" style={{ color: text.secondary as string, flex: 1 }}>
                       {item.label}
                     </Text>
                     <Text variant="labelSmall" style={{ color: theme.colors.onSurface }}>
@@ -294,11 +313,11 @@ export default function AnalyticsScreen() {
 
       {hoursChartData.length === 0 && fuelChartData.length === 0 && (
         <View style={styles.emptyContainer}>
-          <Icon source="chart-line-variant" size={64} color={theme.colors.onSurfaceVariant} />
-          <Text variant="titleMedium" style={{ color: theme.colors.onSurfaceVariant, marginTop: 16 }}>
+          <AppIcon name="chartNoData" size={64} color={text.secondary} />
+          <Text variant="titleMedium" style={{ color: text.secondary as string, marginTop: 16 }}>
             {t('analytics.notEnoughData')}
           </Text>
-          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, textAlign: 'center' }}>
+          <Text variant="bodyMedium" style={{ color: text.secondary as string, textAlign: 'center' }}>
             {t('analytics.logMoreHint')}
           </Text>
         </View>
@@ -306,24 +325,76 @@ export default function AnalyticsScreen() {
     </>
   );
 
+  const viewSwitcher = (
+    <PlatformSegmented
+      value={selectedView}
+      onValueChange={setSelectedView}
+      options={[
+        { value: 'overview', label: t('analytics.overview'), icon: 'grid' },
+        { value: 'charts', label: t('analytics.charts'), icon: 'chartLine' },
+      ]}
+      style={isIOS ? styles.segmentedIOS : styles.segmentedButtons}
+    />
+  );
+
+  const header = (
+    <ScreenHeader
+      title={t('analytics.title')}
+      largeTitle
+      scrollEdge
+      menu={
+        isIOS && generators.length > 1
+          ? {
+              label: t('analytics.allGenerators'),
+              icon: 'filter',
+              actions: [
+                {
+                  key: 'all',
+                  label: t('analytics.allGenerators'),
+                  selected: selectedGeneratorId === null,
+                  onPress: () => setSelectedGeneratorId(null),
+                },
+                ...generators.map(g => ({
+                  key: g.id,
+                  label: g.name,
+                  selected: selectedGeneratorId === g.id,
+                  onPress: () => setSelectedGeneratorId(g.id),
+                })),
+              ],
+            }
+          : undefined
+      }
+    />
+  );
+
+  if (isIOS) {
+    // Native: the scroll view is the screen root (collapsing large title); the
+    // generator filter is a pull-down menu in the navigation bar.
+    return (
+      <>
+        {header}
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={{ backgroundColor: surface.screen }}
+          contentContainerStyle={[styles.content, contentColumn]}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
+          }
+        >
+          {viewSwitcher}
+          {selectedView === 'overview' ? renderOverview() : renderCharts()}
+        </ScrollView>
+      </>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Content title={t('analytics.title')} titleStyle={styles.headerTitle} />
-      </Appbar.Header>
-
-      <SegmentedButtons
-        value={selectedView}
-        onValueChange={setSelectedView}
-        buttons={[
-          { value: 'overview', label: t('analytics.overview'), icon: 'view-grid' },
-          { value: 'charts', label: t('analytics.charts'), icon: 'chart-line' },
-        ]}
-        style={styles.segmentedButtons}
-      />
+      {header}
+      <View style={contentColumn}>{viewSwitcher}</View>
 
       {generators.length > 1 && (
-        <View style={styles.filterContainer}>
+        <View style={[styles.filterContainer, contentColumn]}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -351,7 +422,7 @@ export default function AnalyticsScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: tabBarHeight + 16 }]}
+        contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
         }
@@ -368,6 +439,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontWeight: '700',
+  },
+  segmentedIOS: {
+    marginBottom: 16,
   },
   segmentedButtons: {
     marginHorizontal: 16,

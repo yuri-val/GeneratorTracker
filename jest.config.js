@@ -1,3 +1,9 @@
+// Pin the timezone so date tests are deterministic on every machine and in CI. A zone
+// west of UTC exposes both local-vs-UTC bugs (S-10): in the evening the UTC date is
+// already tomorrow, and 'YYYY-MM-DD' parsed as UTC midnight lands on the previous day.
+// Set here (the parent process) so the Jest workers inherit it.
+process.env.TZ = 'America/New_York';
+
 /** @type {import('jest').Config} */
 module.exports = {
   preset: 'jest-expo',

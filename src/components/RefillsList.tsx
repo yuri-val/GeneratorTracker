@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Refill } from '../models/types';
 import { formatDate } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
+import { contentColumn } from '../theme/layout';
 
 interface RefillsListProps {
   refills: Refill[];
@@ -49,7 +50,7 @@ export const RefillsList: React.FC<RefillsListProps> = ({
       data={refills}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={[styles.listContent, contentColumn]}
       style={{ backgroundColor: theme.colors.background }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />

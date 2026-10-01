@@ -1,12 +1,15 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Text, Icon } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { useAppTheme } from '../theme/useAppTheme';
+import { AppIcon } from './AppIcon';
+import type { IconName } from '../constants/icons';
+import { textColors } from '../theme/platform';
 
 interface StatBlockProps {
   value: string;
   label: string;
-  icon?: string;
+  icon?: IconName;
   color?: string;
 }
 
@@ -16,11 +19,11 @@ export function StatBlock({ value, label, icon, color }: StatBlockProps) {
 
   return (
     <View style={styles.container}>
-      {icon && <Icon source={icon} size={20} color={displayColor} />}
+      {icon && <AppIcon name={icon} size={20} color={displayColor} />}
       <Text variant="headlineSmall" style={[styles.value, { color: displayColor }]}>
         {value}
       </Text>
-      <Text variant="labelSmall" style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>
+      <Text variant="labelSmall" style={[styles.label, { color: textColors(theme).secondary as string }]}>
         {label}
       </Text>
     </View>

@@ -9,16 +9,15 @@ interface EmailAuthFormProps {
   onSignUp: (email: string, password: string) => Promise<void>;
 }
 
-export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp }) => {
-  const theme = useAppTheme();
+/** Email sign-in / sign-up state and submission, shared by the Paper form and the iOS native form. */
+export function useEmailAuth({ onSignIn, onSignUp }: EmailAuthFormProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async () => {
+  const submit = async () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert(t('common.error'), t('auth.bothEmailPasswordRequired'));
       return;
@@ -44,6 +43,24 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
       setLoading(false);
     }
   };
+
+  return {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    isSignUp,
+    toggleMode: () => setIsSignUp(value => !value),
+    loading,
+    submit,
+  };
+}
+
+export const EmailAuthForm: React.FC<EmailAuthFormProps> = props => {
+  const theme = useAppTheme();
+  const { t } = useTranslation();
+  const { email, setEmail, password, setPassword, isSignUp, toggleMode, loading, submit } = useEmailAuth(props);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -87,7 +104,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
 
       <Button
         mode="contained"
-        onPress={handleSubmit}
+        onPress={submit}
         loading={loading}
         disabled={loading}
         style={styles.submitButton}
@@ -99,7 +116,7 @@ export const EmailAuthForm: React.FC<EmailAuthFormProps> = ({ onSignIn, onSignUp
 
       <Button
         mode="text"
-        onPress={() => setIsSignUp(!isSignUp)}
+        onPress={toggleMode}
         disabled={loading}
         testID="auth-toggle-mode"
       >

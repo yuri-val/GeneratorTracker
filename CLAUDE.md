@@ -47,6 +47,8 @@ npm run check          # typecheck + unit (same as the pre-commit hook)
 npm run test:e2e       # Playwright against the Expo web build (offline flows)
 npm run test:e2e:emu   # Playwright + Firebase Auth/Firestore emulators (cloud sync flows)
 npm run test:rules     # Firestore security rules tests (emulator)
+npm run test:native:ios      # Maestro native UI flows on an iOS simulator (app open on Home)
+npm run test:native:android  # Maestro native UI flows on an Android emulator
 npm run emulators      # Firebase emulators for manual testing (UI at :4000)
 npm run start:emu      # Expo dev server wired to the emulators (never touches prod data)
 ```
@@ -149,6 +151,11 @@ Key design principles:
 - **Typography:** Bold sans-serif (Montserrat, Poppins, Inter, or system fonts)
 - **Layout:** Z-pattern reading flow, card-based design
 - **Dark Mode First:** Dark backgrounds with bright accents
+
+**Platform-native UI (since 2.5.0):** iOS uses native chrome (native tabs/bars with Liquid Glass, SF Symbols,
+SwiftUI forms via `@expo/ui`), Android uses Material 3 (Paper + native Material tabs), web keeps Paper. Build screens
+with `ScreenHeader`, `AppIcon`/`ICONS`, `PlatformSegmented`, `NativeForm` (iOS forms), `surfaces()`/`textColors()`
+and `contentColumn` — see "Platform-Native Design" in `DESIGN_GUIDE.md` for the rules.
 
 **Before implementing any UI change:**
 1. Read `DESIGN_GUIDE.md` for complete style specifications

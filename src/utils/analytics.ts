@@ -1,4 +1,5 @@
 import { WorkSession, Refill, Generator, GeneratorStats } from '../models/types';
+import { parseLocalDate } from './calculations';
 
 interface ChartDataPoint {
   value: number;
@@ -16,7 +17,8 @@ interface PieDataPoint {
 }
 
 function getMonthLabel(dateStr: string, locale: string = 'en-US'): string {
-  const date = new Date(dateStr);
+  // dateStr is 'YYYY-MM' or 'YYYY-MM-DD'; parse the month's first day in local time.
+  const date = parseLocalDate(`${dateStr.substring(0, 7)}-01`);
   return date.toLocaleDateString(locale, { month: 'short' });
 }
 

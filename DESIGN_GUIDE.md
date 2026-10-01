@@ -1,6 +1,47 @@
 # Design Guide - Generator Tracker
 
-This comprehensive style guide defines the visual language and design principles for the Generator Tracker application. Built on **React Native Paper (Material Design 3)** with animations, haptics, charts, and glassmorphism effects.
+This comprehensive style guide defines the visual language and design principles for the Generator Tracker application. Since 2.5.0 the app is **native to each platform with one brand accent**: iOS follows the Human Interface Guidelines (native bars and tabs with Liquid Glass, SF Symbols, SwiftUI forms), Android follows Material Design 3 (React Native Paper + native Material navigation), and web keeps the Paper look. Logic, data and behaviour are shared; only the platform chrome differs.
+
+---
+
+## Platform-Native Design (since 2.5.0)
+
+### Principle
+Navigation chrome, controls and dialogs follow the platform; **content** (generator cards, stat blocks, charts, the active-session card) stays branded and shared. Brand orange (`#FF6B35`) is the tint/accent everywhere, blue (`#0a7ea4`) marks time. No Material You dynamic colours. The app follows the system light/dark setting (`userInterfaceStyle: automatic`).
+
+| Element | iOS (HIG, iOS 26+) | Android (Material 3) | Web |
+|---|---|---|---|
+| Tab bar | Native `UITabBar` (Liquid Glass; top bar on iPadOS) — `react-native-bottom-tabs` | Native M3 `BottomNavigationView` | Paper tab bar (`MainTabs.web.tsx`) |
+| Screen header | Native navigation bar: large titles on tab roots, transparent with the scroll-edge effect, glass bar buttons | Paper `Appbar` (M3 top app bar) | Paper `Appbar` |
+| Primary "add" | `+` (prominent) in the navigation bar | FAB / "Add …" buttons | as Android |
+| Detail record types | `UISegmentedControl` + one inset-grouped list | M3 top tabs + cards | as Android |
+| Secondary actions | "More" pull-down menu (Edit, destructive Delete) | Top app bar actions (edit, delete) | as Android |
+| Forms & Settings | SwiftUI `Form` via `@expo/ui` (labelled rows, compact date/time pickers, menu picker) | Paper outlined fields + native Material date dialog | Paper |
+| Modal forms | Sheet with glass close (xmark) and prominent done (checkmark) | Full-screen dialog app bar (close / check) | as Android |
+| Delete confirmation | `UIAlertController`, destructive action | Material `AlertDialog` | Paper `Dialog` |
+| Icons | SF Symbols | MaterialCommunityIcons | MaterialCommunityIcons |
+| Colours | System semantic colours (`systemGroupedBackground`, `label`, …) via `PlatformColor` | MD3 tokens (`src/theme`) | MD3 tokens |
+
+### Building blocks
+| Piece | File | Use it for |
+|---|---|---|
+| `ScreenHeader` | `src/components/ScreenHeader.tsx` | Every screen's top bar. iOS: configures the native bar (`largeTitle`, `scrollEdge`, `actions`, `menu`, `leading`); Android/web: renders a Paper `Appbar` |
+| `AppIcon` + `ICONS` | `src/components/AppIcon.tsx`, `src/constants/icons.ts` | Semantic icon names → SF Symbol (iOS) / MCI (Android, web). Add new icons to `ICONS` (SF names are type-checked, MCI names are checked by `icons.test.ts`) |
+| `PlatformSegmented` | `src/components/PlatformSegmented.tsx` | `UISegmentedControl` on iOS, Paper `SegmentedButtons` elsewhere |
+| `NativeForm` | `src/components/form/` | iOS forms: describe sections/fields (`FormSection`), the screen keeps its state; never imported for rendering on Android/web |
+| `GroupedListRow` | `src/components/GroupedListRow.tsx` | iOS inset-grouped rows (icon tile, title, subtitle, value, chevron) |
+| `DeleteConfirmDialog` | `.native.tsx` / `.tsx` | System alert on iOS/Android, Paper dialog on web — same props |
+| `surfaces()` / `textColors()` | `src/theme/platform.ts` | Screen/card/separator and label colours native to the platform |
+| `contentColumn` | `src/theme/layout.ts` | Centred readable column (max 720 pt/dp) for every scroll container — tablets, foldables |
+| `useTabBarOverlap()` | `src/navigation/useTabBarOverlap*.ts` | Bottom padding for content: 0 with native tabs, the bar height on web |
+
+### Rules
+- iOS root-scroll screens: the `ScrollView`/`FlatList` must be the screen's root with `contentInsetAdjustmentBehavior="automatic"`; pass `scrollEdge` to `ScreenHeader`. Never put a Paper `Appbar` on iOS.
+- iOS modal screens get a navigation bar only if it is enabled at mount — the root stack sets `headerShown` on iOS; don't turn it off per screen.
+- Don't hard-code bottom padding for the tab bar; use `useTabBarOverlap()`.
+- Paper v5 (MD3) does not render `Appbar.Content` subtitles — show secondary info in the content.
+- Every new user-visible string goes to both `en.json` and `uk.json`; short native row labels live under `form.*`.
+- Native UI tests: `.maestro/ios` and `.maestro/android` (`npm run test:native:ios|android`).
 
 ## Design Philosophy
 
@@ -9,13 +50,13 @@ This comprehensive style guide defines the visual language and design principles
 - **Overall Impression:** The design conveys a sense of control over power. It uses a Dark Mode as the standard for professional tools, but features bright, "hot" accents that symbolize energy and fuel.
 
 ### Technology Stack
-- **UI Library:** React Native Paper v5 (Material Design 3)
+- **UI Library:** React Native Paper v5 (Material Design 3) on Android/web; native iOS chrome via react-native-screens, `react-native-bottom-tabs`, `@expo/ui` (SwiftUI), `expo-symbols`, `@react-native-segmented-control/segmented-control`
 - **Animations:** React Native Reanimated v4 (spring-based entrance animations)
 - **Haptics:** Expo Haptics (tactile feedback on key interactions)
 - **Charts:** React Native Gifted Charts (BarChart, PieChart, LineChart)
-- **Blur:** Expo Blur (glassmorphism on tab bar)
+- **Blur:** Expo Blur (web tab bar only; iOS gets Liquid Glass from the system)
 - **Gradients:** Expo Linear Gradient (active session cards)
-- **Icons:** MaterialCommunityIcons via @expo/vector-icons
+- **Icons:** SF Symbols on iOS, MaterialCommunityIcons on Android/web — always through `AppIcon`/`ICONS`
 
 ---
 
@@ -269,8 +310,8 @@ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
 ## Glassmorphism / Blur Effects
 
-### Bottom Tab Bar
-The tab bar uses `expo-blur` `BlurView` for a frosted glass effect:
+### Bottom Tab Bar (web only)
+On iOS and Android the tab bar is native (Liquid Glass / Material 3). The web build keeps a JS tab bar that uses `expo-blur` `BlurView` for a frosted glass effect:
 - `intensity={80}`
 - `tint="dark"`
 - `position: absolute` (floats over content)
@@ -278,7 +319,7 @@ The tab bar uses `expo-blur` `BlurView` for a frosted glass effect:
 - Paper `BottomNavigation.Bar` with `backgroundColor: 'transparent'`
 
 ### Content Padding
-All tab screens must have `paddingBottom: 100` on scrollable content to account for the floating tab bar.
+Use `useTabBarOverlap()` for bottom padding of tab screens: native tab bars never cover content (0), the floating web bar reports its height.
 
 ---
 
@@ -286,14 +327,28 @@ All tab screens must have `paddingBottom: 100` on scrollable content to account 
 
 ### Screen Structure
 ```tsx
-<View style={{ flex: 1, backgroundColor: theme.colors.background }}>
-  <Appbar.Header elevated>
-    <Appbar.Content title="Screen Title" titleStyle={{ fontWeight: '700' }} />
-  </Appbar.Header>
-  <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-    {/* Content */}
-  </ScrollView>
-</View>
+// iOS: the scroll view is the root; ScreenHeader configures the native bar.
+if (isIOS) {
+  return (
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      style={{ backgroundColor: surfaces(theme).screen }}
+      contentContainerStyle={[{ padding: 16 }, contentColumn]}
+    >
+      <ScreenHeader title="Screen Title" largeTitle scrollEdge />
+      {/* Content */}
+    </ScrollView>
+  );
+}
+// Android / web: Material app bar inside the screen.
+return (
+  <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+    <ScreenHeader title="Screen Title" largeTitle />
+    <ScrollView contentContainerStyle={[{ padding: 16, paddingBottom: tabBarOverlap + 16 }, contentColumn]}>
+      {/* Content */}
+    </ScrollView>
+  </View>
+);
 ```
 
 ### Card Design
@@ -315,16 +370,16 @@ All tab screens must have `paddingBottom: 100` on scrollable content to account 
 ## Navigation
 
 ### Bottom Tabs
-- Custom `PaperBottomTabBar` with BlurView glassmorphism
-- Icons: `flash` (Home), `chart-bar` (Analytics), `cog` (Settings)
-- Uses `MaterialCommunityIcons`
+- iOS/Android: native tabs (`src/navigation/MainTabs.tsx`, `react-native-bottom-tabs`); each tab is a native stack so iOS gets large titles
+- Icons: SF Symbols `bolt.fill` / `chart.bar.fill` / `gearshape.fill` on iOS; vector assets `assets/tabs/*.svg` (MDI `flash`, `chart-bar`, `cog`) on Android
+- Web: `MainTabs.web.tsx` with `PaperBottomTabBar` (BlurView)
 
 ### Stack Navigation
 - `presentation: 'modal'` for Add/Edit screens
 - `presentation: 'card'` for detail screens
-- `Appbar.Header` replaces default navigation headers
+- iOS: native navigation bars configured by `ScreenHeader`; Android/web: `ScreenHeader` renders a Paper `Appbar.Header`
 
-### Material Top Tabs (Generator Detail)
+### Material Top Tabs (Generator Detail — Android/web; iOS uses a segmented control)
 - Orange indicator (`theme.colors.primary`), 3px height, rounded
 - `textTransform: 'none'` for tab labels
 - Dynamic labels with counts: `Sessions (5)`, `Refills (3)`

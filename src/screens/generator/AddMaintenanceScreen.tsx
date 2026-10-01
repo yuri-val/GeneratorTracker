@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, Pressable, Platform } from 'react-native';
-import { Appbar, TextInput, Button } from 'react-native-paper';
+import { TextInput, Button } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,13 @@ import {
   deleteMaintenanceTask,
   getWorkSessions,
 } from '../../utils/storage';
-import { generateId, formatDate, calculateGeneratorStats } from '../../utils/calculations';
+import { generateId, formatDate, calculateGeneratorStats, toLocalDateString, parseLocalDate } from '../../utils/calculations';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { DeleteConfirmDialog } from '../../components/DeleteConfirmDialog';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { NativeForm, type FormSection } from '../../components/form/NativeForm';
+import { isIOS } from '../../theme/platform';
+import { contentColumn } from '../../theme/layout';
 
 type AddMaintenanceScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddMaintenance'>;
@@ -32,7 +36,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
   const [title, setTitle] = useState('');
   const [intervalHours, setIntervalHours] = useState('');
   const [intervalDays, setIntervalDays] = useState('');
-  const [lastServiceDate, setLastServiceDate] = useState(new Date().toISOString().split('T')[0]);
+  const [lastServiceDate, setLastServiceDate] = useState(toLocalDateString());
   const [lastServiceHours, setLastServiceHours] = useState('0');
   const [notes, setNotes] = useState('');
   const [existingTask, setExistingTask] = useState<MaintenanceTask | null>(null);
@@ -42,7 +46,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setLastServiceDate(selectedDate.toISOString().split('T')[0]);
+      setLastServiceDate(toLocalDateString(selectedDate));
     }
   };
 
@@ -142,18 +146,117 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
     }
   };
 
+  const header = (
+    <ScreenHeader
+      title={isEditing ? t('maintenance.editTitle') : t('maintenance.addTitle')}
+      leading="close"
+      onLeadingPress={() => navigation.goBack()}
+      actions={[
+        { key: 'save', label: t('common.save'), icon: 'save', variant: 'done', onPress: handleSave, testID: 'save-maintenance' },
+      ]}
+      scrollEdge={isIOS}
+    />
+  );
+
+  const deleteDialog = (
+    <DeleteConfirmDialog
+      visible={showDeleteDialog}
+      title={t('maintenance.deleteTitle')}
+      message={t('maintenance.deleteConfirm')}
+      onDismiss={() => setShowDeleteDialog(false)}
+      onConfirm={handleDelete}
+    />
+  );
+
+  if (isIOS) {
+    const sections: FormSection[] = [
+      {
+        key: 'task',
+        fields: [
+          {
+            kind: 'text',
+            key: 'title',
+            label: t('form.task'),
+            value: title,
+            onChange: setTitle,
+            placeholder: t('maintenance.titlePlaceholder'),
+            testID: 'input-maintenance-title',
+          },
+        ],
+      },
+      {
+        key: 'interval',
+        title: t('form.interval'),
+        footer: t('maintenance.intervalRequired'),
+        fields: [
+          {
+            kind: 'text',
+            key: 'hours',
+            label: t('form.engineHours'),
+            value: intervalHours,
+            onChange: setIntervalHours,
+            placeholder: t('maintenance.intervalHoursPlaceholder'),
+            keyboard: 'decimal',
+            suffix: t('common.hoursAbbr'),
+            testID: 'input-maintenance-hours',
+          },
+          {
+            kind: 'text',
+            key: 'days',
+            label: t('form.days'),
+            value: intervalDays,
+            onChange: setIntervalDays,
+            placeholder: t('maintenance.intervalDaysPlaceholder'),
+            keyboard: 'number',
+            suffix: t('form.daysSuffix'),
+          },
+        ],
+      },
+      {
+        key: 'lastService',
+        title: t('form.lastService'),
+        fields: [
+          { kind: 'date', key: 'date', label: t('form.date'), value: lastServiceDate, onChange: setLastServiceDate },
+          {
+            kind: 'text',
+            key: 'lastHours',
+            label: t('form.engineHours'),
+            value: lastServiceHours,
+            onChange: setLastServiceHours,
+            placeholder: t('maintenance.lastServiceHoursPlaceholder'),
+            keyboard: 'decimal',
+            suffix: t('common.hoursAbbr'),
+          },
+        ],
+      },
+      {
+        key: 'notes',
+        title: t('form.notes'),
+        fields: [{ kind: 'notes', key: 'notes', value: notes, onChange: setNotes, placeholder: t('maintenance.notesPlaceholder') }],
+      },
+    ];
+    if (isEditing) {
+      sections.push({
+        key: 'delete',
+        fields: [
+          { kind: 'button', key: 'delete', label: t('maintenance.deleteButton'), destructive: true, onPress: () => setShowDeleteDialog(true) },
+        ],
+      });
+    }
+    return (
+      <>
+        {header}
+        <NativeForm sections={sections} />
+        {deleteDialog}
+      </>
+    );
+  }
+
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <Appbar.Header elevated>
-        <Appbar.Action icon="close" onPress={() => navigation.goBack()} />
-        <Appbar.Content
-          title={isEditing ? t('maintenance.editTitle') : t('maintenance.addTitle')}
-          titleStyle={styles.headerTitle}
-        />
-        <Appbar.Action icon="check" onPress={handleSave} testID="save-maintenance" />
-      </Appbar.Header>
+      {header}
 
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={[styles.content, contentColumn]}>
         <TextInput
           mode="outlined"
           label={t('maintenance.titleLabel')}
@@ -204,7 +307,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
 
         {showDatePicker && (
           <DateTimePicker
-            value={new Date(lastServiceDate)}
+            value={parseLocalDate(lastServiceDate)}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
             onChange={onDateChange}
@@ -251,13 +354,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
         )}
       </ScrollView>
 
-      <DeleteConfirmDialog
-        visible={showDeleteDialog}
-        title={t('maintenance.deleteTitle')}
-        message={t('maintenance.deleteConfirm')}
-        onDismiss={() => setShowDeleteDialog(false)}
-        onConfirm={handleDelete}
-      />
+      {deleteDialog}
     </View>
   );
 }
@@ -265,9 +362,6 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerTitle: {
-    fontWeight: '600',
   },
   content: {
     padding: 16,

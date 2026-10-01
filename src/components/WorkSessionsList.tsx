@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { WorkSession } from '../models/types';
 import { formatDate, formatTime } from '../utils/calculations';
 import { useAppTheme } from '../theme/useAppTheme';
+import { contentColumn } from '../theme/layout';
 
 interface WorkSessionsListProps {
   sessions: WorkSession[];
@@ -56,7 +57,7 @@ export const WorkSessionsList: React.FC<WorkSessionsListProps> = ({
       data={sessions}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={[styles.listContent, contentColumn]}
       style={{ backgroundColor: theme.colors.background }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />

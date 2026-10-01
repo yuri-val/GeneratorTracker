@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2026-10-01
+
+**Platform-native design** — iOS follows the Human Interface Guidelines, Android Material 3, web keeps the
+Paper look (`docs/NATIVE_DESIGN_PLAN.md`). Logic, storage and sync are unchanged.
+
+### Added
+- Native tab bars: iOS `UITabBar` (Liquid Glass on iOS 26+, top tab bar on iPadOS) and the Android Material 3 `BottomNavigationView` (`react-native-bottom-tabs`); web keeps the Paper tab bar.
+- iOS native navigation bars (`ScreenHeader`): large titles, transparent bars with the iOS 26 scroll-edge effect, glass bar buttons; "+" in the bar instead of the FAB; a "More" pull-down (Edit, destructive Delete) on the generator screen.
+- iOS generator screen as one inset-grouped list with a native segmented control for sessions / refills / maintenance.
+- iOS forms (generator, session, refill, maintenance) and Settings as SwiftUI grouped forms via `@expo/ui` (`NativeForm`): labelled rows, compact date/time pickers, menu picker for the language; modal sheets with native close/done buttons.
+- SF Symbols on iOS through a semantic icon map (`ICONS` + `AppIcon`), MaterialCommunityIcons on Android/web.
+- Android: explicit edit action in the generator screen's app bar.
+- Maestro native UI tests for iOS and Android (`.maestro/`, `npm run test:native:ios|android`).
+
+### Changed
+- The app follows the system light/dark appearance (`userInterfaceStyle: automatic`, `expo-system-ui`).
+- Delete confirmations use the system alert on iOS/Android (destructive action); web keeps the Paper dialog.
+- iOS uses system semantic colours (grouped backgrounds, labels, separators).
+- Content on tablets, foldables and wide screens is a centred column of at most 720 pt/dp (S-34).
+- The generator model is shown in the screen content on all platforms (Paper MD3 never rendered app-bar subtitles, so it was invisible on Android); the unused "Tap to edit" strings were removed.
+- `DESIGN_GUIDE.md` rewritten around platform-native design; `docs/TESTING.md` documents Maestro.
+
+### Fixed
+- **Dates after midnight** (S-10): `getCurrentDate`, every date picker, `formatDate` and chart month labels mixed UTC and local time — a session started between 00:00 and 03:00 in Kyiv got yesterday's date and an active session showed +24 h; west of UTC dates showed a day early. Local calendar helpers (`toLocalDateString` / `parseLocalDate`) are used everywhere; Jest now runs with `TZ=America/New_York` so these bugs reproduce on every machine. Stored records are intentionally not migrated.
+- **Tablets** (S-34): the Home empty-state text was cut off; chart width came from `Dimensions` once at import and the x-axis overflowed the card — charts now follow `useWindowDimensions`, reserve the y-axis label column and clamp the axis.
+
+### Verified
+- Unit 118/118, web e2e 7/7, Firebase-emulator e2e 14/14.
+- Maestro flows: iPhone 17 (iOS 27) and Android 16 tablet; manual checks on iPad Pro 13", Android 16 phone, light and dark themes.
+
 ## [2.4.3] - 2026-09-30
 
 Platform upgrade to **Expo SDK 57** (React Native 0.86, React 19.2) — required for iOS builds with

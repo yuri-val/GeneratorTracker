@@ -30,7 +30,7 @@ export function DeleteConfirmDialog({
         </Dialog.Content>
         <Dialog.Actions>
           <Button onPress={onDismiss}>{t('common.cancel')}</Button>
-          <Button textColor={theme.colors.error} onPress={onConfirm}>
+          <Button textColor={theme.colors.error} onPress={onConfirm} testID="confirm-delete">
             {t('common.delete')}
           </Button>
         </Dialog.Actions>
