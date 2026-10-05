@@ -1,6 +1,6 @@
 # Privacy Policy for Generator Tracker
 
-**Last Updated:** January 26, 2026
+**Last Updated:** October 6, 2026
 
 ## Introduction
 
@@ -21,11 +21,12 @@ When you use Generator Tracker, you create and store data **locally on your devi
 - **Generators**: Name, model, purchase date
 - **Work Sessions**: Date, start/end times, hours worked, notes
 - **Refills**: Date, fuel amount, notes
+- **Maintenance tasks**: Task name, service intervals (engine hours and/or days), last service date and engine hours, notes
 
 **This data:**
 - ✅ Stays on your device
 - ✅ Is NOT sent anywhere unless you sign in
-- ✅ Can be deleted anytime by uninstalling the app
+- ✅ Can be deleted anytime in the app or by uninstalling the app
 
 ### 2. Optional Account Information (Firebase Authentication)
 
@@ -46,7 +47,7 @@ When you use Generator Tracker, you create and store data **locally on your devi
 ### 3. Synchronized Data (Firebase Firestore)
 
 **ONLY if you sign in**, your generator data is uploaded to Firebase Firestore:
-- All generators, work sessions, and refills you've created
+- All generators, work sessions, refills, and maintenance tasks you've created
 - User ID to associate data with your account
 - Timestamps for synchronization and conflict resolution
 
@@ -54,7 +55,7 @@ When you use Generator Tracker, you create and store data **locally on your devi
 - ✅ Is encrypted in transit (HTTPS)
 - ✅ Is stored in Google Cloud (Firebase) servers
 - ✅ Is accessible only to you when signed in
-- ✅ Can be deleted by signing out and clearing data
+- ✅ Can be deleted on request (see "Delete Your Data" below); signing out does not delete it
 
 ## How We Use Your Information
 
@@ -179,11 +180,8 @@ If you are located outside the United States, please note:
 
 We may update this Privacy Policy from time to time. Changes will be posted:
 - In this document (with updated "Last Updated" date)
-- In the app (if changes are material)
 
-**Material changes** will be notified via:
-- In-app notification on next launch
-- Update to app store listing
+**Material changes** will also be reflected in the app store listing.
 
 ## Open Source
 
