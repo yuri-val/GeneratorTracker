@@ -5,16 +5,19 @@ on:
     branches:
       - main
     paths:
+      - 'landing/**'
       - 'privacy_policy/en.md'
       - 'privacy_policy/uk.md'
       - 'privacy_policy/template.html'
-      - 'landing/index.html'
-      - 'landing/assets/**'
       - '.github/workflows/deploy-gh-pages.yml'
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: gh-pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -29,73 +32,42 @@ jobs:
         with:
           version: 3.1.11
 
-      - name: Create temporary directory
-        run: |
-          mkdir -p temp_build
+      - name: Build landing page (EN at /, UK at /uk/)
+        run: python3 landing/build.py
 
-      - name: Convert Markdown to HTML
+      - name: Build privacy policy pages
         run: |
-          # Convert English version
-          pandoc privacy_policy/en.md \
-            --from markdown \
-            --to html5 \
-            --standalone \
+          mkdir -p landing/_site/privacy_policy
+          pandoc privacy_policy/en.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
             --template=privacy_policy/template.html \
-            --metadata title="Privacy Policy" \
-            --metadata lang="en" \
-            --output=temp_build/privacy-policy.html
-
-          # Convert Ukrainian version
-          pandoc privacy_policy/uk.md \
-            --from markdown \
-            --to html5 \
-            --standalone \
+            --metadata title="Privacy Policy" --metadata lang="en" \
+            --metadata home="../" --metadata file="privacy-policy.html" \
+            --metadata description="How Generator Tracker handles your data: local-first storage, optional cloud sync, no ads and no tracking." \
+            --output=landing/_site/privacy_policy/privacy-policy.html
+          pandoc privacy_policy/uk.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
             --template=privacy_policy/template.html \
-            --metadata title="Політика конфіденційності" \
-            --metadata lang="uk" \
-            --output=temp_build/privacy-policy-uk.html
-
-      - name: Create privacy policy index redirect
-        run: |
-          cat > temp_build/privacy-index.html << 'EOF'
-          <!DOCTYPE html>
-          <html>
+            --metadata title="Політика конфіденційності" --metadata lang="uk" \
+            --metadata home="../uk/" --metadata file="privacy-policy-uk.html" \
+            --metadata description="Як Generator Tracker поводиться з вашими даними: локальне зберігання, синхронізація за бажанням, без реклами й стеження." \
+            --output=landing/_site/privacy_policy/privacy-policy-uk.html
+          cat > landing/_site/privacy_policy/index.html << 'EOF'
+          <!doctype html>
+          <html lang="en">
           <head>
-              <meta charset="UTF-8">
-              <meta http-equiv="refresh" content="0; url=privacy-policy.html">
-              <title>Redirecting...</title>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0; url=privacy-policy.html">
+            <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+            <title>Privacy Policy — Generator Tracker</title>
           </head>
-          <body>
-              <p>Redirecting to <a href="privacy-policy.html">Privacy Policy</a>...</p>
-          </body>
+          <body><p><a href="privacy-policy.html">Privacy Policy</a></p></body>
           </html>
           EOF
-
-      - name: Prepare deployment directory
-        run: |
-          mkdir -p deploy
-          mkdir -p deploy/privacy_policy
-          mkdir -p deploy/assets
-
-          # Copy landing page to root
-          cp landing/index.html deploy/index.html
-
-          # Copy landing assets
-          cp -r landing/assets/* deploy/assets/
-
-          # Copy privacy policy files
-          cp temp_build/privacy-policy.html deploy/privacy_policy/
-          cp temp_build/privacy-policy-uk.html deploy/privacy_policy/
-          cp temp_build/privacy-index.html deploy/privacy_policy/index.html
-
-          # Create .nojekyll to prevent Jekyll processing
-          touch deploy/.nojekyll
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
+          publish_dir: ./landing/_site
           publish_branch: gh-pages
           force_orphan: true
           commit_message: |

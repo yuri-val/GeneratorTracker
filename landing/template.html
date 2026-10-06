@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{meta_title}}</title>
+  <meta name="description" content="{{meta_description}}">
+  <link rel="canonical" href="{{site_url}}{{canonical_path}}">
+  <link rel="alternate" hreflang="en" href="{{site_url}}">
+  <link rel="alternate" hreflang="uk" href="{{site_url}}uk/">
+  <link rel="alternate" hreflang="x-default" href="{{site_url}}">
+  <meta name="theme-color" content="#0d0f12">
+  <meta name="color-scheme" content="dark">
+  <meta name="google-play-app" content="app-id=com.yurival.GeneratorTracker">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Generator Tracker">
+  <meta property="og:locale" content="{{locale}}">
+  <meta property="og:title" content="{{meta_title}}">
+  <meta property="og:description" content="{{meta_description}}">
+  <meta property="og:url" content="{{site_url}}{{canonical_path}}">
+  <meta property="og:image" content="{{site_url}}assets/og-{{lang}}.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="{{dir_root}}favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="{{dir_root}}favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="{{dir_root}}apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{dir_root}}styles.css?v={{build_id}}">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MobileApplication",
+    "name": "Generator Tracker",
+    "operatingSystem": "Android, iOS",
+    "applicationCategory": "UtilitiesApplication",
+    "description": "{{meta_description}}",
+    "url": "{{site_url}}{{canonical_path}}",
+    "inLanguage": ["en", "uk"],
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "installUrl": "{{play_url}}",
+    "author": { "@type": "Person", "name": "Yuri Valigursky" }
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">{{skip_link}}</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="Generator Tracker">
+        <img src="{{dir_root}}assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <a href="#features">{{nav_features}}</a>
+        <a href="#platforms">{{nav_platforms}}</a>
+        <a href="#privacy">{{nav_privacy}}</a>
+        <a href="#faq">{{nav_faq}}</a>
+      </nav>
+      <div class="header-actions">
+        <a class="lang-switch" href="{{alt_lang_href}}" hreflang="{{alt_lang}}" lang="{{alt_lang}}" aria-label="{{lang_switch_label}}: {{alt_lang_label}}" title="{{alt_lang_label}}">{{alt_lang_short}}</a>
+        <a class="btn btn-small" href="{{play_url}}" rel="noopener">{{nav_cta}}</a>
+        <button class="menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-toggle>
+          <span class="sr-only">{{nav_menu}}</span>
+          <span class="menu-bar"></span><span class="menu-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">{{hero_eyebrow}}</p>
+          <h1>{{hero_title}}</h1>
+          <p class="lead">{{hero_lead}}</p>
+          <div class="store-badges">
+            <a class="store-badge" href="{{play_url}}" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>{{badge_play_small}}</small><strong>{{badge_play}}</strong></span>
+            </a>
+            <span class="store-badge is-soon" aria-disabled="true">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>{{badge_ios_small}}</small><strong>{{badge_ios}}</strong></span>
+            </span>
+          </div>
+          <p class="hero-note">{{hero_note}}</p>
+        </div>
+        <div class="hero-visual">
+          <figure class="device device-android device-hero-main">
+            <img src="{{dir_root}}assets/screens/android-{{lang}}-active.jpg" width="540" height="1200" alt="{{hero_shot_main_alt}}" fetchpriority="high">
+          </figure>
+          <figure class="device device-ios device-hero-second">
+            <img src="{{dir_root}}assets/screens/ios-{{lang}}-home-dark.jpg" width="540" height="1174" alt="{{hero_shot_second_alt}}">
+          </figure>
+        </div>
+      </div>
+      <div class="container">
+        <ul class="proof" role="list">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_offline}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_privacy}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_sync}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_langs}}</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">{{features_eyebrow}}</p>
+          <h2>{{features_title}}</h2>
+          <p class="lead">{{features_lead}}</p>
+        </header>
+        <div class="feature-grid">
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
+            <h3>{{f_session_t}}</h3><p>{{f_session_d}}</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7zM15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg></span>
+            <h3>{{f_fuel_t}}</h3><p>{{f_fuel_d}}</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
+            <h3>{{f_service_t}}</h3><p>{{f_service_d}}</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+            <h3>{{f_analytics_t}}</h3><p>{{f_analytics_d}}</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+            <h3>{{f_fleet_t}}</h3><p>{{f_fleet_d}}</p>
+          </article>
+          <article class="feature">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9M12 12v8m-3-3 3 3 3-3"/></svg></span>
+            <h3>{{f_sync_t}}</h3><p>{{f_sync_d}}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section showcase">
+      <div class="container showcase-row">
+        <figure class="device device-ios showcase-device">
+          <img src="{{dir_root}}assets/screens/ios-{{lang}}-active.jpg" width="540" height="1174" alt="{{show1_alt}}" loading="lazy">
+        </figure>
+        <div class="showcase-copy">
+          <p class="eyebrow">{{show1_eyebrow}}</p>
+          <h2>{{show1_title}}</h2>
+          <p class="lead">{{show1_text}}</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device">
+          <img src="{{dir_root}}assets/screens/ios-{{lang}}-maintenance.jpg" width="540" height="1174" alt="{{show2_alt}}" loading="lazy">
+        </figure>
+        <div class="showcase-copy">
+          <p class="eyebrow">{{show2_eyebrow}}</p>
+          <h2>{{show2_title}}</h2>
+          <p class="lead">{{show2_text}}</p>
+        </div>
+      </div>
+      <div class="container showcase-row">
+        <figure class="device device-android showcase-device">
+          <img src="{{dir_root}}assets/screens/android-{{lang}}-charts.jpg" width="540" height="1200" alt="{{show3_alt}}" loading="lazy">
+        </figure>
+        <div class="showcase-copy">
+          <p class="eyebrow">{{show3_eyebrow}}</p>
+          <h2>{{show3_title}}</h2>
+          <p class="lead">{{show3_text}}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section platforms" id="platforms">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">{{platforms_eyebrow}}</p>
+          <h2>{{platforms_title}}</h2>
+          <p class="lead">{{platforms_lead}}</p>
+        </header>
+        <div class="platform-grid">
+          <article class="platform">
+            <figure class="device device-android">
+              <img src="{{dir_root}}assets/screens/android-{{lang}}-home.jpg" width="540" height="1200" alt="{{pl_android_alt}}" loading="lazy">
+            </figure>
+            <div class="platform-copy">
+              <h3>{{pl_android_t}}</h3>
+              <p>{{pl_android_d}}</p>
+              <a class="status is-live" href="{{play_url}}" rel="noopener">{{pl_android_status}} →</a>
+            </div>
+          </article>
+          <article class="platform">
+            <figure class="device device-ios">
+              <img src="{{dir_root}}assets/screens/ios-{{lang}}-home.jpg" width="540" height="1174" alt="{{pl_ios_alt}}" loading="lazy">
+            </figure>
+            <div class="platform-copy">
+              <h3>{{pl_ios_t}}</h3>
+              <p>{{pl_ios_d}}</p>
+              <span class="status">{{pl_ios_status}}</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="privacy">
+      <div class="container privacy">
+        <header class="section-head is-left">
+          <p class="eyebrow">{{privacy_eyebrow}}</p>
+          <h2>{{privacy_title}}</h2>
+          <p class="lead">{{privacy_lead}}</p>
+          <a class="text-link" href="{{privacy_href}}">{{privacy_link}} →</a>
+        </header>
+        <ul class="privacy-list" role="list">
+          <li><h3>{{pv_local_t}}</h3><p>{{pv_local_d}}</p></li>
+          <li><h3>{{pv_track_t}}</h3><p>{{pv_track_d}}</p></li>
+          <li><h3>{{pv_open_t}}</h3><p>{{pv_open_d}}</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container faq">
+        <header class="section-head">
+          <p class="eyebrow">{{faq_eyebrow}}</p>
+          <h2>{{faq_title}}</h2>
+        </header>
+        <div class="faq-list">
+          <details><summary>{{q1}}</summary><p>{{a1}}</p></details>
+          <details><summary>{{q2}}</summary><p>{{a2}}</p></details>
+          <details><summary>{{q3}}</summary><p>{{a3}}</p></details>
+          <details><summary>{{q4}}</summary><p>{{a4}}</p></details>
+          <details><summary>{{q5}}</summary><p>{{a5}}</p></details>
+          <details><summary>{{q6}}</summary><p>{{a6}}</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section">
+      <div class="container cta">
+        <img src="{{dir_root}}assets/app-icon.png" width="72" height="72" alt="" loading="lazy">
+        <h2>{{cta_title}}</h2>
+        <p class="lead">{{cta_text}}</p>
+        <div class="store-badges is-centered">
+          <a class="store-badge" href="{{play_url}}" rel="noopener">
+            <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+            <span><small>{{badge_play_small}}</small><strong>{{badge_play}}</strong></span>
+          </a>
+          <span class="store-badge is-soon" aria-disabled="true">
+            <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            <span><small>{{badge_ios_small}}</small><strong>{{badge_ios}}</strong></span>
+          </span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./">
+          <img src="{{dir_root}}assets/app-icon.png" width="32" height="32" alt="">
+          <span>Generator Tracker</span>
+        </a>
+        <p>{{footer_tagline}}</p>
+      </div>
+      <div>
+        <h2 class="footer-title">{{footer_product}}</h2>
+        <ul role="list">
+          <li><a href="{{play_url}}" rel="noopener">Google Play</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">{{footer_source}}</a></li>
+          <li><a href="{{alt_lang_href}}" hreflang="{{alt_lang}}" lang="{{alt_lang}}">{{alt_lang_label}}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer-title">{{footer_legal}}</h2>
+        <ul role="list">
+          <li><a href="{{privacy_href}}">{{footer_privacy}}</a></li>
+          <li><a href="{{footer_privacy_alt_href}}">{{footer_privacy_alt}}</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE" rel="noopener">{{footer_license}}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="footer-title">{{footer_contact}}</h2>
+        <ul role="list">
+          <li><a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/issues" rel="noopener">GitHub Issues</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>{{footer_copy}}</p>
+    </div>
+  </footer>
+  <script src="{{dir_root}}main.js?v={{build_id}}" defer></script>
+</body>
+</html>
