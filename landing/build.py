@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / '_site'
 SITE_URL = 'https://yuri-val.github.io/GeneratorTracker/'
 PLAY_URL = 'https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl={hl}'
+# Country-less form: the App Store opens the visitor's own storefront.
+APP_STORE_URL = 'https://apps.apple.com/app/id6819560707'
 PLACEHOLDER = re.compile(r'\{\{(\w+)\}\}')
 
 
@@ -38,7 +40,8 @@ def main():
     build_id = str(int(time.time()))
     for lang_file in sorted((ROOT / 'i18n').glob('*.json')):
         strings = json.loads(lang_file.read_text())
-        strings.update(site_url=SITE_URL, build_id=build_id, play_url=PLAY_URL.format(hl=strings['play_hl']))
+        strings.update(site_url=SITE_URL, build_id=build_id, play_url=PLAY_URL.format(hl=strings['play_hl']),
+                       app_store_url=APP_STORE_URL)
         target = OUT / strings['canonical_path'] / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(render(template, strings))

@@ -113,8 +113,6 @@ ul[role="list"] { list-style: none; margin: 0; padding: 0; }
 .store-badge small { font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
 .store-badge strong { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; }
 .store-icon { width: 26px; height: 26px; flex: none; }
-.store-badge.is-soon { background: transparent; color: var(--text-2); border-color: var(--line-strong); cursor: default; }
-.store-badge.is-soon:hover { transform: none; box-shadow: none; }
 
 .hero-visual { position: relative; display: flex; justify-content: center; align-items: center; min-height: 680px; }
 .device-hero-main { position: relative; z-index: 2; width: min(300px, 60vw); transform: translateX(-14%); }
