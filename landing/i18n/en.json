@@ -13,7 +13,7 @@
   "privacy_href": "privacy_policy/privacy-policy.html",
 
   "meta_title": "Generator Tracker — run hours, fuel and maintenance for every generator",
-  "meta_description": "Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. Free on Google Play and the App Store.",
+  "meta_description": "Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.",
   "og_alt": "Generator Tracker on Android and iPhone: run hours, fuel and maintenance for every generator",
 
   "skip_link": "Skip to content",
@@ -37,7 +37,7 @@
   "badge_play": "Google Play",
   "badge_ios_small": "Download on the",
   "badge_ios": "App Store",
-  "hero_note": "Free · No ads · No tracking · Open source",
+  "hero_note": "No ads · No tracking · Open source",
   "hero_shot_main_alt": "Generator screen on Android: a running session with a live timer, total hours, refills and a maintenance task due",
   "hero_shot_second_alt": "Generator list on iPhone in dark mode with total hours and refills for three generators",
   "chip_running_t": "Session running",
@@ -156,8 +156,8 @@
 
   "faq_eyebrow": "FAQ",
   "faq_title": "Questions, answered",
-  "q1": "Is Generator Tracker free?",
-  "a1": "Yes. The app is free, with no ads and no in-app purchases.",
+  "q1": "Are there ads or in-app purchases?",
+  "a1": "No. There are no ads, no subscriptions and no in-app purchases.",
   "q2": "Does it work without the internet?",
   "a2": "Yes. Everything is stored on your device and works offline. If you sign in, changes sync automatically when a connection is available.",
   "q3": "Which devices are supported?",
@@ -172,7 +172,7 @@
   "a7": "Yes. Generator Tracker is open source under the MIT license — the full code, including this website, is on <a href=\"https://github.com/yuri-val/GeneratorTracker\" rel=\"noopener\">GitHub</a>.",
 
   "cta_title": "Put your generator on the record.",
-  "cta_text": "Free, offline-first and private. Installs in a minute.",
+  "cta_text": "Offline-first and private. Installs in a minute.",
   "cta_qr_t": "Scan to install",
   "cta_qr_d": "Opens Google Play or the App Store — whichever fits your phone.",
   "cta_qr_alt": "QR code linking to the Generator Tracker download page",
