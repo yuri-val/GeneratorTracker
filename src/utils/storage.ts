@@ -434,6 +434,30 @@ export const markSynced = async (entries: SyncedEntry[], userId: string, syncedA
   });
 };
 
+/**
+ * Account deletion: keep every record on the device but detach it from the deleted
+ * account — pending again, without the cloud owner or sync time — so nothing treats it
+ * as "known to be in the cloud" (a later sign-in, with any account, uploads it as new).
+ */
+export const detachFromAccount = async (): Promise<void> => {
+  await updateLocalData(state => {
+    const changes: LocalStateChanges = {};
+    for (const entityType of ENTITY_TYPES) {
+      const field = COLLECTION_FIELD[entityType];
+      (changes as Record<string, SyncEntity[]>)[field] = (state[field] as SyncEntity[]).map(record => {
+        const { syncedAt: _syncedAt, userId: _userId, ...rest } = record;
+        return { ...rest, syncStatus: 'pending' as const };
+      });
+    }
+    return changes;
+  });
+};
+
+/** Drop all pending cloud deletions (the cloud copy is gone, e.g. after account deletion). */
+export const clearTombstones = async (): Promise<void> => {
+  await updateLocalData(state => (state.tombstones.length > 0 ? { tombstones: [] } : undefined));
+};
+
 /** Local changes that have not reached the cloud yet (pending records + deletions). */
 export const getPendingChangesCount = async (): Promise<number> => {
   await ensureMigrated();

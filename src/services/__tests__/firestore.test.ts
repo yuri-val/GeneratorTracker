@@ -29,9 +29,17 @@ jest.mock('firebase/firestore', () => {
     collectionGroup: (_db: unknown, id: string) => ({ group: id }),
     query: (target: object, ...clauses: unknown[]) => ({ ...target, clauses }),
     where: (...args: unknown[]) => ({ where: args }),
-    getDocsFromServer: jest.fn(async (target: { path?: string }) => ({
-      docs: (mockServerDocs[target.path ?? ''] ?? []).map(id => ({ id, ref: { path: `${target.path}/${id}` } })),
-    })),
+    // Keyed by collection path, or `group:<id>` for collection-group queries (whose entries
+    // are full document paths).
+    getDocsFromServer: jest.fn(async (target: { path?: string; group?: string }) => {
+      const key = target.path ?? `group:${target.group}`;
+      return {
+        docs: (mockServerDocs[key] ?? []).map(entry => {
+          const path = entry.includes('/') ? entry : `${target.path}/${entry}`;
+          return { id: path.split('/').pop(), ref: { path } };
+        }),
+      };
+    }),
     writeBatch: () => {
       const ops: Op[] = [];
       return {
@@ -54,6 +62,7 @@ import {
   fromFirestoreDoc,
   writeEntities,
   deleteRemoteEntities,
+  deleteAllRemoteData,
   withTimeout,
   SyncTimeoutError,
   BATCH_LIMIT,
@@ -218,6 +227,47 @@ describe('deleteRemoteEntities (S-3)', () => {
     expect(result.done.map(t => t.key)).toEqual(['workSession:s1']);
     expect(mockCommits).toEqual([]);
     warn.mockRestore();
+  });
+});
+
+describe('deleteAllRemoteData (account deletion)', () => {
+  beforeEach(() => {
+    mockCommits.length = 0;
+    mockFailOnCommit = null;
+    for (const key of Object.keys(mockServerDocs)) delete mockServerDocs[key];
+  });
+
+  it('deletes every owned child (incl. orphans) and then every generator', async () => {
+    mockServerDocs['group:workSessions'] = ['users/u1/generators/g1/workSessions/s1', 'users/u1/generators/gone/workSessions/s9'];
+    mockServerDocs['group:refills'] = ['users/u1/generators/g1/refills/r1'];
+    mockServerDocs['group:maintenanceTasks'] = ['users/u1/generators/g2/maintenanceTasks/t1'];
+    mockServerDocs['users/u1/generators'] = ['g1', 'g2'];
+
+    await expect(deleteAllRemoteData('u1')).resolves.toBe(6);
+
+    const deleted = mockCommits.flat().map(([kind, path]) => `${kind} ${path}`);
+    expect(deleted).toEqual([
+      'delete users/u1/generators/g1/workSessions/s1',
+      'delete users/u1/generators/gone/workSessions/s9',
+      'delete users/u1/generators/g1/refills/r1',
+      'delete users/u1/generators/g2/maintenanceTasks/t1',
+      'delete users/u1/generators/g1',
+      'delete users/u1/generators/g2',
+    ]);
+  });
+
+  it('succeeds with nothing to delete', async () => {
+    await expect(deleteAllRemoteData('u1')).resolves.toBe(0);
+    expect(mockCommits).toEqual([]);
+  });
+
+  it(`splits large deletions into batches of ${BATCH_LIMIT} and throws when a batch fails`, async () => {
+    mockServerDocs['users/u1/generators'] = Array.from({ length: BATCH_LIMIT + 5 }, (_, i) => `g${i}`);
+    mockFailOnCommit = 1;
+
+    await expect(deleteAllRemoteData('u1')).rejects.toThrow('commit failed');
+    expect(mockCommits).toHaveLength(1);
+    expect(mockCommits[0]).toHaveLength(BATCH_LIMIT);
   });
 });
 

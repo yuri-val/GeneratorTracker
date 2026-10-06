@@ -6,6 +6,9 @@ import {
   GoogleAuthProvider,
   signInWithCredential,
   onAuthStateChanged,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
   User as FirebaseUser,
 } from 'firebase/auth';
 import * as WebBrowser from 'expo-web-browser';
@@ -88,8 +91,10 @@ const GOOGLE_CLIENT_IDS = {
  * id, which used to take the whole Settings screen down. Google sign-in is only
  * offered when this build has an id for the platform it runs on.
  */
+// Not offered on iOS: App Store guideline 4.8 requires "Sign in with Apple" next to any
+// third-party sign-in, so iOS offers email/password and anonymous sign-in only.
 export const isGoogleAuthConfigured = !!Platform.select({
-  ios: GOOGLE_CLIENT_IDS.ios,
+  ios: false,
   android: GOOGLE_CLIENT_IDS.android,
   default: GOOGLE_CLIENT_IDS.web,
 });
@@ -145,6 +150,39 @@ export const signOut = async (): Promise<void> => {
     console.error('Sign out error:', error);
     throw new Error(error.message || 'Failed to sign out');
   }
+};
+
+/** How the current user signed in — decides how account deletion confirms identity. */
+export type AccountKind = 'password' | 'anonymous' | 'google' | 'other';
+
+export const getAccountKind = (): AccountKind => {
+  const user = auth.currentUser;
+  if (!user) return 'other';
+  if (user.isAnonymous) return 'anonymous';
+  const providers = user.providerData.map(p => p.providerId);
+  if (providers.includes('password')) return 'password';
+  if (providers.includes('google.com')) return 'google';
+  return 'other';
+};
+
+/** Firebase lets an account be deleted only within ~5 minutes of signing in. */
+const RECENT_SIGN_IN_MS = 4 * 60 * 1000;
+
+export const hasRecentSignIn = (): boolean => {
+  const lastSignIn = auth.currentUser?.metadata.lastSignInTime;
+  return !!lastSignIn && Date.now() - Date.parse(lastSignIn) < RECENT_SIGN_IN_MS;
+};
+
+/** Confirm the user's identity again with their password (throws auth/wrong-password etc.). */
+export const reauthenticateWithPassword = async (password: string): Promise<void> => {
+  const user = auth.currentUser;
+  if (!user?.email) throw new Error('No signed-in email account');
+  await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, password));
+};
+
+/** Delete the Firebase account itself (the caller deletes the cloud data first). */
+export const deleteCurrentUser = async (): Promise<void> => {
+  if (auth.currentUser) await deleteUser(auth.currentUser);
 };
 
 /**

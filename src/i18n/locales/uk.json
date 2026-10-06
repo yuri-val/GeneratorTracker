@@ -82,7 +82,19 @@
         "pendingChanges": "Очікують на синхронізацію",
         "about": "Про додаток",
         "emulatorTitle": "Емулятор Firebase",
-        "emulatorDescription": "Підключено до локальних емуляторів Auth і Firestore (лише для розробки)"
+        "emulatorDescription": "Підключено до локальних емуляторів Auth і Firestore (лише для розробки)",
+        "deleteAccount": "Видалити обліковий запис",
+        "deleteAccountTitle": "Видалити обліковий запис?",
+        "deleteAccountMessage": "Обліковий запис і всі дані, синхронізовані з хмарою, буде видалено назавжди. Генератори й записи на цьому пристрої залишаться й працюватимуть офлайн.",
+        "deleteAccountPasswordTitle": "Підтвердьте паролем",
+        "deleteAccountPasswordMessage": "Введіть пароль для {{email}}, щоб видалити обліковий запис.",
+        "deleteAccountPasswordLabel": "Пароль",
+        "deleteAccountConfirm": "Видалити",
+        "accountDeleted": "Обліковий запис і його дані в хмарі видалено. Дані на цьому пристрої збережено.",
+        "deleteAccountWrongPassword": "Неправильний пароль. Нічого не видалено.",
+        "deleteAccountReauth": "З міркувань безпеки вийдіть, увійдіть знову, а потім видаліть обліковий запис.",
+        "deleteAccountCloudFailed": "Не вдалося видалити дані в хмарі. Перевірте з’єднання й спробуйте ще раз — дані на пристрої не втрачено.",
+        "deleteAccountAccountFailed": "Дані в хмарі видалено, але сам обліковий запис — ні. Увійдіть знову й повторіть видалення."
     },
     "detail": {
         "generatorNotFound": "Генератор не знайдено",

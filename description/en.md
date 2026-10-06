@@ -37,9 +37,10 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 
 **Cloud Sync & Security**
 - Firebase-powered cloud synchronization
-- Email/Password and Google Sign-In
+- Sign in with email and password, or anonymously
 - Offline-first architecture - works without internet
 - Your data syncs when connection is available
+- Delete your account and cloud data any time in Settings
 
 **Modern, Native Design**
 - Looks and feels native: Material 3 on Android, native iOS design on iPhone and iPad
@@ -76,8 +77,9 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.5.0
+### 🆕 What's New in Version 2.6.0
 
+- **Delete Your Account in the App**: Settings → Delete Account removes your account and all cloud data; records on your device stay.
 - **Native Design**: native Material 3 navigation on Android; native iOS navigation, forms and settings on iPhone and iPad.
 - **Dark Theme**: the app now follows your device's light/dark setting.
 - **Tablets**: a comfortable, centred layout on tablets and foldables; charts fit the screen.

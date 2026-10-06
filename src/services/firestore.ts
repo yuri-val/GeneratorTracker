@@ -270,3 +270,22 @@ export const deleteRemoteEntities = async (
   );
   return { done: [...done, ...result.done], error: result.error };
 };
+
+/**
+ * Delete everything the user owns in the cloud (account deletion). Children are found
+ * with the collection-group queries, so records orphaned by app versions before 2.4.2
+ * (children whose generator document is gone) are removed too. Children first,
+ * generators last; throws if any batch fails (already-deleted documents stay deleted,
+ * a retry deletes the rest).
+ */
+export const deleteAllRemoteData = async (uid: string): Promise<number> => {
+  const children = await withTimeout(
+    Promise.all(CHILD_TYPES.map(type => getDocsFromServer(childCollectionGroupQuery(type, uid)))),
+    'Preparing account deletion'
+  );
+  const generators = await withTimeout(getDocsFromServer(generatorsCollectionRef(uid)), 'Preparing account deletion');
+  const refs = [...children.flatMap(snapshot => snapshot.docs.map(d => d.ref)), ...generators.docs.map(d => d.ref)];
+  const result = await commitInBatches(refs, ref => [batch => batch.delete(ref)], 'Deleting account data');
+  if (result.error) throw result.error;
+  return refs.length;
+};

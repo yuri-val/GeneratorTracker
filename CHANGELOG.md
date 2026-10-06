@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2026-10-06
+
+**Account deletion in the app** and email/anonymous-only sign-in on iOS — required by the App Store
+(guidelines 5.1.1(v) and 4.8) and by Google Play's account-deletion policy.
+
+### Added
+- **Settings → Delete Account** (signed-in users): deletes the Firebase account and everything it synced to the cloud — generators, work sessions, refills, maintenance tasks and children orphaned by versions before 2.4.2. Data on the device stays and keeps working offline.
+  - Email accounts confirm with their password (re-authentication), so a stale session can never leave the cloud wiped with the account still in place; anonymous accounts just confirm.
+  - Order: sync lock and realtime listeners stopped → local records detached from the account (pending, no owner) → cloud data deleted → account deleted. A failure at any step loses nothing: the next sync re-uploads the detached records, and a new sign-in (any account) uploads them as new data.
+  - iOS: system alert with a destructive action and a secure-text password prompt; Android/web: Material dialog.
+- Tests: `accountDeletion.test.ts`, cloud wipe (`deleteAllRemoteData`), local detach, sync ordering, and an emulator e2e covering wrong password, orphan cleanup, kept local data and re-upload to a new account.
+
+### Changed
+- iOS no longer offers Google sign-in (App Store guideline 4.8 would require Sign in with Apple next to it); email/password and anonymous sign-in remain. Android never offered Google sign-in; the web version keeps it.
+- Privacy policy and landing FAQ describe in-app account deletion.
+
 ## [2.5.0] - 2026-10-01
 
 **Platform-native design** — iOS follows the Human Interface Guidelines, Android Material 3, web keeps the

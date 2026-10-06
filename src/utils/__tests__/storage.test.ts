@@ -22,6 +22,8 @@ import {
   markSynced,
   getPendingChangesCount,
   updateLocalData,
+  detachFromAccount,
+  clearTombstones,
 } from '../storage';
 
 const OLD = '2026-06-01T00:00:00.000Z';
@@ -206,6 +208,40 @@ describe('markSynced', () => {
     await markSynced([{ entityType: 'generator', id: 'g1', lastModified: pushed.lastModified }], 'u1', OLD);
 
     expect((await getGenerators())[0]).toMatchObject({ name: 'Edited during push', syncStatus: 'pending' });
+  });
+});
+
+describe('account deletion (detach + clear tombstones)', () => {
+  it('keeps every record but makes it pending and drops the cloud owner and sync time', async () => {
+    const synced = { syncStatus: 'synced' as const, syncedAt: OLD, userId: 'u1' };
+    await seed('@generators', [makeGenerator(synced)]);
+    await seed('@work_sessions', [makeSession(synced)]);
+    await seed('@refills', [makeRefill(synced)]);
+    await seed('@maintenance_tasks', [makeTask(synced)]);
+
+    await detachFromAccount();
+
+    const data = await getLocalData();
+    const records = [...data.generators, ...data.workSessions, ...data.refills, ...data.maintenanceTasks];
+    expect(records).toHaveLength(4);
+    for (const record of records) {
+      expect(record.syncStatus).toBe('pending');
+      expect(record).not.toHaveProperty('syncedAt');
+      expect(record).not.toHaveProperty('userId');
+      expect(record.lastModified).toBe(OLD); // content and version untouched
+    }
+    expect(data.generators[0].name).toBe('Honda');
+  });
+
+  it('keeps tombstones until the cloud copy is gone, then clears them', async () => {
+    await seed('@work_sessions', [makeSession({ syncStatus: 'synced', userId: 'u1' })]);
+    await deleteWorkSession('s1');
+
+    await detachFromAccount();
+    expect(await getTombstones()).toHaveLength(1);
+
+    await clearTombstones();
+    expect(await getTombstones()).toEqual([]);
   });
 });
 
