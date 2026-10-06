@@ -79,3 +79,6 @@ AuthKey_*.p8
 
 # Landing page build output
 landing/_site/
+
+# Store screenshots (large PNGs, regenerate with scripts/demo-data)
+store/
