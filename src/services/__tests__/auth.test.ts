@@ -12,9 +12,14 @@ jest.mock('firebase/auth', () => ({}));
 const ENV_KEYS = ['EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID', 'EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID', 'EXPO_PUBLIC_GOOGLE_CLIENT_ID'];
 const saved: Record<string, string | undefined> = {};
 
-const loadAuth = (): typeof import('../auth') => {
+const loadAuth = (platform?: 'android' | 'web'): typeof import('../auth') => {
   let mod!: typeof import('../auth');
   jest.isolateModules(() => {
+    if (platform) {
+      jest.doMock('react-native', () => ({
+        Platform: { OS: platform, select: (spec: Record<string, unknown>) => (platform in spec ? spec[platform] : spec.default) },
+      }));
+    }
     mod = require('../auth');
   });
   return mod;
@@ -47,12 +52,22 @@ it('disables Google sign-in instead of throwing when the platform has no client 
   expect(mockUseAuthRequest).not.toHaveBeenCalled();
 });
 
+it('never offers Google sign-in on iOS, even with an iOS client id (App Store guideline 4.8)', () => {
+  process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID = 'ios-id';
+
+  const auth = loadAuth();
+
+  expect(auth.isGoogleAuthConfigured).toBe(false);
+  expect(auth.useGoogleAuth().available).toBe(false);
+  expect(mockUseAuthRequest).not.toHaveBeenCalled();
+});
+
 it('uses expo-auth-session with every platform id when the current platform is configured', () => {
   process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID = 'ios-id';
   process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID = 'android-id';
   process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID = 'web-id';
 
-  const auth = loadAuth();
+  const auth = loadAuth('web');
   const google = auth.useGoogleAuth();
 
   expect(auth.isGoogleAuthConfigured).toBe(true);

@@ -82,7 +82,19 @@
         "pendingChanges": "Pending Changes",
         "about": "About",
         "emulatorTitle": "Firebase Emulator",
-        "emulatorDescription": "Connected to the local Auth and Firestore emulators (development only)"
+        "emulatorDescription": "Connected to the local Auth and Firestore emulators (development only)",
+        "deleteAccount": "Delete Account",
+        "deleteAccountTitle": "Delete account?",
+        "deleteAccountMessage": "Your account and all data synced to the cloud will be permanently deleted. Generators and records on this device stay and keep working offline.",
+        "deleteAccountPasswordTitle": "Confirm with password",
+        "deleteAccountPasswordMessage": "Enter the password for {{email}} to delete the account.",
+        "deleteAccountPasswordLabel": "Password",
+        "deleteAccountConfirm": "Delete",
+        "accountDeleted": "Your account and its cloud data have been deleted. Data on this device is kept.",
+        "deleteAccountWrongPassword": "Incorrect password. Nothing was deleted.",
+        "deleteAccountReauth": "For security, sign out, sign in again and then delete the account.",
+        "deleteAccountCloudFailed": "Could not delete the cloud data. Check the connection and try again — nothing on this device was lost.",
+        "deleteAccountAccountFailed": "The cloud data was deleted, but the account itself could not be. Sign in again and repeat the deletion."
     },
     "detail": {
         "generatorNotFound": "Generator not found",

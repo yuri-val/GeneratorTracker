@@ -92,7 +92,7 @@
   "q4": "Can I use it for several generators?",
   "a4": "Yes — add as many as you need. Each one keeps its own sessions, refills, service plan and statistics.",
   "q5": "How do I delete my data?",
-  "a5": "Data stored only on your phone is removed when you delete it in the app or uninstall the app. To delete a synced account and its cloud data, email <a href=\"mailto:yuri.valigursky@gmail.com\">yuri.valigursky@gmail.com</a> — see the <a href=\"{{privacy_href}}\">privacy policy</a> for details.",
+  "a5": "Data stored only on your phone is removed when you delete it in the app or uninstall the app. To delete your account and everything synced to the cloud, open Settings → Delete Account; if you no longer have the app, email <a href=\"mailto:yuri.valigursky@gmail.com\">yuri.valigursky@gmail.com</a>. Details are in the <a href=\"{{privacy_href}}\">privacy policy</a>.",
   "q6": "Which languages are available?",
   "a6": "English and Ukrainian. The app follows your device language and can be switched in Settings.",
   "cta_title": "Put your generator on the record.",

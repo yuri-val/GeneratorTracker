@@ -14,6 +14,7 @@ jest.mock('../firestore', () => ({
   fetchAllRemoteData: jest.fn(),
   writeEntities: jest.fn(),
   deleteRemoteEntities: jest.fn(),
+  deleteAllRemoteData: jest.fn(),
   generatorsCollectionRef: jest.fn(() => 'generators-ref'),
   childCollectionGroupQuery: jest.fn((type: string) => `group-${type}`),
 }));
@@ -26,6 +27,7 @@ import {
   stopRealtimeListeners,
   getSyncStatus,
   SyncError,
+  deleteCloudAccountData,
 } from '../sync';
 import {
   getGenerators,
@@ -39,6 +41,7 @@ import {
   getTombstones,
   updateLocalData,
   getPendingChangesCount,
+  getLocalData,
 } from '../../utils/storage';
 
 const mocked = firestore as jest.Mocked<typeof firestore>;
@@ -388,5 +391,44 @@ describe('realtime listeners', () => {
     errorCallback(new Error('permission-denied'));
 
     expect(getSyncStatus()).toBe('error');
+  });
+});
+
+describe('account deletion (cloud side)', () => {
+  it('stops listeners and detaches local records before deleting the cloud data, then clears tombstones', async () => {
+    const unsubscribe = jest.fn();
+    onSnapshotMock.mockReturnValue(unsubscribe);
+    startRealtimeListeners('u1');
+    await seedLocal({ generators: [gen('g1')], workSessions: [session('s1')] });
+    await updateLocalData(() => ({ tombstones: [{ key: 'refill:r9', entityType: 'refill', entityId: 'r9', generatorId: 'g1', deletedAt: T1 }] }));
+
+    let statusesSeenByDelete: string[] = [];
+    mocked.deleteAllRemoteData.mockImplementation(async () => {
+      const data = await getLocalData();
+      statusesSeenByDelete = [...data.generators, ...data.workSessions].map(r => r.syncStatus);
+      return 2;
+    });
+
+    await expect(deleteCloudAccountData('u1')).resolves.toBe(2);
+
+    expect(unsubscribe).toHaveBeenCalled();
+    expect(mocked.deleteAllRemoteData).toHaveBeenCalledWith('u1');
+    expect(statusesSeenByDelete).toEqual(['pending', 'pending']);
+    expect((await getGenerators())[0]).toMatchObject({ id: 'g1', syncStatus: 'pending' });
+    expect((await getGenerators())[0]).not.toHaveProperty('userId');
+    expect(await getTombstones()).toEqual([]);
+  });
+
+  it('keeps everything local and pending when the cloud deletion fails, so nothing can be pruned', async () => {
+    await seedLocal({ generators: [gen('g1')] });
+    mocked.deleteAllRemoteData.mockRejectedValue(new Error('offline'));
+
+    await expect(deleteCloudAccountData('u1')).rejects.toThrow('offline');
+
+    expect(await getGenerators()).toEqual([expect.objectContaining({ id: 'g1', syncStatus: 'pending' })]);
+    // A later pull against a cloud that still has (part of) the data cannot delete it locally.
+    setRemote({});
+    await performFullSync('u1');
+    expect((await getGenerators()).map(g => g.id)).toEqual(['g1']);
   });
 });

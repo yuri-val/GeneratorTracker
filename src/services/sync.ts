@@ -5,6 +5,7 @@ import {
   fetchAllRemoteData,
   writeEntities,
   deleteRemoteEntities,
+  deleteAllRemoteData,
   fromFirestoreDoc,
   generatorsCollectionRef,
   childCollectionGroupQuery,
@@ -13,6 +14,8 @@ import {
 import { applyRemoteChanges, RemoteChangeSet } from './syncMerge';
 import {
   COLLECTION_FIELD,
+  clearTombstones,
+  detachFromAccount,
   getLocalData,
   getTombstones,
   markSynced,
@@ -146,6 +149,22 @@ export const performInitialSync = async (userId: string): Promise<void> => {
   await performFullSync(userId);
   startRealtimeListeners(userId);
 };
+
+/**
+ * Account deletion, cloud side. Runs under the sync lock (never during a sync), stops the
+ * realtime listeners, detaches the local records first and only then deletes the cloud
+ * data: if the deletion fails half-way, the records are pending and the next sync simply
+ * uploads them again — nothing can be pruned on the device.
+ */
+export const deleteCloudAccountData = (uid: string): Promise<number> =>
+  syncMutex.run(async () => {
+    stopRealtimeListeners();
+    await detachFromAccount();
+    const deleted = await deleteAllRemoteData(uid);
+    await clearTombstones();
+    syncStatus = 'idle';
+    return deleted;
+  });
 
 /** "Sync Now". */
 export const performManualSync = (userId: string): Promise<void> => performFullSync(userId);

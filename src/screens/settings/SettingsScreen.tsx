@@ -22,6 +22,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { useSync } from '../../hooks/useSync';
 import { EmailAuthForm, useEmailAuth } from '../../components/EmailAuthForm';
 import { NativeForm, type FormSection } from '../../components/form/NativeForm';
+import { DeleteAccountDialog } from '../../components/DeleteAccountDialog';
+import { deleteAccount, AccountDeletionError } from '../../services/accountDeletion';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { saveLanguage } from '../../utils/storage';
 import { isUsingFirebaseEmulator } from '../../config/firebase';
@@ -32,6 +34,7 @@ import {
   signInAnonymouslyUser,
   signInWithGoogleCredential,
   useGoogleAuth,
+  getAccountKind,
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
 
@@ -107,6 +110,73 @@ export default function SettingsScreen() {
     }
   };
 
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | undefined>();
+  const [deleting, setDeleting] = useState(false);
+
+  const deletionMessage = (error: unknown): string => {
+    const stage = error instanceof AccountDeletionError ? error.stage : 'cloud';
+    return {
+      password: t('settings.deleteAccountWrongPassword'),
+      reauth: t('settings.deleteAccountReauth'),
+      cloud: t('settings.deleteAccountCloudFailed'),
+      account: t('settings.deleteAccountAccountFailed'),
+    }[stage];
+  };
+
+  const runAccountDeletion = async (password?: string) => {
+    setDeleting(true);
+    setDeleteError(undefined);
+    try {
+      await deleteAccount({ password });
+      setDeleteDialogVisible(false);
+      Alert.alert(t('common.success'), t('settings.accountDeleted'));
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      const message = deletionMessage(error);
+      if (error instanceof AccountDeletionError && error.stage === 'password') {
+        setDeleteError(message); // keep the dialog open to retry
+      } else {
+        setDeleteDialogVisible(false);
+      }
+      Alert.alert(t('common.error'), message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  /** iOS: system alert, then a secure-text prompt for email accounts; elsewhere a Material dialog. */
+  const handleDeleteAccount = () => {
+    const needsPassword = getAccountKind() === 'password';
+    if (!isIOS) {
+      setDeleteError(undefined);
+      setDeleteDialogVisible(true);
+      return;
+    }
+    Alert.alert(t('settings.deleteAccountTitle'), t('settings.deleteAccountMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('settings.deleteAccountConfirm'),
+        style: 'destructive',
+        onPress: () => {
+          if (!needsPassword) {
+            runAccountDeletion();
+            return;
+          }
+          Alert.prompt(
+            t('settings.deleteAccountPasswordTitle'),
+            t('settings.deleteAccountPasswordMessage', { email: user?.email ?? '' }),
+            [
+              { text: t('common.cancel'), style: 'cancel' },
+              { text: t('settings.deleteAccountConfirm'), style: 'destructive', onPress: (value?: string) => runAccountDeletion(value ?? '') },
+            ],
+            'secure-text'
+          );
+        },
+      },
+    ]);
+  };
+
   const handleManualSync = async () => {
     try {
       await performManualSync();
@@ -177,12 +247,12 @@ export default function SettingsScreen() {
         syncing={syncStatus === 'syncing'}
         pendingCount={pendingCount}
         signingIn={signingIn}
-        googleAvailable={googleAvailable && !!request}
-        onGoogleSignIn={() => promptAsync()}
         onAnonymousSignIn={handleAnonymousSignIn}
         onEmailSignIn={handleEmailSignIn}
         onEmailSignUp={handleEmailSignUp}
         onSignOut={handleSignOut}
+        onDeleteAccount={handleDeleteAccount}
+        deleting={deleting}
         onSync={handleManualSync}
         language={i18n.language.split('-')[0]}
         onLanguageChange={handleLanguageChange}
@@ -279,6 +349,17 @@ export default function SettingsScreen() {
                 >
                   {t('settings.signOut')}
                 </Button>
+                <Button
+                  mode="text"
+                  textColor={theme.colors.error}
+                  icon="account-remove"
+                  onPress={handleDeleteAccount}
+                  disabled={deleting}
+                  style={styles.authButton}
+                  testID="delete-account"
+                >
+                  {t('settings.deleteAccount')}
+                </Button>
               </Surface>
             )}
           </List.Section>
@@ -361,6 +442,15 @@ export default function SettingsScreen() {
           </List.Section>
         </Animated.View>
       </ScrollView>
+      <DeleteAccountDialog
+        visible={deleteDialogVisible}
+        email={user?.email}
+        needsPassword={!!user && getAccountKind() === 'password'}
+        busy={deleting}
+        error={deleteError}
+        onDismiss={() => setDeleteDialogVisible(false)}
+        onConfirm={runAccountDeletion}
+      />
     </View>
   );
 }
@@ -372,12 +462,12 @@ interface SettingsIOSProps {
   syncing: boolean;
   pendingCount: number;
   signingIn: boolean;
-  googleAvailable: boolean;
-  onGoogleSignIn: () => void;
   onAnonymousSignIn: () => void;
   onEmailSignIn: (email: string, password: string) => Promise<void>;
   onEmailSignUp: (email: string, password: string) => Promise<void>;
   onSignOut: () => void;
+  onDeleteAccount: () => void;
+  deleting: boolean;
   onSync: () => void;
   language: string;
   onLanguageChange: (language: string) => void;
@@ -405,6 +495,22 @@ function SettingsIOS(props: SettingsIOSProps) {
               systemImage: 'rectangle.portrait.and.arrow.right',
               onPress: props.onSignOut,
               testID: 'sign-out',
+            },
+          ],
+        },
+        {
+          key: 'deleteAccount',
+          footer: t('settings.deleteAccountMessage'),
+          fields: [
+            {
+              kind: 'button',
+              key: 'deleteAccount',
+              label: t('settings.deleteAccount'),
+              destructive: true,
+              systemImage: 'trash',
+              disabled: props.deleting,
+              onPress: props.onDeleteAccount,
+              testID: 'delete-account',
             },
           ],
         },
@@ -482,17 +588,6 @@ function SettingsIOS(props: SettingsIOSProps) {
         {
           key: 'otherSignIn',
           fields: [
-            ...(props.googleAvailable
-              ? [
-                  {
-                    kind: 'button' as const,
-                    key: 'google',
-                    label: t('settings.signInWithGoogle'),
-                    disabled: busy,
-                    onPress: props.onGoogleSignIn,
-                  },
-                ]
-              : []),
             {
               kind: 'button',
               key: 'anonymous',

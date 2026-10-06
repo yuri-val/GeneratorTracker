@@ -65,6 +65,12 @@ const deleteDoc = async (request: APIRequestContext, path: string) => {
   expect(response.ok()).toBe(true);
 };
 
+const accountExists = async (request: APIRequestContext, email: string): Promise<boolean> =>
+  findUid(request, email).then(
+    () => true,
+    () => false
+  );
+
 const generatorIdByName = async (page: Page, name: string): Promise<string> => {
   const raw = await page.evaluate(() => localStorage.getItem('@generators') || '[]');
   const generator = (JSON.parse(raw) as Array<{ id: string; name: string }>).find(g => g.name === name);
@@ -300,5 +306,51 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await expect(visibleText(page, '999.0', true)).toHaveCount(0);
     const refills = await page.evaluate(() => localStorage.getItem('@refills') || '[]');
     expect(refills).not.toContain('ghost-refill');
+  });
+
+  test('account deletion removes the cloud data (incl. orphans) and the account, keeps local data', async ({ page, request }) => {
+    const email = uniqueEmail();
+    await page.goto('/');
+    await waitForEmptyHome(page);
+    await createGenerator(page, 'Kept Gen');
+    await signUp(page, email); // initial sync pushes it
+    const uid = await findUid(request, email);
+    await expect.poll(() => listGeneratorNames(request, uid), { timeout: SYNC_TIMEOUT }).toContain('Kept Gen');
+    // A child orphaned by an old app version (its generator document is gone).
+    await writeDoc(request, `users/${uid}/generators/gone/workSessions/orphan-1`, {
+      id: { stringValue: 'orphan-1' },
+      generatorId: { stringValue: 'gone' },
+      userId: { stringValue: uid },
+      lastModified: { stringValue: '2026-01-01T00:00:00.000Z' },
+    });
+
+    // Wrong password: nothing is deleted and the dialog stays open.
+    await goToTab(page, 'Settings');
+    await page.getByTestId('delete-account').click();
+    await page.getByTestId('input-delete-password').fill('wrong-password');
+    await page.getByTestId('confirm-delete-account').click();
+    await expect(visibleText(page, 'Incorrect password. Nothing was deleted.')).toBeVisible({ timeout: SYNC_TIMEOUT });
+    expect(await listGeneratorNames(request, uid)).toContain('Kept Gen');
+
+    // Correct password: account and cloud data are gone, the device is signed out.
+    await page.getByTestId('input-delete-password').fill(PASSWORD);
+    await page.getByTestId('confirm-delete-account').click();
+    await expect(page.getByTestId('auth-submit')).toBeVisible({ timeout: SYNC_TIMEOUT });
+    await expect.poll(() => accountExists(request, email), { timeout: SYNC_TIMEOUT }).toBe(false);
+    expect(await listGeneratorNames(request, uid)).toEqual([]);
+    expect(await getDoc(request, `users/${uid}/generators/gone/workSessions/orphan-1`)).toBeNull();
+
+    // Local data stays and is detached from the deleted account…
+    const local = await page.evaluate(() => JSON.parse(localStorage.getItem('@generators') || '[]'));
+    expect(local).toEqual([expect.objectContaining({ name: 'Kept Gen', syncStatus: 'pending' })]);
+    expect(local[0].userId).toBeUndefined();
+    await goToTab(page, 'Home');
+    await expect(visibleText(page, 'Kept Gen')).toBeVisible();
+
+    // …so a new account uploads it as new data.
+    const newEmail = uniqueEmail();
+    await signUp(page, newEmail);
+    const newUid = await findUid(request, newEmail);
+    await expect.poll(() => listGeneratorNames(request, newUid), { timeout: SYNC_TIMEOUT }).toContain('Kept Gen');
   });
 });

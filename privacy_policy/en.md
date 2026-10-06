@@ -36,7 +36,7 @@ When you use Generator Tracker, you create and store data **locally on your devi
 - Email address
 - Encrypted password (we never see your actual password)
 
-**Google Sign-In:**
+**Google Sign-In (web version only):**
 - Email address
 - Profile name (if provided by Google)
 - Profile photo URL (if provided by Google)
@@ -55,7 +55,7 @@ When you use Generator Tracker, you create and store data **locally on your devi
 - ✅ Is encrypted in transit (HTTPS)
 - ✅ Is stored in Google Cloud (Firebase) servers
 - ✅ Is accessible only to you when signed in
-- ✅ Can be deleted on request (see "Delete Your Data" below); signing out does not delete it
+- ✅ Can be deleted at any time in the app (Settings → Delete Account) or by email request; signing out does not delete it
 
 ## How We Use Your Information
 
@@ -132,20 +132,21 @@ Generator Tracker does **not sell, rent, or share** your personal data with thir
 
 ### Delete Your Data
 
-**Option 1: Delete Local Data**
-- Uninstall the app from your device
-- This removes all local data immediately
+**Option 1: Delete your account in the app**
+1. Open Settings while signed in
+2. Tap "Delete Account" and confirm (email accounts confirm with their password)
+3. Your account and all data synced to the cloud (generators, work sessions, refills, maintenance tasks) are deleted immediately and permanently
 
-**Option 2: Delete Cloud Data**
-1. Sign in to the app
-2. Go to Settings
-3. Tap "Sign Out"
-4. Your cloud data remains in Firebase
-5. To permanently delete: Contact us at yuri.valigursky@gmail.com
+Data on your device is not deleted: it stays available offline and is no longer linked to any account.
 
-**Option 3: Delete Account**
-- Contact us at yuri.valigursky@gmail.com
+**Option 2: Delete local data**
+- Delete records in the app, or uninstall the app to remove all local data immediately
+
+**Option 3: Request deletion by email**
+- If you can no longer access the app, email yuri.valigursky@gmail.com from the address of your account
 - We will delete your account and all associated data within 30 days
+
+Signing out does not delete cloud data.
 
 ### Control Synchronization
 - ✅ Use the app without signing in (no cloud sync)
@@ -166,7 +167,7 @@ If you are a parent or guardian and believe your child has provided us with pers
 
 ### Cloud Data (Firebase)
 - Retained while your account is active
-- Deleted within 30 days after account deletion request
+- Deleted immediately when you delete your account in the app, or within 30 days of an email request
 - Automatic backup retention: Firebase's standard retention policy
 
 ## International Data Transfers
