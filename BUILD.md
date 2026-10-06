@@ -12,38 +12,28 @@ mv *.aab builds/ 2>/dev/null || true
 
 ### Credentials Setup
 
-For local builds, you need to configure your Android signing credentials.
+All keys live in `credentials/` (gitignored, see `credentials/README.md`). Only `credentials.json` stays in the
+project root because EAS CLI reads it only from there.
 
 1. **Copy the credentials template:**
    ```bash
    cp credentials.json.example credentials.json
    ```
 
-2. **Generate a keystore (if you don't have one):**
+2. **Put the keystore at `credentials/android/keystore.jks`** (or generate one):
    ```bash
    keytool -genkeypair -v -storetype PKCS12 \
-     -keystore android-release.keystore \
+     -keystore credentials/android/keystore.jks \
      -alias generatortracker \
      -keyalg RSA \
      -keysize 2048 \
      -validity 10000
    ```
 
-3. **Update credentials.json with your keystore information:**
-   ```json
-   {
-     "android": {
-       "keystore": {
-         "keystorePath": "android-release.keystore",
-         "keystorePassword": "your-keystore-password",
-         "keyAlias": "generatortracker",
-         "keyPassword": "your-key-password"
-       }
-     }
-   }
-   ```
+3. **Fill in the alias and passwords in `credentials.json`.**
 
-4. **Ensure your keystore file is in the project root or update the path in credentials.json**
+4. **For `eas submit` to Google Play** put the service account key at
+   `credentials/android/play-service-account.json` (referenced from `eas.json`).
 
 ### Building
 
@@ -67,7 +57,7 @@ make eas-build-prod
 
 ### Notes
 
-- `credentials.json` and `*.keystore` files are gitignored for security
+- `credentials.json` and everything in `credentials/` (except its README) are gitignored
 - Keep your keystore and passwords safe - losing them means you can't update your app
 - For remote builds on EAS, credentials are managed by Expo
 - Local builds output to `builds/` directory
