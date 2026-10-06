@@ -5,15 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>$title$ — Generator Tracker</title>
   <meta name="description" content="$description$">
-  <meta name="theme-color" content="#0d0f12">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf8">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0d10">
   <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/$file$">
+  <link rel="alternate" hreflang="en" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="alternate" hreflang="uk" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html">
+  <link rel="alternate" hreflang="x-default" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="icon" href="../favicon.png" type="image/png" sizes="64x64">
   <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    })();
+  </script>
   <style>
     .doc { max-width: 760px; padding: clamp(40px, 6vw, 72px) 0 80px; }
     .doc h1 { font-size: clamp(34px, 5vw, 48px); margin-bottom: 12px; }
@@ -24,9 +31,9 @@
     .doc ul, .doc ol { padding-left: 22px; margin: 10px 0; }
     .doc li + li { margin-top: 6px; }
     .doc strong { color: var(--text); }
-    .doc a { color: var(--brand); }
+    .doc a { color: var(--brand-text); }
     .doc hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
-    .doc code { padding: 2px 6px; border-radius: 6px; background: var(--bg-card); font-size: 0.9em; }
+    .doc code { padding: 2px 6px; border-radius: 6px; background: var(--card-2); font-size: 0.9em; }
     .doc-langs { display: inline-flex; gap: 8px; }
   </style>
 </head>
@@ -38,6 +45,10 @@
         <span>Generator Tracker</span>
       </a>
       <div class="header-actions" style="margin-left:auto">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Theme" data-theme-toggle data-label-light="Switch to the light theme" data-label-dark="Switch to the dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
         <nav class="doc-langs" aria-label="Language">
           <a class="lang-switch" href="privacy-policy.html" hreflang="en" lang="en">EN</a>
           <a class="lang-switch" href="privacy-policy-uk.html" hreflang="uk" lang="uk">UA</a>
@@ -51,8 +62,9 @@ $body$
   <footer class="site-footer">
     <div class="container footer-bottom" style="margin-top:0;border-top:0;padding-top:0">
       <p><a href="$home$">Generator Tracker</a> · <a href="https://github.com/yuri-val/GeneratorTracker">GitHub</a> · <a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></p>
-      <p style="margin-top:8px">© 2026 Yuri Valigursky · MIT License</p>
+      <p>© 2026 Yuri Valigursky · MIT License</p>
     </div>
   </footer>
+  <script src="../main.js" defer></script>
 </body>
 </html>

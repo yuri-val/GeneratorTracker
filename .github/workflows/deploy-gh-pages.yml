@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'landing/**'
+      - 'release_notes/**'
+      - 'app.json'
       - 'privacy_policy/en.md'
       - 'privacy_policy/uk.md'
       - 'privacy_policy/template.html'

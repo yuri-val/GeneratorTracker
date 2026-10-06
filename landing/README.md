@@ -1,7 +1,7 @@
 # Landing page
 
 Static product site published to GitHub Pages: <https://yuri-val.github.io/GeneratorTracker/>
-(English at `/`, Ukrainian at `/uk/`, privacy policy at `/privacy_policy/`).
+(English at `/`, Ukrainian at `/uk/`, privacy policy at `/privacy_policy/`, smart download link at `/get/`).
 
 ## Structure
 
@@ -9,14 +9,24 @@ Static product site published to GitHub Pages: <https://yuri-val.github.io/Gener
 |---|---|
 | `template.html` | The page markup with `{{key}}` placeholders |
 | `i18n/en.json`, `i18n/uk.json` | All texts per language (strings may contain HTML and other `{{keys}}`) |
-| `styles.css`, `main.js` | Shared styles (also used by the privacy-policy pages) and the mobile menu |
+| `styles.css` | Shared styles — light and dark themes, also used by the privacy-policy pages |
+| `main.js` | Theme toggle, mobile menu, section highlighting, scroll-reveal (the page works without it) |
+| `fonts/` | Self-hosted Inter (variable, latin + cyrillic subsets) — no request to Google Fonts |
 | `assets/screens/` | App screenshots: `{android,ios}-{en,uk}-{screen}.jpg`, 540 px wide |
-| `assets/og-{en,uk}.png` | Social preview images (1200×630) |
-| `build.py` | Renders both languages into `_site/` (git-ignored) with sitemap and robots.txt |
+| `assets/og-{en,uk}.png` | Social preview images (1200×630), rendered by `og/render.mjs` |
+| `assets/qr-get.svg` | QR code pointing at `/get/` (regenerate only if the site URL changes) |
+| `icon-192.png`, `icon-512.png` | Web-manifest icons, resized from `../assets/icon.png` |
+| `build.py` | Renders everything into `_site/` (git-ignored) |
+
+`build.py` writes, per language, `index.html` with JSON-LD (`WebSite`, `MobileApplication`, `FAQPage`),
+plus `get/index.html` (opens Google Play or the App Store for the visitor's platform), `404.html`,
+`llms.txt`, `site.webmanifest`, `robots.txt` and `sitemap.xml` with hreflang alternates. The app version
+comes from `../app.json` and the "What's new" section from `../release_notes/<version>/<lang>.md`, so a
+release bump updates the site without touching this directory.
 
 The privacy policy lives in `../privacy_policy/{en,uk}.md` and is rendered with pandoc by
 `.github/workflows/deploy-gh-pages.yml`, which also runs `build.py` and deploys on every push to
-`main` that touches `landing/` or the policy.
+`main` that touches `landing/`, `release_notes/`, `app.json` or the policy.
 
 ## Preview locally
 
@@ -39,3 +49,7 @@ accounts:
    (Maestro) open the screens and save the screenshots; `android-demo-statusbar.sh` gives
    Android a clean status bar, `xcrun simctl status_bar … override` does it on iOS.
 3. Resize to 540 px wide JPEG (quality ~84) into `assets/screens/` with the same names.
+4. Re-render the social previews: `cd landing/og && node render.mjs` (Node 22, uses the repo's Playwright).
+
+The hero chips ("Session running 2.3 h", "Avg 0.51 L/h", "Oil change — due now") repeat numbers visible in
+the screenshots; keep them in step when the demo data changes.
