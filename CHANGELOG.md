@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- New app icon: a white lightning bolt inside a glowing orange 3/4 "run-hours" ring with gauge ticks on dark
+  glass — the same visual language as the app's dark theme and the landing page, readable down to 29 px and in
+  tinted/grayscale modes. Android gets a proper adaptive icon (separate background layer, mark inside the 66 dp
+  safe zone) and a monochrome layer for themed icons. Splash, web favicon, landing icons and OG images follow.
+  Sources and geometry live in `scripts/icons/build-icons.mjs` (`assets/icon-source/`).
+
 ## [2.6.0] - 2026-10-06
 
 **Account deletion in the app** and email/anonymous-only sign-in on iOS — required by the App Store
