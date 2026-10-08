@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundImage": "./assets/adaptive-icon-background.png",
         "monochromeImage": "./assets/adaptive-icon-monochrome.png",
-        "backgroundColor": "#F97A3E"
+        "backgroundColor": "#171A20"
       },
       "package": "com.yurival.GeneratorTracker",
       "predictiveBackGestureEnabled": false

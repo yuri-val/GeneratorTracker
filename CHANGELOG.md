@@ -8,10 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- New app icon: a white lightning bolt inside a deep-teal 3/4 "run-hours" ring on the brand orange gradient —
-  readable down to 29 px and in tinted/grayscale modes. Android gets a proper adaptive icon (separate background
-  layer, mark inside the 66 dp safe zone) and a monochrome layer for themed icons. Splash, web favicon and the
-  landing page icons follow. Sources and geometry live in `scripts/icons/build-icons.mjs` (`assets/icon-source/`).
+- New app icon: a white lightning bolt inside a glowing orange 3/4 "run-hours" ring with gauge ticks on dark
+  glass — the same visual language as the app's dark theme and the landing page, readable down to 29 px and in
+  tinted/grayscale modes. Android gets a proper adaptive icon (separate background layer, mark inside the 66 dp
+  safe zone) and a monochrome layer for themed icons. Splash, web favicon, landing icons and OG images follow.
+  Sources and geometry live in `scripts/icons/build-icons.mjs` (`assets/icon-source/`).
 
 ## [2.6.0] - 2026-10-06
 
