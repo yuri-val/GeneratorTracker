@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, Alert, FlatList, Pressable, RefreshControl } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useFocusEffect } from '@react-navigation/native';
@@ -70,6 +70,10 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
   useSnackbarBottomOffset(others.length > 0 ? size.liveBar + 12 + 12 : 12);
 
   useFocusEffect(useCallback(() => setInfoOpen(false), []));
+  // iOS back button: "‹ Головна" (the tabs screen has no title of its own).
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerBackTitle: t('tabs.home') });
+  }, [navigation, t]);
 
   const onRefresh = async () => {
     setRefreshing(true);

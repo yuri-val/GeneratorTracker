@@ -51,7 +51,9 @@ def build(today: date, active: bool, lang: str = 'en'):
     for index, (gid, name, purchased, burn) in enumerate(GENERATORS):
         model = text['models'][index]
         created = datetime.fromisoformat(purchased + 'T10:00:00')
+        tank = {0: 3.6, 1: 25, 2: 90}[index]
         generators.append({'id': gid, 'name': name, 'model': model, 'purchaseDate': purchased,
+                           'tankCapacity': tank,  # 3.0: enables the fuel estimate
                            'createdAt': iso(created), 'lastModified': iso(now - timedelta(minutes=index)),
                            'syncStatus': 'pending'})
         total_hours = 0.0
@@ -74,10 +76,10 @@ def build(today: date, active: bool, lang: str = 'en'):
                              'createdAt': iso(end_dt), 'lastModified': iso(end_dt), 'syncStatus': 'pending'})
             total_hours += hours
             fuel_since_refill += hours * burn
-            tank = {0: 3.6, 1: 25, 2: 90}[index]
             if fuel_since_refill > tank * 0.7:
                 amount = round(min(tank, fuel_since_refill) * 2) / 2
                 refills.append({'id': f'{gid}-r{len(refills)}', 'generatorId': gid, 'date': day.isoformat(),
+                                'time': (end_dt + timedelta(minutes=5)).strftime('%H:%M'), 'isFull': True,
                                 'amount': amount, 'createdAt': iso(end_dt), 'lastModified': iso(end_dt),
                                 'syncStatus': 'pending'})
                 fuel_since_refill = 0.0

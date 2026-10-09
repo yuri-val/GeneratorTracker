@@ -1,4 +1,4 @@
-import { fmtLitres, fmtDurationWords, fmtClock, fmtTime, fmtShortDate, fmtSummary, fmtHours, NBSP } from '../format';
+import { ukPlural, fmtLitres, fmtDurationWords, fmtClock, fmtTime, fmtShortDate, fmtSummary, fmtHours, NBSP } from '../format';
 
 describe('format', () => {
   it('litres: decimal comma for uk, NBSP between ≈, number and unit', () => {
@@ -38,4 +38,12 @@ describe('format', () => {
     expect(fmtSummary(1, 0, 'en')).toBe('1 generator · all off');
     expect(fmtSummary(3, 2, 'en')).toBe('3 generators · 2 running');
   });
+});
+
+it('Ukrainian plural categories match Intl.PluralRules (which Hermes lacks)', () => {
+  const rules = new Intl.PluralRules('uk-UA');
+  for (let n = 0; n <= 125; n++) {
+    const expected = rules.select(n) === 'other' ? 'many' : rules.select(n);
+    expect([n, ukPlural(n)]).toEqual([n, expected]);
+  }
 });

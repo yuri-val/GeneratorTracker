@@ -202,7 +202,9 @@ export default function AddRefillScreen({ navigation, route }: Props) {
       : null;
 
   const isToday = date === toLocalDateString();
-  const whenLabel = `${isToday ? t('refill.today') : fmtShortDate(date, lang)}${time ? `, ${fmtClockTime(time, lang)}` : ''}`;
+  // A new refill is stamped with the save time; show it ahead ("Today, 22:41").
+  const shownTime = time ?? (!isEditing && isToday ? getCurrentTime() : undefined);
+  const whenLabel = `${isToday ? t('refill.today') : fmtShortDate(date, lang)}${shownTime ? `, ${fmtClockTime(shownTime, lang)}` : ''}`;
 
   return (
     <View style={[styles.flex, { backgroundColor: gt.dark ? gt.surface : gt.bg }]}>

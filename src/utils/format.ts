@@ -56,16 +56,25 @@ export const fmtShortDate = (date: Date | string, lang: string) => {
   return new Intl.DateTimeFormat(locale(lang), { day: 'numeric', month: 'short' }).format(d);
 };
 
+/**
+ * Ukrainian plural category of a whole number. Hand-written because Hermes (the app's JS engine)
+ * has no Intl.PluralRules: 1, 21 → one; 2–4, 22–24 → few; 0, 5–20, 25–30 → many.
+ */
+export function ukPlural(n: number): 'one' | 'few' | 'many' {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'one';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'few';
+  return 'many';
+}
+
 /** "3 генератори · 2 працюють" / "3 generators · 2 running". */
 export function fmtSummary(total: number, running: number, lang: string) {
   if (!isUk(lang)) {
     return `${total} generator${total === 1 ? '' : 's'} · ${running === 0 ? 'all off' : `${running} running`}`;
   }
-  const rules = new Intl.PluralRules('uk-UA');
-  const noun = ({ one: 'генератор', few: 'генератори', many: 'генераторів', other: 'генератора' } as Record<string, string>)[
-    rules.select(total)
-  ];
-  const verb = rules.select(running) === 'one' ? 'працює' : 'працюють';
+  const noun = { one: 'генератор', few: 'генератори', many: 'генераторів' }[ukPlural(total)];
+  const verb = ukPlural(running) === 'one' ? 'працює' : 'працюють';
   return `${total} ${noun} · ${running === 0 ? 'усі вимкнені' : `${running} ${verb}`}`;
 }
 
