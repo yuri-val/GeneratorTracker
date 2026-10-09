@@ -10,41 +10,43 @@ const file = (p) => 'file://' + path.resolve(landing, p);
 const strings = (lang) => JSON.parse(fs.readFileSync(path.join(landing, 'i18n', `${lang}.json`), 'utf8'));
 
 const page_html = (lang, s) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>
-@font-face { font-family: Inter; font-weight: 400 800; src: url(${file('fonts/inter-latin.woff2')}) format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
-@font-face { font-family: Inter; font-weight: 400 800; src: url(${file('fonts/inter-cyrillic.woff2')}) format("woff2"); unicode-range: U+0400-045F, U+0490-0491; }
+@font-face { font-family: Plex; font-weight: 400; src: url(${file('fonts/plex-sans-400.woff2')}) format("woff2"); }
+@font-face { font-family: Plex; font-weight: 500; src: url(${file('fonts/plex-sans-500.woff2')}) format("woff2"); }
+@font-face { font-family: Plex; font-weight: 600; src: url(${file('fonts/plex-sans-600.woff2')}) format("woff2"); }
+@font-face { font-family: Plex; font-weight: 700; src: url(${file('fonts/plex-sans-700.woff2')}) format("woff2"); }
+@font-face { font-family: PlexMono; font-weight: 500; src: url(${file('fonts/plex-mono-500.woff2')}) format("woff2"); }
 * { box-sizing: border-box; margin: 0; }
 html, body { width: 1200px; height: 630px; overflow: hidden; }
-body { position: relative; font-family: Inter, system-ui, sans-serif; color: #f4f5f7; -webkit-font-smoothing: antialiased;
-  background: radial-gradient(55% 70% at 78% 40%, rgba(255,107,53,.30), transparent 70%), radial-gradient(35% 45% at 95% 85%, rgba(56,189,248,.14), transparent 70%), #0b0d10; }
-.grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px); background-size: 56px 56px;
-  -webkit-mask-image: radial-gradient(70% 80% at 60% 30%, #000 20%, transparent 80%); }
-.brand { position: absolute; left: 72px; top: 64px; display: flex; align-items: center; gap: 18px; font-size: 30px; font-weight: 700; letter-spacing: -.01em; }
-.brand img { width: 72px; height: 72px; border-radius: 18px; }
-h1 { position: absolute; left: 72px; top: 200px; width: 620px; font-size: 62px; line-height: 1.04; font-weight: 800; letter-spacing: -.035em; }
-h1 em { font-style: normal; background: linear-gradient(100deg, #ff6b35 10%, #ffb347 90%); -webkit-background-clip: text; color: transparent; }
-.sub { position: absolute; left: 72px; top: 414px; width: 600px; font-size: 24px; line-height: 1.35; color: #aab1bc; }
-.note { position: absolute; left: 72px; top: 484px; font-size: 17px; color: #7c8591; }
-.badges { position: absolute; left: 72px; top: 522px; display: flex; gap: 14px; }
-.badge { display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 22px 0 16px; border-radius: 15px; background: #fff; color: #0b0b0b; }
-.badge svg { width: 28px; height: 28px; }
+/* The app's 3.0 language: warm paper, ink, square shapes, a 1.5 px ink rule; phones are the only rounded things. */
+body { position: relative; font-family: Plex, system-ui, sans-serif; color: #1b1a17; background: #f3f1ec; -webkit-font-smoothing: antialiased; }
+.brand { position: absolute; left: 72px; top: 60px; display: flex; align-items: center; gap: 16px; font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+.brand img { width: 64px; height: 64px; border-radius: 22%; }
+h1 { position: absolute; left: 72px; top: 178px; width: 620px; font-size: 60px; line-height: 1.02; font-weight: 700; letter-spacing: -.03em; }
+h1 em { font-style: normal; box-shadow: inset 0 -.14em 0 #ff6b35; }
+.rule { position: absolute; left: 72px; top: 400px; width: 600px; height: 1.5px; background: #1b1a17; }
+.sub { position: absolute; left: 72px; top: 418px; width: 600px; font-size: 23px; line-height: 1.35; color: #4f4b43; }
+.note { position: absolute; left: 72px; top: 482px; font-size: 16px; color: #6e6a60; }
+.badges { position: absolute; left: 72px; top: 522px; display: flex; gap: 12px; }
+.badge { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 22px 0 16px; background: #1b1a17; color: #f3f1ec; }
+.badge svg { width: 26px; height: 26px; }
 .badge span { display: flex; flex-direction: column; line-height: 1.1; }
 .badge small { font-size: 11px; font-weight: 500; }
-.badge strong { font-size: 20px; font-weight: 600; letter-spacing: -.01em; }
-.phone { position: absolute; padding: 10px; background: linear-gradient(145deg, #2a2e36, #0a0c0f); box-shadow: 0 40px 90px -20px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.07); }
+.badge strong { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+.phone { position: absolute; padding: 10px; background: #1b1a17; box-shadow: 0 30px 60px -30px rgba(27,26,23,.55); }
 .phone img { display: block; width: 100%; }
-.android { left: 745px; top: 70px; width: 290px; border-radius: 36px; z-index: 2; }
+.android { left: 745px; top: 60px; width: 290px; border-radius: 36px; z-index: 2; }
 .android img { border-radius: 28px; }
-.ios { left: 980px; top: 120px; width: 250px; border-radius: 42px; transform: rotate(6deg); }
+.ios { left: 985px; top: 120px; width: 250px; border-radius: 42px; transform: rotate(5deg); }
 .ios img { border-radius: 34px; }
-.chip { position: absolute; z-index: 3; left: 690px; top: 150px; display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 14px; border-radius: 16px; background: rgba(24,28,35,.92); border: 1px solid rgba(255,255,255,.1); box-shadow: 0 20px 40px -20px rgba(0,0,0,.8); }
-.dot { width: 12px; height: 12px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 5px rgba(52,211,153,.2); }
-.chip span { display: flex; flex-direction: column; line-height: 1.15; }
-.chip small { font-size: 13px; color: #7c8591; font-weight: 500; }
-.chip strong { font-size: 19px; font-weight: 700; }
+.chip { position: absolute; z-index: 3; left: 612px; top: 96px; display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 14px; background: #1b1a17; color: #f3f1ec; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #7bd88f; }
+.chip span { display: flex; flex-direction: column; line-height: 1.2; }
+.chip small { font-size: 13px; color: #a8a398; font-weight: 400; }
+.chip strong { font-size: 19px; font-weight: 600; }
 </style></head><body>
-<div class="grid"></div>
 <div class="brand"><img src="${file('assets/app-icon.png')}"><span>Generator Tracker</span></div>
 <h1>${s.hero_title}</h1>
+<div class="rule"></div>
 <p class="sub">${s.footer_tagline}</p>
 <p class="note">${s.hero_note}</p>
 <div class="badges">

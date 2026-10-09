@@ -11,7 +11,7 @@ Static product site published to GitHub Pages: <https://yuri-val.github.io/Gener
 | `i18n/en.json`, `i18n/uk.json` | All texts per language (strings may contain HTML and other `{{keys}}`) |
 | `styles.css` | Shared styles — light and dark themes, also used by the privacy-policy pages |
 | `main.js` | Theme toggle, mobile menu, section highlighting, scroll-reveal (the page works without it) |
-| `fonts/` | Self-hosted Inter (variable, latin + cyrillic subsets) — no request to Google Fonts |
+| `fonts/` | Self-hosted IBM Plex Sans 400–700 and Plex Mono 400/500 (latin + cyrillic subsets, `OFL.txt`) — no request to Google Fonts |
 | `assets/screens/` | App screenshots: `{android,ios}-{en,uk}-{screen}.jpg`, 540 px wide |
 | `assets/og-{en,uk}.png` | Social preview images (1200×630), rendered by `og/render.mjs` |
 | `assets/qr-get.svg` | QR code pointing at `/get/` (regenerate only if the site URL changes) |
@@ -45,11 +45,13 @@ accounts:
 1. `scripts/demo-data/seed.py` writes demo generators, sessions, refills and maintenance tasks
    straight into the app's local storage (iOS simulator container or a copy of the Android
    `RKStorage` database), in English or Ukrainian, optionally with a running session.
-2. `scripts/demo-data/ios-screens.yaml`, `ios-screens-dark.yaml` and `android-screens.yaml`
-   (Maestro) open the screens and save the screenshots; `android-demo-statusbar.sh` gives
+2. Release builds only (a dev client adds its own UI). `scripts/demo-data/screens.yaml` (Maestro) opens Home,
+   the running generator, its maintenance tab, the refill sheet and Analytics and saves
+   `{ios,android}-{lang}-{home,active,maintenance,refill,charts}.png`; `screens-dark.yaml` adds `-home-dark`
+   (switch the device to dark first). The commands are in the flow headers. `android-demo-statusbar.sh` gives
    Android a clean status bar, `xcrun simctl status_bar … override` does it on iOS.
 3. Resize to 540 px wide JPEG (quality ~84) into `assets/screens/` with the same names.
 4. Re-render the social previews: `cd landing/og && node render.mjs` (Node 22, uses the repo's Playwright).
 
-The hero chips ("Session running 2.3 h", "Avg 0.51 L/h", "Oil change — due now") repeat numbers visible in
+The hero chips ("Honda EU22i · running 2 h 16 min", "Fuel left ≈ 2.4 L · ~4.8 h", "Oil change — overdue 6 h") repeat numbers visible in
 the screenshots; keep them in step when the demo data changes.

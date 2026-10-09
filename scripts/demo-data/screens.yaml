@@ -1,0 +1,67 @@
+# Store/landing screenshots (3.0) on an iOS simulator or Android emulator with seeded demo data (see seed.py
+# and landing/README.md). Release builds only — a dev client adds its own UI.
+#   maestro test -e APP_ID=com.yuri-val.generatortracker -e P=ios -e LANG=uk -e HOME_TAB=Головна \
+#     -e ANALYTICS=Аналітика scripts/demo-data/screens.yaml
+#   maestro test -e APP_ID=com.yurival.GeneratorTracker -e P=android -e LANG=en -e HOME_TAB=Home \
+#     -e ANALYTICS=Analytics scripts/demo-data/screens.yaml
+appId: ${APP_ID}
+---
+- launchApp
+- extendedWaitUntil:
+    visible:
+      id: home-open-gen-honda
+    timeout: 60000
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-home
+
+# Running generator: live session clock, fuel estimate
+- tapOn:
+    id: home-open-gen-honda
+- extendedWaitUntil:
+    visible:
+      id: session-clock
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-active
+
+# Maintenance tab with interval bars
+- tapOn:
+    id: detail-tab-maintenance
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-maintenance
+
+# Refill sheet of an idle generator
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: home-open-gen-atlas
+    timeout: 30000
+- tapOn:
+    id: home-open-gen-atlas
+- tapOn:
+    id: detail-tab-refills
+- tapOn:
+    id: detail-add-refills
+- extendedWaitUntil:
+    visible:
+      id: refill-plus
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-refill
+
+# Analytics
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: home-open-gen-honda
+    timeout: 30000
+- tapOn: ${ANALYTICS}
+- extendedWaitUntil:
+    visible:
+      id: chart-hours
+    timeout: 10000
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-charts
+- tapOn: ${HOME_TAB}

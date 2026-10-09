@@ -131,7 +131,7 @@
     },
     "detail": {
         "generatorNotFound": "Generator not found",
-        "activeSession": "Session Running",
+        "activeSession": "Session running",
         "startedAt": "Started",
         "stopSession": "Stop",
         "startSession": "Start session",

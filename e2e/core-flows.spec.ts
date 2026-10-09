@@ -45,7 +45,7 @@ test.describe('Core flows (web e2e)', () => {
 
     await page.getByTestId('start-session').click();
     await expect(page.getByTestId('session-card-running')).toBeVisible();
-    await expect(visibleText(page, 'Session Running')).toBeVisible();
+    await expect(visibleText(page, 'Session running')).toBeVisible();
     await expect(page.getByTestId('session-clock')).toHaveText(/^0:00:\d{2}$/);
 
     // Stop has no confirmation; the snackbar offers Undo for 5 s

@@ -1,8 +1,0 @@
-# Dark-mode home screenshot (run after `xcrun simctl ui booted appearance dark`).
-appId: com.yuri-val.generatortracker
----
-- launchApp
-- extendedWaitUntil:
-    visible: ".*Honda EU22i.*"
-    timeout: 30000
-- takeScreenshot: ios-${LANG}-home-dark

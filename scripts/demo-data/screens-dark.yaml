@@ -1,0 +1,12 @@
+# Dark-mode Home screenshot. Switch the device to dark first:
+#   iOS: xcrun simctl ui booted appearance dark · Android: adb shell cmd uimode night yes
+appId: ${APP_ID}
+---
+- launchApp:
+    stopApp: true
+- extendedWaitUntil:
+    visible:
+      id: home-open-gen-honda
+    timeout: 60000
+- waitForAnimationToEnd
+- takeScreenshot: ${P}-${LANG}-home-dark
