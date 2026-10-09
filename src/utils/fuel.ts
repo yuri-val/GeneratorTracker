@@ -3,7 +3,8 @@
 // Nothing new is persisted besides Generator.tankCapacity and Refill.isFull/time: the level is
 // replayed from history. Ported from the 3.0 design handoff with three fixes:
 //  - event times are local (the handoff took the refill time from the UTC part of createdAt);
-//  - a session ends at start + hours, so overnight sessions sort after a late-evening refill;
+//  - a session ends at its stop time (next day when earlier than the start), so overnight sessions
+//    sort after a late-evening refill, and a refill in the stop minute comes after the session;
 //  - the level is unknown until the first full refill (the handoff counted any partial refill
 //    from an empty tank, which under-reports the level).
 import type { Generator, Refill, WorkSession } from '../models/types';
@@ -46,9 +47,19 @@ export const refillTimestamp = (refill: Pick<Refill, 'date' | 'time' | 'createdA
   return new Date(`${refill.date}T${time}`).getTime();
 };
 
-/** Local timestamp when a completed session ended (start + duration, so overnight sessions work). */
-export const sessionEndTimestamp = (session: Pick<WorkSession, 'date' | 'startTime' | 'hours'>): number =>
-  new Date(`${session.date}T${session.startTime}`).getTime() + session.hours * 3_600_000;
+/**
+ * Local timestamp when a completed session ended: the recorded stop time (the next day when it is
+ * earlier than the start), else start + duration.
+ */
+export const sessionEndTimestamp = (session: Pick<WorkSession, 'date' | 'startTime' | 'endTime' | 'hours'>): number => {
+  const start = new Date(`${session.date}T${session.startTime}`).getTime();
+  if (!session.endTime) return start + session.hours * 3_600_000;
+  let end = new Date(`${session.date}T${session.endTime}`).getTime();
+  if (end < start) end += 24 * 3_600_000;
+  // A session longer than a day: the clock time alone cannot tell, trust the duration.
+  if (session.hours >= 24) end = start + session.hours * 3_600_000;
+  return end;
+};
 
 /** Average consumption from the history, or the fallback while there is too little of it. */
 export function averageLph(sessions: WorkSession[], refills: Refill[], fallback = DEFAULT_LPH): number {
@@ -77,7 +88,8 @@ export function estimateFuel(
   const events: FuelEvent[] = [
     ...refills.map(r => ({ at: refillTimestamp(r), kind: 'refill' as const, amount: r.amount, full: !!r.isFull })),
     ...sessions.filter(s => !s.isActive).map(s => ({ at: sessionEndTimestamp(s), kind: 'run' as const, hours: s.hours })),
-  ].sort((a, b) => a.at - b.at || (a.kind === 'refill' ? -1 : 1));
+  // Same minute: the session ended first ("stop and refill" records the refill at the stop time).
+  ].sort((a, b) => a.at - b.at || (a.kind === 'run' ? -1 : 1));
 
   let level: number | null = null;
   for (const e of events) {

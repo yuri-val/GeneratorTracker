@@ -18,7 +18,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-lc",
-        "source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && CI=1 BROWSER=none EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true npx expo start --web --port 8081 --clear"
+        "source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && BROWSER=none EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true npx expo start --web --port 8081"
       ],
       "port": 8081
     }

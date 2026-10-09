@@ -86,10 +86,18 @@ describe('estimateFuel', () => {
 });
 
 describe('helpers', () => {
-  it('session end = start + duration', () => {
-    const end = new Date(sessionEndTimestamp(session('2026-10-01', '22:00', 4)));
-    expect(end.getDate()).toBe(2);
-    expect(end.getHours()).toBe(2);
+  it('session end = recorded stop time (next day if earlier), else start + duration', () => {
+    const overnight = new Date(sessionEndTimestamp(session('2026-10-01', '22:00', 4, { endTime: '02:00' })));
+    expect([overnight.getDate(), overnight.getHours()]).toEqual([2, 2]);
+    const noEnd = new Date(sessionEndTimestamp(session('2026-10-01', '22:00', 4)));
+    expect([noEnd.getDate(), noEnd.getHours()]).toEqual([2, 2]);
+  });
+
+  it('stop and refill in the same minute: the refill comes after the session', () => {
+    // Session 21:54 → 00:18 (2.4 h, rounded), full refill at 00:18 → the tank is full afterwards.
+    const sessions = [session('2026-10-01', '21:54', 2.4, { endTime: '00:18' })];
+    const refills = [refill('2026-10-01', 3.6, { time: '08:00', isFull: true }), refill('2026-10-02', 3.8, { time: '00:18', isFull: true })];
+    expect(estimateFuel(TANK, sessions, refills)!.level).toBeCloseTo(3.6);
   });
 
   it('average consumption falls back while the history is short', () => {
