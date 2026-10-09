@@ -31,6 +31,17 @@ export function PageHeader({ title, summary, trailing, summaryTestID }: { title:
   );
 }
 
+/**
+ * Android/web: tab roots draw edge-to-edge, so scrolled content would show through the transparent
+ * status bar. This page-coloured strip covers the top inset (nothing when there is no inset).
+ */
+export function StatusBarScrim() {
+  const { gt } = useAppTheme();
+  const { top } = useSafeAreaInsets();
+  if (top === 0) return null;
+  return <View pointerEvents="none" style={[styles.scrim, { height: top, backgroundColor: gt.bg }]} />;
+}
+
 /** iOS counterpart under the native large title: the summary line and the ink rule. */
 export function PageSummary({ summary, testID }: { summary: string; testID?: string }) {
   const { gt } = useAppTheme();
@@ -49,5 +60,6 @@ const styles = StyleSheet.create({
   header: { gap: 14, marginBottom: 6 },
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
   rule: { height: 1.5 },
+  scrim: { position: 'absolute', top: 0, left: 0, right: 0 },
   iosSummary: { paddingTop: 4, gap: 10, marginBottom: 6 },
 });

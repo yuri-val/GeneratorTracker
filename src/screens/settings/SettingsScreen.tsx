@@ -38,7 +38,7 @@ import {
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
 import { NightRedSheet } from '../../components/NightRedSheet';
-import { PageHeader } from '../../components/gt';
+import { PageHeader, StatusBarScrim } from '../../components/gt';
 import { FONT } from '../../theme/tokens';
 import { useThemePreference } from '../../contexts/ThemePreferenceContext';
 import type { ThemePreference } from '../../utils/storage';
@@ -273,6 +273,15 @@ export default function SettingsScreen() {
   }
 
   // 3.0: flat sections with a hairline border instead of elevated rounded cards.
+  // 3.0: the selected segment is ink-filled like FilterChips, not Material's tinted container.
+  const inkSegments = (current: string, buttons: { value: string; label: string; testID: string }[]) =>
+    buttons.map(b => ({
+      ...b,
+      checkedColor: theme.gt.bg,
+      uncheckedColor: theme.gt.text,
+      style: b.value === current ? { backgroundColor: theme.gt.text } : undefined,
+    }));
+
   const sectionColors = { backgroundColor: 'transparent', borderColor: theme.gt.dark ? theme.gt.ruleStrong : theme.gt.rule };
 
   return (
@@ -428,11 +437,11 @@ export default function SettingsScreen() {
               <SegmentedButtons
                 value={themePreference}
                 onValueChange={value => setThemePreference(value as ThemePreference)}
-                buttons={[
+                buttons={inkSegments(themePreference, [
                   { value: 'system', label: t('settings.themeSystem'), testID: 'theme-system' },
                   { value: 'light', label: t('settings.themeLight'), testID: 'theme-light' },
                   { value: 'dark', label: t('settings.themeDark'), testID: 'theme-dark' },
-                ]}
+                ])}
               />
               <List.Item
                 title={t('settings.nightRed')}
@@ -452,10 +461,10 @@ export default function SettingsScreen() {
               <SegmentedButtons
                 value={i18n.language.split('-')[0]}
                 onValueChange={handleLanguageChange}
-                buttons={[
+                buttons={inkSegments(i18n.language.split('-')[0], [
                   { value: 'en', label: t('settings.english'), testID: 'lang-en' },
                   { value: 'uk', label: t('settings.ukrainian'), testID: 'lang-uk' },
-                ]}
+                ])}
               />
             </Surface>
           </List.Section>
@@ -481,6 +490,7 @@ export default function SettingsScreen() {
           </List.Section>
         </Animated.View>
       </ScrollView>
+      <StatusBarScrim />
       {nightRed}
       <DeleteAccountDialog
         visible={deleteDialogVisible}

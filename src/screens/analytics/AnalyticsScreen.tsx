@@ -7,7 +7,7 @@ import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
 import type { RootStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { AppIcon } from '../../components/AppIcon';
-import { AccentRule, FilterChips, GtText, Num, PageHeader, PageSummary, StackedBars } from '../../components/gt';
+import { AccentRule, FilterChips, GtText, Num, PageHeader, PageSummary, StackedBars, StatusBarScrim } from '../../components/gt';
 import { isIOS } from '../../theme/platform';
 import type { Generator, Refill, WorkSession } from '../../models/types';
 import { getGenerators, getRefills, getWorkSessions } from '../../utils/storage';
@@ -251,7 +251,12 @@ export default function AnalyticsScreen() {
       </>
     );
   }
-  return <View style={[styles.flex, { backgroundColor: gt.bg }]}>{scroll}</View>;
+  return (
+    <View style={[styles.flex, { backgroundColor: gt.bg }]}>
+      {scroll}
+      <StatusBarScrim />
+    </View>
+  );
 }
 
 function Stat({ label, value, testID }: { label: string; value: string; testID?: string }) {

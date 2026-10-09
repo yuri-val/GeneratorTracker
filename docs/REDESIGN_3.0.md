@@ -140,7 +140,7 @@ interface Refill    { …; isFull?: boolean; time?: string } // isFull калі�
 - **Аналітика перероблена** в мові 3.0 (у handoff була відкладена на 3.1, але поруч із новою головною виглядала чужою):
   одна сторінка — квадратний фільтр генераторів, підсумки за весь час, мотогодини й пальне за 6 місяців стовпчиками
   з розбивкою за кольором генератора (власні View, без gifted-charts), список «По генераторах». `src/utils/analytics.ts`
-  переписано (`hoursByMonth`, `fuelByMonth`, `totalsByGenerator`, `niceMax`) з тестами.
+  переписано (`hoursByMonth`, `fuelByMonth`, `totalsByGenerator`, `niceFloor`) з тестами.
 - **Live-панель на вкладках — смуга над таб-баром на всіх платформах.** iOS 26 accessory прибрано: підключення/відключення
   його залежно від вкладки перебудовує SwiftUI TabView і падає («child view controller … should have parent view
   controller»), а постійний показав би порожню капсулу на головній. На iOS смуга відступає на висоту таб-бару.

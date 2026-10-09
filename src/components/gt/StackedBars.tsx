@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { GtText } from './GtText';
 import { useAppTheme } from '../../theme/useAppTheme';
-import { niceMax, type MonthBucket } from '../../utils/analytics';
+import { niceFloor, type MonthBucket } from '../../utils/analytics';
 import { fmtNumber } from '../../utils/format';
 
 interface Props {
@@ -18,21 +18,29 @@ interface Props {
 
 /**
  * Square stacked bars (3.0): one column per month, one segment per generator in its identity colour,
- * the month total in mono above the column, a 1.5 px ink baseline. Drawn with Views — no rounded
+ * the month total in mono above the column, a dashed guide at a round value, a 1.5 px ink baseline. Drawn with Views — no rounded
  * chart-library bars, and it follows the theme and font automatically.
  */
 export function StackedBars({ months, colorOf, lang, unit, height = 150, testID, monthValueLabel }: Props) {
   const { gt } = useAppTheme();
-  const max = niceMax(Math.max(0, ...months.map(m => m.total)));
-  const digits = max < 10 ? 1 : 0;
+  // The tallest month fills the plot; the dashed guide sits at a round value below it, so there is no
+  // empty band above the bars (a rounded-up axis left up to 40 % of the plot blank).
+  const peak = Math.max(0, ...months.map(m => m.total));
+  const max = peak > 0 ? peak : 1;
+  const guide = niceFloor(peak * 0.9);
+  const guideY = (guide / max) * height;
+  const digits = guide < 10 && guide % 1 !== 0 ? 1 : 0;
   return (
     <View testID={testID}>
       <View style={[styles.plot, { height: height + 20 }]}>
-        {/* Half-way guide */}
-        <View style={[styles.guide, { bottom: height / 2, borderColor: gt.rule }]} />
-        <GtText variant="caption" mono color={gt.textFaint} style={[styles.axis, { bottom: height / 2 + 2 }]}>
-          {fmtNumber(max / 2, lang, digits)}
-        </GtText>
+        {guide > 0 && (
+          <>
+            <View style={[styles.guide, { bottom: guideY, borderColor: gt.rule }]} />
+            <GtText variant="caption" mono color={gt.textFaint} style={[styles.axis, { bottom: guideY + 2 }]}>
+              {fmtNumber(guide, lang, digits)}
+            </GtText>
+          </>
+        )}
         {months.map(m => (
           <View
             key={m.key}

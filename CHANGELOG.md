@@ -43,6 +43,9 @@ Data model changes are optional fields only; sync and Firestore rules are unchan
 - Settings (Android/web): flat hairline sections and the shared page header; sign out is a neutral button (red is
   for destructive actions only). iOS native forms (Settings, generator, session, maintenance) use the app background,
   IBM Plex Sans and muted section captions instead of the system grouped grey.
+- Android/web: the top app bar is flat on the page colour (no tonal elevation); tab pages keep a page-coloured strip
+  under the transparent Android status bar so scrolled content never shows through it; theme/language segments are
+  ink-filled when selected.
 - New app icon: a white lightning bolt inside a glowing orange 3/4 "run-hours" ring with gauge ticks on dark
   glass — the same visual language as the app's dark theme and the landing page, readable down to 29 px and in
   tinted/grayscale modes. Android gets a proper adaptive icon (separate background layer, mark inside the 66 dp

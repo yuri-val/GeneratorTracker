@@ -1,4 +1,4 @@
-import { hoursByMonth, fuelByMonth, totalsByGenerator, lastMonths, niceMax, monthLabel } from '../analytics';
+import { hoursByMonth, fuelByMonth, totalsByGenerator, lastMonths, niceFloor, monthLabel } from '../analytics';
 import type { Refill, WorkSession } from '../../models/types';
 
 const META = { createdAt: '2026-06-01T00:00:00.000Z', lastModified: '2026-06-01T00:00:00.000Z', syncStatus: 'synced' as const };
@@ -45,8 +45,8 @@ describe('analytics', () => {
     ]);
   });
 
-  it('niceMax rounds the axis up to 1 / 2 / 2.5 / 5 × 10ⁿ', () => {
-    expect([0, 0.4, 3, 7, 12, 23, 130, 620].map(niceMax)).toEqual([1, 0.5, 5, 10, 20, 25, 200, 1000]);
+  it('niceFloor rounds the guide down to 1 / 2 / 2.5 / 5 × 10ⁿ', () => {
+    expect([0, 0.4, 3, 7, 22.7, 108.9, 256.5, 1000].map(niceFloor)).toEqual([0, 0.25, 2.5, 5, 20, 100, 250, 1000]);
   });
 
   it('month labels follow the UI language', () => {

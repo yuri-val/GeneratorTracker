@@ -9,7 +9,7 @@ import { RootStackParamList } from '../../navigation/types';
 import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { AppIcon } from '../../components/AppIcon';
-import { GtText, PageHeader, PageSummary, TAB_BAR_OFFSET, useSnackbarBottomOffset } from '../../components/gt';
+import { GtText, PageHeader, PageSummary, StatusBarScrim, TAB_BAR_OFFSET, useSnackbarBottomOffset } from '../../components/gt';
 import { IdleRow, RunningCard } from '../../components/fleet/FleetRows';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { isIOS } from '../../theme/platform';
@@ -70,8 +70,6 @@ export default function HomeScreen() {
 
   const summary = fleet.length > 0 ? fmtSummary(fleet.length, runningCount, i18n.language) : t('home.summaryEmpty');
 
-  // iOS: the native large title "Генератори" and "+" live in the navigation bar; the summary line and
-  // the 1.5 px ink rule open the list. Android/web: the whole header is drawn here (no FAB in 3.0).
   // iOS: the native large title "Генератори" and "+" live in the navigation bar; the summary line and
   // the 1.5 px ink rule open the list. Android/web: the whole header is drawn here (no FAB in 3.0).
   const listHeader = isIOS ? (
@@ -154,7 +152,12 @@ export default function HomeScreen() {
     );
   }
 
-  return <View style={[styles.flex, { backgroundColor: gt.bg }]}>{list}</View>;
+  return (
+    <View style={[styles.flex, { backgroundColor: gt.bg }]}>
+      {list}
+      <StatusBarScrim />
+    </View>
+  );
 }
 
 function Separator() {

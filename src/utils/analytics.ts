@@ -98,10 +98,10 @@ export function totalsByGenerator(generators: Pick<Generator, 'id'>[], sessions:
   });
 }
 
-/** A "nice" axis maximum (1, 2, 2.5, 5 × 10ⁿ) at or above the largest value. */
-export function niceMax(value: number): number {
-  if (value <= 0) return 1;
+/** The largest "nice" value (1, 2, 2.5, 5 × 10ⁿ) at or below `value` — the chart's guide line. */
+export function niceFloor(value: number): number {
+  if (value <= 0) return 0;
   const exp = Math.pow(10, Math.floor(Math.log10(value)));
-  for (const step of [1, 2, 2.5, 5, 10]) if (step * exp >= value) return step * exp;
-  return 10 * exp;
+  for (const step of [5, 2.5, 2, 1]) if (step * exp <= value) return step * exp;
+  return exp;
 }
