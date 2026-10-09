@@ -56,7 +56,18 @@
         "fuelDistribution": "Fuel Distribution",
         "notEnoughData": "Not enough data for charts",
         "logMoreHint": "Log more sessions and refills to see trends",
-        "allGenerators": "All Generators"
+        "allGenerators": "All Generators",
+        "all": "All",
+        "allTime": "All time",
+        "hoursByMonth": "Run hours by month",
+        "fuelByMonth": "Fuel by month",
+        "last6": "Last 6 months, {{unit}}",
+        "byGenerator": "By generator",
+        "byGeneratorHint": "Bar — run hours relative to the busiest generator",
+        "fuelTotal": "Fuel, L",
+        "rowDetail": "{{litres}} L · {{lph}} L/h · {{sessions}} sessions",
+        "monthValue": "{{month}}: {{value}}",
+        "filterLabel": "Generator"
     },
     "settings": {
         "title": "Settings",

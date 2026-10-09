@@ -11,7 +11,7 @@ import {
   calculateActiveSessionHours,
   calculateMaintenanceStatus,
 } from '../calculations';
-import { getHoursOverTime } from '../analytics';
+import { hoursByMonth } from '../analytics';
 import { MaintenanceTask, WorkSession } from '../../models/types';
 
 // 2026-10-01 20:00 EDT = 2026-10-02 00:00 UTC
@@ -80,6 +80,8 @@ describe('local calendar dates (S-10)', () => {
       lastModified: '2026-03-01T09:00:00.000Z',
       syncStatus: 'synced',
     };
-    expect(getHoursOverTime([session], '#000', 'en-US')[0].label).toBe('Mar');
+    // A session on 1 March counts in March even in the evening west of UTC (S-10).
+    const months = hoursByMonth([session], ['g1'], 'en', 1, new Date(2026, 2, 31, 20));
+    expect(months[0]).toMatchObject({ key: '2026-03', label: 'Mar', total: 1 });
   });
 });

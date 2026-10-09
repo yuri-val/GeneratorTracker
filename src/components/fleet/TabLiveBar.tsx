@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
+import { useBottomTabBarHeight } from 'react-native-bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import type { Generator, MaintenanceTask, Refill, WorkSession } from '../../models/types';
 import { getGenerators, getMaintenanceTasks, getRefills, getWorkSessions } from '../../utils/storage';
@@ -30,23 +31,21 @@ export function useRunningFleet() {
   return { running, now, reload };
 }
 
-/**
- * The live bar on the Analytics / Settings tabs: inside the iOS 26 tab bar accessory, or as a footer
- * above the tab bar elsewhere. Never on Home, where the cards already show the state.
- */
-export function TabLiveBar({ placement }: { placement: 'footer' | 'accessory' }) {
+/** The live bar on the Analytics / Settings tabs, as a footer above the tab bar. Never on Home. */
+export function TabLiveBar() {
   const navigation = useNavigation<any>();
   const { running, now, reload } = useRunningFleet();
   const { stop } = useSessionActions(reload);
+  // The iOS tab bar is translucent and drawn over the screen; keep the bar above it.
+  const tabBarHeight = useBottomTabBarHeight();
   if (running.length === 0) return null;
   const bar = (
     <LiveBar
       others={running}
       now={now}
-      placement={placement}
       onStop={item => item.running && stop(item.running, item.generator.name)}
       onHome={() => navigation.navigate('MainTabs', { screen: 'Home' })}
     />
   );
-  return placement === 'footer' ? <View style={{ paddingVertical: 8 }}>{bar}</View> : bar;
+  return <View style={{ paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? tabBarHeight + 8 : 8 }}>{bar}</View>;
 }

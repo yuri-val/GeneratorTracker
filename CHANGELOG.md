@@ -26,8 +26,12 @@ Data model changes are optional fields only; sync and Firestore rules are unchan
 - **Generator screen**: session card with a live clock (seconds), used / in-tank fuel with an (i) explanation,
   Stop and Edit time; engine hours include the running session; text tabs with counts; maintenance rows with a bar
   of the used service interval and a limit tick.
-- **Live bar** for other running generators: footer on the generator screen, iOS 26 tab bar accessory on
-  Analytics / Settings (footer on Android and older iOS); one generator → Stop, two or more → "Go to Home".
+- **Live bar** for other running generators: footer on the generator screen and above the tab bar on
+  Analytics / Settings; one generator → Stop, two or more → "Go to Home".
+- **Analytics redesigned** in the same language: one page with a square generator filter, all-time totals (engine
+  hours, litres, L/h), monthly run hours and fuel for the last 6 months as square bars split by generator colour
+  (petrol and diesel are never summed into one bar), and a "By generator" list with shares; custom-drawn instead
+  of the chart library.
 - **Settings → Appearance**: theme (system / light / dark) and "Night red mode" instructions for the system colour
   filter with a shortcut to the system settings.
 
@@ -36,6 +40,9 @@ Data model changes are optional fields only; sync and Firestore rules are unchan
   Mono (digits only), square corners, red only for Stop and problems, generator identity colours, ▲ as a non-colour
   maintenance cue. Native chrome stays native (iOS bars and tab bar, Material navigation on Android).
 - Android Home: the header "+" replaces the floating action button.
+- Settings (Android/web): flat hairline sections and the shared page header; sign out is a neutral button (red is
+  for destructive actions only). iOS native forms (Settings, generator, session, maintenance) use the app background,
+  IBM Plex Sans and muted section captions instead of the system grouped grey.
 - New app icon: a white lightning bolt inside a glowing orange 3/4 "run-hours" ring with gauge ticks on dark
   glass — the same visual language as the app's dark theme and the landing page, readable down to 29 px and in
   tinted/grayscale modes. Android gets a proper adaptive icon (separate background layer, mark inside the 66 dp
@@ -44,9 +51,10 @@ Data model changes are optional fields only; sync and Firestore rules are unchan
 
 ### Removed
 - Success alerts after starting/stopping a session and after deleting a generator.
-- Unused components (GradientCard, StatBlock, WorkSessionsList, RefillsList, MaintenanceList, GroupedListRow) and
-  packages (`@react-navigation/material-top-tabs`, `react-native-tab-view`, `react-native-pager-view`,
-  `expo-linear-gradient`).
+- Unused components (GradientCard, StatBlock, WorkSessionsList, RefillsList, MaintenanceList, GroupedListRow,
+  PlatformSegmented) and packages (`@react-navigation/material-top-tabs`, `react-native-tab-view`,
+  `react-native-pager-view`, `expo-linear-gradient`, `@react-native-segmented-control/segmented-control`).
+- The Overview / Charts switch and the pie chart in Analytics.
 
 ### Fixed (in the design handoff code, before release)
 - Fuel events use local times (the handoff read the refill time from the UTC part of `createdAt`), sessions end at

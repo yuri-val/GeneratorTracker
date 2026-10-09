@@ -14,26 +14,19 @@ interface Props {
   now: number;
   onStop: (item: FleetItem) => void;
   onHome: () => void;
-  /** "accessory" = inside the iOS 26 tab bar accessory (no own background or inset). */
-  placement?: 'footer' | 'accessory';
 }
 
 /**
  * Live bar (3.0): what else is running while you look at another screen. One other generator →
  * name, elapsed time and Stop; two or more → a count, the names and "Go to Home".
  */
-export function LiveBar({ others, now, onStop, onHome, placement = 'footer' }: Props) {
+export function LiveBar({ others, now, onStop, onHome }: Props) {
   const { t, i18n } = useTranslation();
   const { gt } = useAppTheme();
   if (others.length === 0) return null;
-  const footer = placement === 'footer';
-  const container = [
-    styles.bar,
-    footer && { backgroundColor: gt.runSurface, marginHorizontal: 12 },
-    !footer && styles.accessory,
-  ];
-  const textColor = footer ? gt.runText : gt.text;
-  const mutedColor = footer ? gt.running : gt.runningOnBg;
+  const container = [styles.bar, { backgroundColor: gt.runSurface }];
+  const textColor = gt.runText;
+  const mutedColor = gt.running;
 
   if (others.length === 1) {
     const item = others[0];
@@ -51,7 +44,7 @@ export function LiveBar({ others, now, onStop, onHome, placement = 'footer' }: P
         <SquareButton
           kind="stop"
           glyph="stop"
-          height={footer ? 48 : 36}
+          height={48}
           label={t('home.stop')}
           accessibilityLabel={t('live.stopNamed', { name: item.generator.name })}
           onPress={() => onStop(item)}
@@ -67,7 +60,7 @@ export function LiveBar({ others, now, onStop, onHome, placement = 'footer' }: P
         <GtText variant="meta" weight="600" color={mutedColor} numberOfLines={1}>
           ● {t('live.moreRunning', { count: others.length })}
         </GtText>
-        <GtText variant="caption" color={footer ? gt.runMuted : gt.textMuted} numberOfLines={1}>
+        <GtText variant="caption" color={gt.runMuted} numberOfLines={1}>
           {others.map(o => o.generator.name).join(', ')}
         </GtText>
       </View>
@@ -80,6 +73,5 @@ export function LiveBar({ others, now, onStop, onHome, placement = 'footer' }: P
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  bar: { minHeight: size.liveBar, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 6 },
-  accessory: { minHeight: 0, flex: 1, paddingVertical: 0 },
+  bar: { minHeight: size.liveBar, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 6, marginHorizontal: 12 },
 });

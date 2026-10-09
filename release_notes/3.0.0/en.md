@@ -14,6 +14,7 @@ Generator Tracker 3.0 is redesigned around what you do during a power cut: start
 - **Generator screen**: a live clock, fuel used and left, engine hours that include the running session, and maintenance bars showing how much of each service interval is used.
 - **Other generators at a glance**: a bar at the bottom shows what else is running, with a Stop button.
 - **New look**: a warm light theme and a true-black dark theme that saves battery, clear high-contrast buttons, and a theme setting (light, dark or system). Settings also explain how to turn on a red screen at night.
+- **Clearer analytics**: monthly run hours and fuel as bars split by generator colour, totals and a per-generator list on one page.
 - **New app icon.**
 
 ## 🔧 Changed

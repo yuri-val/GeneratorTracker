@@ -151,8 +151,8 @@ test.describe('Core flows (web e2e)', () => {
 
     await goBack(page);
     await goToTab(page, 'Analytics');
-    await expect(visibleText(page, 'LITERS USED')).toBeVisible();
-    await expect(visibleText(page, '12.5', true)).toBeVisible();
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('12.5');
+    await expect(page.getByTestId('chart-fuel')).toBeVisible();
   });
 
   test('switching the language persists across reloads', async ({ page }) => {
@@ -189,19 +189,15 @@ test.describe('Core flows (web e2e)', () => {
     await expect(page.getByText(/^Last session Jun 2/).first()).toBeVisible();
 
     await goToTab(page, 'Analytics');
-    await expect(visibleText(page, '14.5', true)).toBeVisible(); // total hours
-    await expect(visibleText(page, '30.0', true)).toBeVisible(); // litres used
-
-    // Per-generator filter narrows the totals. Inactive bottom-tab screens stay laid out
-    // on web, so target the filter Chip by its button role rather than by text.
-    await page.getByRole('button', { name: 'Beta', exact: true }).click();
-    // With a single generator selected both TOTAL HOURS and AVG HOURS/GEN read 2.5
-    await expect(visibleText(page, '2.5', true)).toHaveCount(2);
-    await expect(visibleText(page, '10.0', true).last()).toBeVisible();
-
-    // Charts view renders the chart cards
-    await visibleText(page, 'Charts', true).click();
-    await expect(page.getByText('Operating Hours (last 6 months)')).toBeVisible();
-    await expect(page.getByText('Fuel Consumption (last 6 months)')).toBeVisible();
+    await expect(page.getByTestId('analytics-total-hours')).toHaveText('14.5');
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('30.0');
+    await expect(page.getByTestId('analytics-lph')).toHaveText('2.07');
+    // Per-generator list, busiest first, and the filter narrows the totals.
+    await expect(page.getByTestId('analytics-row-g-a')).toContainText('12.0');
+    await expect(page.getByTestId('analytics-row-g-b')).toContainText('2.5');
+    await page.getByTestId('filter-g-b').filter({ visible: true }).click();
+    await expect(page.getByTestId('analytics-total-hours')).toHaveText('2.5');
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('10.0');
+    await expect(page.getByTestId('analytics-row-g-a')).toHaveCount(0);
   });
 });

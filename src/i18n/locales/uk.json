@@ -56,7 +56,18 @@
         "fuelDistribution": "Розподіл палива",
         "notEnoughData": "Недостатньо даних для графіків",
         "logMoreHint": "Записуйте більше сесій та заправок, щоб побачити тренди",
-        "allGenerators": "Усі генератори"
+        "allGenerators": "Усі генератори",
+        "all": "Усі",
+        "allTime": "За весь час",
+        "hoursByMonth": "Мотогодини по місяцях",
+        "fuelByMonth": "Пальне по місяцях",
+        "last6": "Останні 6 місяців, {{unit}}",
+        "byGenerator": "По генераторах",
+        "byGeneratorHint": "Смуга — мотогодини відносно найактивнішого генератора",
+        "fuelTotal": "Пальне, л",
+        "rowDetail": "{{litres}} л · {{lph}} л/год · {{sessions}} сес.",
+        "monthValue": "{{month}}: {{value}}",
+        "filterLabel": "Генератор"
     },
     "settings": {
         "title": "Налаштування",

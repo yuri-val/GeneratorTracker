@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Platform, View } from 'react-native';
 import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -11,7 +11,7 @@ import { ICONS } from '../constants/icons';
 import { useAppTheme } from '../theme/useAppTheme';
 import { nativeHeaderStyle } from '../theme/navigation';
 import { FONT } from '../theme/tokens';
-import { TabLiveBar, useRunningFleet } from '../components/fleet/TabLiveBar';
+import { TabLiveBar } from '../components/fleet/TabLiveBar';
 
 /**
  * Native bottom tabs: UITabBar on iOS (Liquid Glass on iOS 26+), Material 3
@@ -33,19 +33,20 @@ const ANDROID_TAB_ICONS = {
  * large title on the tab root. Android keeps the Material top app bar rendered by the
  * screen itself (ScreenHeader), so the stack header is hidden there.
  */
-// iOS 26+ hosts the live bar in the tab bar accessory; older iOS, Android and web get a footer.
-const NATIVE_ACCESSORY = Platform.OS === 'ios' && parseFloat(String(Platform.Version)) >= 26;
-
-/** Analytics / Settings with the live bar as a footer above the tab bar (no accessory available). */
+/**
+ * Analytics / Settings with the live bar as a footer above the tab bar, on every platform.
+ * Not the iOS 26 tab bar accessory: attaching/detaching it per tab rebuilds SwiftUI's TabView and
+ * crashes ("child view controller … should have parent view controller"), and a permanent one
+ * would show an empty glass capsule on Home.
+ */
 function withLiveBarFooter(Component: React.ComponentType) {
-  if (NATIVE_ACCESSORY) return Component;
   function WithLiveBar() {
     return (
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <Component />
         </View>
-        <TabLiveBar placement="footer" />
+        <TabLiveBar />
       </View>
     );
   }
@@ -81,9 +82,6 @@ export default function MainTabs() {
   const theme = useAppTheme();
   const icon = (name: keyof typeof ANDROID_TAB_ICONS, sf: (typeof ICONS)[keyof typeof ICONS]['sf']) => () =>
     Platform.OS === 'ios' ? { sfSymbol: sf } : ANDROID_TAB_ICONS[name];
-  // The accessory is only attached on Analytics / Settings (never on Home).
-  const [activeTab, setActiveTab] = useState<string>('Home');
-  const { running } = useRunningFleet();
 
   return (
     <Tab.Navigator
@@ -94,10 +92,6 @@ export default function MainTabs() {
       tabLabelStyle={Platform.OS === 'android' ? { fontFamily: FONT.sans600, fontSize: 11 } : undefined}
       tabBarStyle={Platform.OS === 'android' ? { backgroundColor: theme.colors.background } : undefined}
       hapticFeedbackEnabled
-      screenListeners={{ focus: e => setActiveTab(String(e.target).split('-')[0]) }}
-      renderBottomAccessoryView={
-        NATIVE_ACCESSORY && activeTab !== 'Home' && running.length > 0 ? () => <TabLiveBar placement="accessory" /> : undefined
-      }
     >
       <Tab.Screen
         name="Home"

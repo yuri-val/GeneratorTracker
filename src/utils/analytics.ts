@@ -1,128 +1,107 @@
-import { WorkSession, Refill, Generator, GeneratorStats } from '../models/types';
-import { parseLocalDate } from './calculations';
+// Analytics data (3.0): monthly totals split by generator, so petrol and diesel units are never
+// summed into one anonymous bar, and per-generator totals for the "By generator" list.
+import type { Generator, Refill, WorkSession } from '../models/types';
 
-interface ChartDataPoint {
+export interface MonthSegment {
+  generatorId: string;
   value: number;
-  label?: string;
-  frontColor?: string;
-  gradientColor?: string;
-  dataPointText?: string;
 }
 
-interface PieDataPoint {
-  value: number;
-  color: string;
-  text?: string;
-  label?: string;
+export interface MonthBucket {
+  /** 'YYYY-MM' (local calendar month). */
+  key: string;
+  /** Short month name in the UI language, e.g. "жовт." / "Oct". */
+  label: string;
+  /** One segment per generator with a non-zero value, in the order of `generatorOrder`. */
+  segments: MonthSegment[];
+  total: number;
 }
 
-function getMonthLabel(dateStr: string, locale: string = 'en-US'): string {
-  // dateStr is 'YYYY-MM' or 'YYYY-MM-DD'; parse the month's first day in local time.
-  const date = parseLocalDate(`${dateStr.substring(0, 7)}-01`);
-  return date.toLocaleDateString(locale, { month: 'short' });
+export interface GeneratorTotals {
+  generatorId: string;
+  hours: number;
+  litres: number;
+  /** Litres per hour; 0 while there are no completed hours. */
+  lph: number;
+  sessions: number;
+  refills: number;
 }
 
-function groupByMonth(dates: string[]): Map<string, string[]> {
-  const groups = new Map<string, string[]>();
-  for (const d of dates) {
-    const key = d.substring(0, 7); // YYYY-MM
-    const arr = groups.get(key) || [];
-    arr.push(d);
-    groups.set(key, arr);
-  }
-  return groups;
+const round1 = (v: number) => Math.round(v * 10) / 10;
+const pad = (n: number) => String(n).padStart(2, '0');
+const monthKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const locale = (lang: string) => (lang === 'uk' ? 'uk-UA' : 'en-US');
+
+/** The last `count` calendar months ending with the month of `now` (oldest first). */
+export function lastMonths(count: number, now = new Date()): string[] {
+  const keys: string[] = [];
+  for (let i = count - 1; i >= 0; i--) keys.push(monthKey(new Date(now.getFullYear(), now.getMonth() - i, 1)));
+  return keys;
 }
 
-export function getHoursOverTime(
-  sessions: WorkSession[],
-  color: string = '#FF6B35',
-  locale: string = 'en-US',
-): ChartDataPoint[] {
-  if (sessions.length === 0) return [];
+export const monthLabel = (key: string, lang: string) =>
+  new Intl.DateTimeFormat(locale(lang), { month: 'short' }).format(new Date(`${key}-15T12:00`));
 
-  const completed = sessions.filter(s => !s.isActive && s.hours > 0);
-  const monthGroups = groupByMonth(completed.map(s => s.date));
+function buckets(
+  records: { generatorId: string; date: string; value: number }[],
+  generatorOrder: string[],
+  months: number,
+  lang: string,
+  now: Date,
+): MonthBucket[] {
+  return lastMonths(months, now).map(key => {
+    const segments = generatorOrder
+      .map(generatorId => ({
+        generatorId,
+        value: round1(records.filter(r => r.generatorId === generatorId && r.date.startsWith(key)).reduce((s, r) => s + r.value, 0)),
+      }))
+      .filter(s => s.value > 0);
+    return { key, label: monthLabel(key, lang), segments, total: round1(segments.reduce((s, x) => s + x.value, 0)) };
+  });
+}
 
-  const sortedKeys = Array.from(monthGroups.keys()).sort();
-  // Ensure we show at least the last few months even if empty?
-  // For now stick to existing logic
+/** Run hours per month (completed sessions), split by generator. */
+export const hoursByMonth = (sessions: WorkSession[], generatorOrder: string[], lang: string, months = 6, now = new Date()) =>
+  buckets(
+    sessions.filter(s => !s.isActive && s.hours > 0).map(s => ({ generatorId: s.generatorId, date: s.date, value: s.hours })),
+    generatorOrder,
+    months,
+    lang,
+    now,
+  );
 
-  // Limiting to last 6 months present in data
-  const last6 = sortedKeys.slice(-6);
+/** Litres refilled per month, split by generator. */
+export const fuelByMonth = (refills: Refill[], generatorOrder: string[], lang: string, months = 6, now = new Date()) =>
+  buckets(
+    refills.map(r => ({ generatorId: r.generatorId, date: r.date, value: r.amount })),
+    generatorOrder,
+    months,
+    lang,
+    now,
+  );
 
-  return last6.map(key => {
-    const dates = monthGroups.get(key) || [];
-    // We need to sum hours for all sessions in this month
-    // The previous implementation was slightly incorrect in filtering again
-    // reducing map lookup. Let's stick to previous logical flow but fix filter key
-    const totalHours = completed
-      .filter(s => s.date.startsWith(key))
-      .reduce((sum, s) => sum + s.hours, 0);
-
+/** All-time totals per generator (completed sessions only). */
+export function totalsByGenerator(generators: Pick<Generator, 'id'>[], sessions: WorkSession[], refills: Refill[]): GeneratorTotals[] {
+  return generators.map(g => {
+    const done = sessions.filter(s => s.generatorId === g.id && !s.isActive);
+    const fills = refills.filter(r => r.generatorId === g.id);
+    const hours = done.reduce((s, x) => s + x.hours, 0);
+    const litres = fills.reduce((s, x) => s + x.amount, 0);
     return {
-      value: Math.round(totalHours * 10) / 10,
-      label: getMonthLabel(key + '-01', locale),
-      frontColor: color,
+      generatorId: g.id,
+      hours: round1(hours),
+      litres: round1(litres),
+      lph: hours > 0 ? Math.round((litres / hours) * 100) / 100 : 0,
+      sessions: done.length,
+      refills: fills.length,
     };
   });
 }
 
-export function getFuelOverTime(
-  refills: Refill[],
-  color: string = '#FF6B35',
-  locale: string = 'en-US',
-): ChartDataPoint[] {
-  if (refills.length === 0) return [];
-
-  const monthGroups = groupByMonth(refills.map(r => r.date));
-  const sortedKeys = Array.from(monthGroups.keys()).sort();
-  const last6 = sortedKeys.slice(-6);
-
-  return last6.map(key => {
-    const totalFuel = refills
-      .filter(r => r.date.startsWith(key))
-      .reduce((sum, r) => sum + r.amount, 0);
-
-    return {
-      value: Math.round(totalFuel * 10) / 10,
-      label: getMonthLabel(key + '-01', locale),
-      frontColor: color,
-    };
-  });
-}
-
-export function getGeneratorComparison(
-  generators: Array<Generator & { stats: GeneratorStats }>,
-  color: string = '#FF6B35',
-): ChartDataPoint[] {
-  if (generators.length === 0) return [];
-
-  return generators
-    .map(g => ({
-      value: Math.round(g.stats.totalHours * 10) / 10,
-      label: g.name.length > 10 ? g.name.substring(0, 10) + '...' : g.name,
-      frontColor: color,
-    }))
-    .sort((a, b) => b.value - a.value);
-}
-
-export function getFuelDistribution(
-  generators: Array<Generator & { stats: GeneratorStats }>,
-  refills: Refill[],
-  unit: string = 'L'
-): PieDataPoint[] {
-  const pieColors = ['#FF6B35', '#0a7ea4', '#22C55E', '#F59E0B', '#EF4444', '#8B5CF6'];
-
-  return generators
-    .map((g, i) => {
-      const genRefills = refills.filter(r => r.generatorId === g.id);
-      const totalFuel = genRefills.reduce((sum, r) => sum + r.amount, 0);
-      return {
-        value: Math.round(totalFuel * 10) / 10,
-        color: pieColors[i % pieColors.length],
-        text: `${Math.round(totalFuel)}${unit}`,
-        label: g.name,
-      };
-    })
-    .filter(p => p.value > 0);
+/** A "nice" axis maximum (1, 2, 2.5, 5 × 10ⁿ) at or above the largest value. */
+export function niceMax(value: number): number {
+  if (value <= 0) return 1;
+  const exp = Math.pow(10, Math.floor(Math.log10(value)));
+  for (const step of [1, 2, 2.5, 5, 10]) if (step * exp >= value) return step * exp;
+  return 10 * exp;
 }

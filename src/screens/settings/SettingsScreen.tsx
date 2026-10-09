@@ -38,6 +38,8 @@ import {
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
 import { NightRedSheet } from '../../components/NightRedSheet';
+import { PageHeader } from '../../components/gt';
+import { FONT } from '../../theme/tokens';
 import { useThemePreference } from '../../contexts/ThemePreferenceContext';
 import type { ThemePreference } from '../../utils/storage';
 
@@ -270,19 +272,21 @@ export default function SettingsScreen() {
     );
   }
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScreenHeader title={t('settings.title')} largeTitle />
+  // 3.0: flat sections with a hairline border instead of elevated rounded cards.
+  const sectionColors = { backgroundColor: 'transparent', borderColor: theme.gt.dark ? theme.gt.ruleStrong : theme.gt.rule };
 
+  return (
+    <View style={[styles.container, { backgroundColor: theme.gt.bg }]}>
       <ScrollView
         contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
       >
+        <PageHeader title={t('settings.title')} summary={t('settings.appName') + ' ' + APP_VERSION} />
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.account')}</List.Subheader>
 
             {!user ? (
-              <Surface elevation={1} style={styles.sectionCard}>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16 }}>
                   {t('settings.syncDescription')}
                 </Text>
@@ -330,7 +334,7 @@ export default function SettingsScreen() {
                 )}
               </Surface>
             ) : (
-              <Surface elevation={1} style={styles.sectionCard}>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <Card mode="contained" style={{ backgroundColor: 'transparent' }}>
                   <Card.Title
                     title={user.email || t('settings.anonymousUser')}
@@ -348,9 +352,7 @@ export default function SettingsScreen() {
                 </Card>
 
                 <Button
-                  mode="contained"
-                  buttonColor={theme.colors.error}
-                  textColor={theme.colors.onError}
+                  mode="outlined"
                   icon="logout"
                   onPress={handleSignOut}
                   style={styles.authButton}
@@ -378,8 +380,8 @@ export default function SettingsScreen() {
         {user && (
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <List.Section>
-              <List.Subheader style={styles.sectionTitle}>{t('settings.sync')}</List.Subheader>
-              <Surface elevation={1} style={styles.sectionCard}>
+              <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.sync')}</List.Subheader>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <List.Item
                   title={t('settings.status')}
                   description={getSyncText()}
@@ -418,8 +420,8 @@ export default function SettingsScreen() {
 
         <Animated.View entering={FadeInDown.delay(125).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.appearance')}</List.Subheader>
-            <Surface elevation={1} style={styles.sectionCard}>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.appearance')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
               <Text variant="labelLarge" style={{ marginBottom: 8 }}>
                 {t('settings.theme')}
               </Text>
@@ -445,8 +447,8 @@ export default function SettingsScreen() {
 
         <Animated.View entering={FadeInDown.delay(150).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.language')}</List.Subheader>
-            <Surface elevation={1} style={styles.sectionCard}>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.language')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
               <SegmentedButtons
                 value={i18n.language.split('-')[0]}
                 onValueChange={handleLanguageChange}
@@ -461,8 +463,8 @@ export default function SettingsScreen() {
 
         <Animated.View entering={FadeInDown.delay(200).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.about')}</List.Subheader>
-            <Surface elevation={1} style={styles.sectionCard}>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.about')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
               <List.Item
                 title={t('settings.appName')}
                 description={t('settings.version', { version: APP_VERSION })}
@@ -702,14 +704,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   content: {
-    padding: 16,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontFamily: FONT.sans500,
+    paddingHorizontal: 0,
   },
   sectionCard: {
-    borderRadius: 16,
+    borderRadius: 0,
+    borderWidth: 1,
     padding: 16,
   },
   divider: {

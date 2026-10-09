@@ -301,9 +301,8 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await syncNow(page);
 
     await goToTab(page, 'Analytics');
-    await expect(visibleText(page, 'LITERS USED')).toBeVisible();
-    await expect(visibleText(page, '0.0', true).first()).toBeVisible();
-    await expect(visibleText(page, '999.0', true)).toHaveCount(0);
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('0.0');
+    await expect(visibleText(page, /999/)).toHaveCount(0);
     const refills = await page.evaluate(() => localStorage.getItem('@refills') || '[]');
     expect(refills).not.toContain('ghost-refill');
   });

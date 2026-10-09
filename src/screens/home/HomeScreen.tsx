@@ -5,12 +5,11 @@ import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../navigation/types';
 import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { AppIcon } from '../../components/AppIcon';
-import { GtText, TAB_BAR_OFFSET, useSnackbarBottomOffset } from '../../components/gt';
+import { GtText, PageHeader, PageSummary, TAB_BAR_OFFSET, useSnackbarBottomOffset } from '../../components/gt';
 import { IdleRow, RunningCard } from '../../components/fleet/FleetRows';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { isIOS } from '../../theme/platform';
@@ -31,7 +30,6 @@ export default function HomeScreen() {
   const { gt } = theme;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
   const tabBarOverlap = useTabBarOverlap();
   const { raw, reload } = useFleet();
   const [refreshing, setRefreshing] = useState(false);
@@ -74,41 +72,34 @@ export default function HomeScreen() {
 
   // iOS: the native large title "Генератори" and "+" live in the navigation bar; the summary line and
   // the 1.5 px ink rule open the list. Android/web: the whole header is drawn here (no FAB in 3.0).
+  // iOS: the native large title "Генератори" and "+" live in the navigation bar; the summary line and
+  // the 1.5 px ink rule open the list. Android/web: the whole header is drawn here (no FAB in 3.0).
   const listHeader = isIOS ? (
-    <View style={styles.iosHeader}>
-      <GtText variant="meta" color={gt.textMuted} testID="home-summary">
-        {summary}
-      </GtText>
-      <View style={[styles.rule, { backgroundColor: gt.ruleStrong }]} />
-    </View>
+    <PageSummary summary={summary} testID="home-summary" />
   ) : (
-    <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-      <View style={styles.headerRow}>
-        <View style={styles.flex}>
-          <GtText variant="meta" color={gt.textMuted} testID="home-summary">
-            {summary}
-          </GtText>
-          <GtText variant="largeTitle" accessibilityRole="header">
-            {t('home.title')}
-          </GtText>
-        </View>
-        <SyncStatusIndicator />
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('generator.addTitle')}
-          testID="fab-add-generator"
-          onPress={addGenerator}
-          style={({ pressed }) => [
-            styles.addButton,
-            gt.dark ? { backgroundColor: pressed ? gt.raised : '#1A1918' } : { borderColor: gt.text, borderWidth: 1.5 },
-            !gt.dark && pressed && { backgroundColor: gt.pressed },
-          ]}
-        >
-          <AppIcon name="add" size={22} color={gt.text} />
-        </Pressable>
-      </View>
-      <View style={[styles.rule, { backgroundColor: gt.ruleStrong }]} />
-    </View>
+    <PageHeader
+      title={t('home.title')}
+      summary={summary}
+      summaryTestID="home-summary"
+      trailing={
+        <>
+          <SyncStatusIndicator />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('generator.addTitle')}
+            testID="fab-add-generator"
+            onPress={addGenerator}
+            style={({ pressed }) => [
+              styles.addButton,
+              gt.dark ? { backgroundColor: pressed ? gt.raised : '#1A1918' } : { borderColor: gt.text, borderWidth: 1.5 },
+              !gt.dark && pressed && { backgroundColor: gt.pressed },
+            ]}
+          >
+            <AppIcon name="add" size={22} color={gt.text} />
+          </Pressable>
+        </>
+      }
+    />
   );
 
   const list = (
@@ -174,10 +165,6 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   center: { textAlign: 'center' },
   listContent: { paddingHorizontal: space.screenX },
-  iosHeader: { paddingTop: 4, gap: 10, marginBottom: space.s },
-  header: { gap: 14, marginBottom: space.s },
-  headerRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
   addButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  rule: { height: 1.5 },
   empty: { alignItems: 'center', paddingTop: 72, paddingHorizontal: 32, gap: 12 },
 });

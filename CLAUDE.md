@@ -163,7 +163,10 @@ handoff in `docs/design/redesign-3.0/` (README = spec, `Generator Tracker 3.0.dc
 - Tokens in `src/theme/tokens.ts` (light 5a / dark 5d), resolved per scheme on `useAppTheme().gt`; Paper themes use
   ink as primary and `roundness: 0`. IBM Plex Sans for labels, IBM Plex Mono for digits only (`src/theme/fonts.ts`).
 - UI kit `src/components/gt`: `GtText`/`Num`, `SquareButton` (red = Stop/destructive only), `AccentRule`
-  (generator colour), app-wide `SnackbarProvider` (`useSnackbar`, `useSnackbarBottomOffset`).
+  (generator colour), `PageHeader`/`PageSummary` (tab-root headers), `FilterChips`, `StackedBars` (square bars split
+  by generator colour), app-wide `SnackbarProvider` (`useSnackbar`, `useSnackbarBottomOffset`).
+- Don't attach the iOS 26 tab bar accessory conditionally (it rebuilds SwiftUI's TabView and crashes); the live bar is
+  a footer above the tab bar (`TabLiveBar`).
 - Data for Home/detail/live bar: `useFleet` + `buildFleet` (`src/hooks/useFleet.ts`); start/stop/undo/refill go through
   `src/services/sessions.ts` (emits `onSessionsChanged`) and `useSessionActions` (Stop: no confirm, 5 s Undo).
 - Fuel estimate `src/utils/fuel.ts`, formatting `src/utils/format.ts` (Intl, NBSP), maintenance texts/bars

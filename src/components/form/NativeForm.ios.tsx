@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { PlatformColor, View } from 'react-native';
+import { View } from 'react-native';
 import {
   Host,
   Form,
@@ -29,6 +29,10 @@ import {
   tint,
   monospacedDigit,
   disabled,
+  scrollContentBackground,
+  background,
+  listRowBackground,
+  font,
 } from '@expo/ui/swift-ui/modifiers';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { contentColumn } from '../../theme/layout';
@@ -213,21 +217,38 @@ function Field({ field }: { field: FormField }) {
  */
 export function NativeForm({ sections }: { sections: FormSection[] }) {
   const theme = useAppTheme();
+  const { gt } = theme;
+  // 3.0: the form sits on the app's paper / OLED background instead of the system grouped grey, with
+  // rows a step lighter (light) or the raised surface (dark), and IBM Plex Sans as the text font.
+  const rowBackground = gt.dark ? '#121211' : '#FBFAF7';
 
   return (
-    // Centred readable column on iPad; the grouped background fills the rest.
-    <View style={{ flex: 1, backgroundColor: PlatformColor('systemGroupedBackground') }}>
+    // Centred readable column on iPad; the page background fills the rest.
+    <View style={{ flex: 1, backgroundColor: gt.bg }}>
       <Host style={[{ flex: 1 }, contentColumn]}>
-        <Form modifiers={[tint(theme.colors.primary), scrollDismissesKeyboard('interactively')]}>
+        <Form
+          modifiers={[
+            tint(theme.colors.primary),
+            scrollDismissesKeyboard('interactively'),
+            scrollContentBackground('hidden'),
+            background(gt.bg),
+            font({ family: 'IBMPlexSans-Regular', size: 17 }),
+          ]}
+        >
           {sections.map(section => (
             <Section
               key={section.key}
-              title={section.title}
+              modifiers={[listRowBackground(rowBackground)]}
+              header={
+                section.title ? (
+                  <Text modifiers={[font({ family: 'IBMPlexSans-Medium', size: 13 }), foregroundStyle(gt.textMuted)]}>{section.title}</Text>
+                ) : undefined
+              }
               footer={
                 section.error ? (
-                  <Text modifiers={[foregroundStyle(theme.colors.error)]}>{section.error}</Text>
+                  <Text modifiers={[font({ family: 'IBMPlexSans-Regular', size: 13 }), foregroundStyle(theme.colors.error)]}>{section.error}</Text>
                 ) : section.footer ? (
-                  <Text>{section.footer}</Text>
+                  <Text modifiers={[font({ family: 'IBMPlexSans-Regular', size: 13 }), foregroundStyle(gt.textMuted)]}>{section.footer}</Text>
                 ) : undefined
               }
             >
