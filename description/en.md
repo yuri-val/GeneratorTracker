@@ -9,24 +9,30 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 
 ### 🎯 Key Features
 
-**Quick Start/Stop Sessions**
-- One-tap session start/stop
-- Real-time elapsed time tracking
-- Automatic hours calculation
-- View active sessions at a glance
+**Start and Stop in One Tap**
+- Start or stop any generator right from the home screen
+- Running generators move to the top with a live timer
+- Several generators can run at once
+- Stopped by mistake? Undo within 5 seconds
+
+**Fuel Left, Estimated**
+- Enter the tank size and see roughly how much fuel is left and for how many hours
+- Quick refill sheet with presets: to full, same as last time
+- "Filled to full" calibrates the estimate
+- Refills are blocked while the engine runs — "Stop and refill" in one tap
 
 **Comprehensive Tracking**
 - Log operating hours with precise timestamps
-- Record fuel refills with date and amount
+- Record fuel refills with date, time and amount
 - Add notes to sessions and refills
 - Track multiple generators effortlessly
 
 **Maintenance & Service Tracking**
 - Define recurring service tasks per generator (oil changes, filters, seasonal checks)
 - Set intervals by engine hours, by calendar days, or both
-- See an at-a-glance status: OK, Due soon, or Due now
+- A bar shows how much of each service interval is used
 - "Mark serviced" to reset a task in one tap
-- Due-soon and overdue badges on the home screen
+- The most urgent task is shown on the home screen, marked with ▲
 
 **Smart Analytics**
 - View total operating hours per generator
@@ -42,11 +48,11 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 - Your data syncs when connection is available
 - Delete your account and cloud data any time in Settings
 
-**Modern, Native Design**
-- Looks and feels native: Material 3 on Android, native iOS design on iPhone and iPad
-- Light and dark themes that follow your system setting
-- Energy-themed orange and blue color scheme
-- Comfortable layout on tablets and foldables
+**Clear, Calm Design**
+- Large, high-contrast controls that are easy to hit in the dark or with gloves
+- Warm light theme and a true-black dark theme that saves battery during outages
+- Native navigation: Material 3 on Android, the native iOS tab bar on iPhone and iPad
+- Night red mode instructions to keep your night vision
 
 **Professional Features**
 - Edit any session or refill record
@@ -77,13 +83,14 @@ Track generator hours, fuel refills, and analyze performance efficiently.
 **Work Offline**: Track hours even without internet
 **Professional Reports**: Clean data for billing and audits
 
-### 🆕 What's New in Version 2.6.0
+### 🆕 What's New in Version 3.0.0
 
-- **Delete Your Account in the App**: Settings → Delete Account removes your account and all cloud data; records on your device stay.
-- **Native Design**: native Material 3 navigation on Android; native iOS navigation, forms and settings on iPhone and iPad.
-- **Dark Theme**: the app now follows your device's light/dark setting.
-- **Tablets**: a comfortable, centred layout on tablets and foldables; charts fit the screen.
-- **Correct Dates After Midnight**: records created shortly after midnight now get the right date.
+- **Redesign**: start and stop generators right from the home screen; running ones move to the top with a live timer.
+- **Undo**: stop without confirmations — undo within 5 seconds.
+- **Fuel left**: add the tank size to see the estimated fuel and hours left; refills calibrate the estimate.
+- **New refill sheet**: presets, "filled to full", and "Stop and refill" while the engine runs.
+- **Maintenance bars** and a live clock on the generator screen; a bar shows other running generators.
+- **Appearance settings**: light, dark or system theme, plus night red mode instructions.
 
 ### 📱 Technical Excellence
 
