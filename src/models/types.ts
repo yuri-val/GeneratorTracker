@@ -11,6 +11,7 @@ export interface Generator extends SyncMetadata {
   name: string;
   model?: string;
   purchaseDate: string; // ISO 8601 date
+  tankCapacity?: number; // litres; the fuel estimate is hidden when missing (since 3.0)
   createdAt: string; // ISO 8601 datetime
 }
 
@@ -31,6 +32,8 @@ export interface Refill extends SyncMetadata {
   generatorId: string;
   date: string; // ISO 8601 date
   amount: number; // Liters or gallons
+  time?: string; // ISO 8601 local time (HH:mm); older records fall back to createdAt (since 3.0)
+  isFull?: boolean; // filled to the brim — calibrates the fuel estimate (since 3.0)
   notes?: string;
   createdAt: string; // ISO 8601 datetime
 }

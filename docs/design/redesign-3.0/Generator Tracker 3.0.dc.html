@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc><helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Onest:wght@400;500;600;700;800&family=Golos+Text:wght@400;500;600&family=Manrope:wght@500;600;700;800&family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#e9e7e2;font-family:system-ui,sans-serif}a{color:#1a1a1a}a:hover{color:#000}.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-direction:column;gap:48px}.dv-opt{display:flex;flex-direction:column;gap:12px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.4 system-ui,sans-serif;color:rgba(0,0,0,.6)}.dv-olabel b{color:#1a1a1a;font-weight:600}.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}.dv-next{margin:28px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.55)}</style>
+</helmet>
+<section class="dv-turn" id="t5">
+<div class="dv-thd"><a class="dv-tid" href="#t5">3.0</a><span class="dv-tname">Generator Tracker 3.0 — фінальні макети для реалізації</span></div>
+<p style="margin:0 0 28px;max-width:820px;font:13px/1.55 system-ui,sans-serif;color:rgba(0,0,0,.6);text-wrap:pretty">Світла тема <a class="dv-oid" href="#5a">5a</a>, темна тема <a class="dv-oid" href="#5d">5d</a>, доповнення <a class="dv-oid" href="#5f">5f</a>–<a class="dv-oid" href="#5h">5h</a>. Специфікація, токени і код — у <code>design_handoff_v3/README.md</code>. Усі кнопки живі; Stop → «Скасувати» 5 с; заправка → «Запустити знову».</p>
+<div class="dv-opts">
+
+<div class="dv-opt" id="5a">
+<div class="dv-olabel"><a class="dv-oid" href="#5a">5a</a><b>Світла, фінал</b> — заправка стартує «до повного» з галочкою; калібрування показано явно; після збереження — «Запустити знову»; пояснення «≈» сховане за ⓘ; live-панель — частина розкладки, а не шар поверх.</div>
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#F3F1EC;border:1px solid rgba(0,0,0,.12);box-shadow:0 20px 50px rgba(0,0,0,.12);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#1B1A17">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #1B1A17;border-radius:3px"></span></div>
+<div style="flex:1;overflow:hidden;padding:12px 20px 0;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between"><div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 13px 'IBM Plex Sans';color:#6E6A60">{{ E.summary }}</span><span style="font:700 30px/1 'IBM Plex Sans';letter-spacing:-.02em">Генератори</span></div><div style="width:44px;height:44px;border:1.5px solid #1B1A17;display:flex;align-items:center;justify-content:center;font:400 24px/1 'IBM Plex Sans'">+</div></div>
+<div style="display:flex;flex-direction:column;gap:6px;border-top:1.5px solid #1B1A17;padding-top:6px">
+<sc-for list="{{ E.gens }}" as="g" hint-placeholder-count="3">
+<sc-if value="{{ g.running }}" hint-placeholder-val="{{ true }}">
+<div style="background:#1B1A17;color:#F3F1EC;padding:16px;margin:0 -4px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:3px;height:16px;background:{{ g.accent }};flex:none"></span><span style="font:600 17px 'IBM Plex Sans'">{{ g.name }}</span></div><span style="font:500 12px 'IBM Plex Sans';color:#7BD88F;white-space:nowrap">● з <span style="font-family:'IBM Plex Mono'">{{ g.since }}</span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font:600 28px/1 'IBM Plex Sans';letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ g.hmWords }}</span><span style="font:400 13px 'IBM Plex Sans';color:#A8A398">Пальне ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#F3F1EC">{{ g.fuelLeft }}&nbsp;л</span> · ~{{ g.hrsLeft }}&nbsp;год</span></div>
+<div onClick="{{ g.stop }}" style="width:76px;height:56px;background:#C0392B;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;font:600 13px 'IBM Plex Sans';flex:none"><span style="width:12px;height:12px;background:#fff"></span>Стоп</div></div>
+<sc-if value="{{ g.hasSvc }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'IBM Plex Sans';color:{{ g.svcInkD }};border-top:1px solid #3A3833;padding-top:10px">▲ {{ g.svcShort }}</span></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ g.idle }}" hint-placeholder-val="{{ false }}">
+<div style="padding:12px 0;border-bottom:1px solid rgba(27,26,23,.15);display:flex;align-items:center;gap:14px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="width:3px;height:16px;background:{{ g.accent }};flex:none"></span><span style="font:600 17px 'IBM Plex Sans'">{{ g.name }}</span></div><span style="font:400 13px 'IBM Plex Sans';color:#6E6A60;padding-left:11px">Остання сесія {{ g.last }} · ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#1B1A17">{{ g.fuelLeft }}&nbsp;л</span></span>
+<sc-if value="{{ g.hasSvc }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'IBM Plex Sans';color:{{ g.svcInk }};padding-left:11px">▲ {{ g.svcShort }}</span></sc-if></div>
+<div onClick="{{ g.start }}" style="width:76px;height:56px;border:1.5px solid #1B1A17;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;font:600 13px 'IBM Plex Sans';flex:none" style-hover="background:#E8E5DD"><span style="width:0;height:0;border-left:11px solid #1B1A17;border-top:7px solid transparent;border-bottom:7px solid transparent"></span>Старт</div>
+</div>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<sc-if value="{{ E.hasUndo }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:12px;right:12px;bottom:88px;min-height:52px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px;box-shadow:0 8px 24px rgba(0,0,0,.2)"><span style="flex:1;font:400 13px/1.35 'IBM Plex Sans'">{{ E.undoText }}</span><div onClick="{{ E.undo }}" style="height:40px;padding:0 12px;display:flex;align-items:center;font:600 13px 'IBM Plex Sans';color:#F2B35C;cursor:pointer">Скасувати</div></div></sc-if>
+<div style="height:76px;flex:none;border-top:1.5px solid #1B1A17;display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:12px">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 11px 'IBM Plex Sans'"><span style="width:20px;height:20px;background:#1B1A17;-webkit-mask:url(assets/flash.svg) center/contain no-repeat;mask:url(assets/flash.svg) center/contain no-repeat"></span>Головна</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:400 11px 'IBM Plex Sans';color:#6E6A60"><span style="width:20px;height:20px;background:#6E6A60;-webkit-mask:url(assets/chart.svg) center/contain no-repeat;mask:url(assets/chart.svg) center/contain no-repeat"></span>Аналітика</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:400 11px 'IBM Plex Sans';color:#6E6A60"><span style="width:20px;height:20px;background:#6E6A60;-webkit-mask:url(assets/cog.svg) center/contain no-repeat;mask:url(assets/cog.svg) center/contain no-repeat"></span>Налаштування</div>
+</div>
+</div>
+
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#F3F1EC;border:1px solid rgba(0,0,0,.12);box-shadow:0 20px 50px rgba(0,0,0,.12);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#1B1A17">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #1B1A17;border-radius:3px"></span></div>
+<div style="flex:1;overflow-y:auto;padding:6px 20px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;font:500 14px 'IBM Plex Sans';color:#6E6A60;height:36px;flex:none"><span>‹ Головна</span><span>Редагувати</span></div>
+<div style="display:flex;align-items:center;gap:10px;flex:none"><span style="width:4px;height:24px;background:#4C6EDB"></span><span style="font:700 28px/1.05 'IBM Plex Sans';letter-spacing:-.02em">Honda EU22i</span></div>
+<sc-if value="{{ f.running }}" hint-placeholder-val="{{ true }}">
+<div style="background:#1B1A17;color:#F3F1EC;padding:16px 18px;display:flex;flex-direction:column;gap:12px;flex:none">
+<div style="display:flex;justify-content:space-between;font:500 13px 'IBM Plex Sans';color:#A8A398"><span style="color:#7BD88F">● Сесія триває</span><span>з <span style="font-family:'IBM Plex Mono'">{{ f.since }}</span></span></div>
+<span style="font:500 48px/1 'IBM Plex Mono';letter-spacing:-.03em">{{ f.clock }}</span>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="display:flex;flex-direction:column;gap:2px"><span style="font:400 12px 'IBM Plex Sans';color:#A8A398">Використано</span><span style="font:500 16px 'IBM Plex Mono'">≈&nbsp;{{ f.used }}&nbsp;л</span></div>
+<div onClick="{{ toggleInfo5 }}" style="display:flex;flex-direction:column;gap:2px;cursor:pointer"><span style="font:400 12px 'IBM Plex Sans';color:#A8A398">У баку <span style="display:inline-flex;width:16px;height:16px;border:1px solid #8C877C;border-radius:50%;align-items:center;justify-content:center;font:600 10px/1 'IBM Plex Sans';vertical-align:-3px">i</span></span><span style="font:500 16px 'IBM Plex Mono'">≈&nbsp;{{ f.fuelLeft }}&nbsp;л <span style="font:400 12px 'IBM Plex Sans';color:#A8A398">~{{ f.hrsLeft }}&nbsp;год</span></span></div>
+</div>
+<sc-if value="{{ info5 }}" hint-placeholder-val="{{ false }}"><span style="font:400 12px/1.4 'IBM Plex Sans';color:#C9C4B8;background:#2A2925;padding:8px 10px">Оцінка за середньою витратою {{ f.lphS }}&nbsp;л/год. Реальна залежить від навантаження.</span></sc-if>
+<div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+<div onClick="{{ f.stop }}" style="height:52px;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:12px;height:12px;background:#fff"></span>Зупинити</div>
+<div style="height:52px;padding:0 14px;border:1px solid #57534B;display:flex;align-items:center;font:500 14px 'IBM Plex Sans'">Змінити час</div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ f.idle }}" hint-placeholder-val="{{ false }}">
+<div style="border:1.5px solid #1B1A17;padding:16px;display:flex;flex-direction:column;gap:12px;flex:none"><span style="font:400 13px 'IBM Plex Sans';color:#6E6A60">Пальне ≈&nbsp;{{ f.fuelLeft }}&nbsp;л з {{ f.tankS }} · ~{{ f.hrsLeft }}&nbsp;год</span>
+<div onClick="{{ f.start }}" style="height:52px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:0;height:0;border-left:12px solid #F3F1EC;border-top:8px solid transparent;border-bottom:8px solid transparent"></span>Запустити сесію</div></div>
+</sc-if>
+<div style="display:flex;gap:18px;font:500 14px 'IBM Plex Sans';color:#6E6A60;flex:none"><span>Сесії <span style="font-family:'IBM Plex Mono'">60</span></span><span>Заправки <span style="font-family:'IBM Plex Mono'">33</span></span><span style="color:#1B1A17;border-bottom:2px solid #1B1A17;padding-bottom:6px">ТО <span style="font-family:'IBM Plex Mono'">5</span></span></div>
+<span style="font:400 12px 'IBM Plex Sans';color:#6E6A60;margin-top:-6px">Шкала — використаний ресурс до наступного ТО</span>
+<div style="display:flex;flex-direction:column;margin-top:-8px;flex:none">
+<sc-for list="{{ tasks5 }}" as="t" hint-placeholder-count="5">
+<div style="padding:9px 0;border-bottom:1px solid rgba(27,26,23,.12);display:flex;flex-direction:column;gap:6px">
+<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font:500 14px 'IBM Plex Sans'">{{ t.title }}</span><span style="font:500 12px 'IBM Plex Sans';color:{{ t.ink }};white-space:nowrap">{{ t.left }}</span></div>
+<div style="position:relative;height:4px;background:rgba(27,26,23,.1)"><div style="height:4px;width:{{ t.pct }};background:{{ t.ink }}"></div><span style="position:absolute;right:0;top:-3px;width:1.5px;height:10px;background:#1B1A17"></span></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="flex:none;padding:0 12px 26px;background:#F3F1EC">
+<sc-for list="{{ live5One }}" as="g" hint-placeholder-count="1"><div style="height:60px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:12px;padding:0 6px 0 14px"><span style="width:3px;height:28px;background:{{ g.accent }}"></span><div style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font:500 13px 'IBM Plex Sans'">{{ g.name }}</span><span style="font:400 12px 'IBM Plex Sans';color:#7BD88F">● {{ g.hmWords }}</span></div><div onClick="{{ g.stop }}" style="height:48px;padding:0 14px;background:#C0392B;display:flex;align-items:center;gap:8px;cursor:pointer;font:600 13px 'IBM Plex Sans'"><span style="width:10px;height:10px;background:#fff"></span>Стоп</div></div></sc-for>
+<sc-if value="{{ live5Many }}" hint-placeholder-val="{{ true }}"><div style="height:60px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:12px;padding:0 16px"><div style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font:500 13px 'IBM Plex Sans';color:#7BD88F">● Ще {{ live5N }} працюють</span><span style="font:400 12px 'IBM Plex Sans';color:#A8A398;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ live5Names }}</span></div><span style="font:500 14px 'IBM Plex Sans';white-space:nowrap">На головну ›</span></div></sc-if>
+</div>
+<sc-if value="{{ F.hasUndo }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:12px;right:12px;bottom:96px;min-height:52px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px;box-shadow:0 8px 24px rgba(0,0,0,.25)"><span style="flex:1;font:400 13px/1.35 'IBM Plex Sans'">{{ F.undoText }}</span><div onClick="{{ F.undo }}" style="height:40px;padding:0 12px;display:flex;align-items:center;font:600 13px 'IBM Plex Sans';color:#F2B35C;cursor:pointer">Скасувати</div></div></sc-if>
+</div>
+
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#7D7A73;border:1px solid rgba(0,0,0,.12);box-shadow:0 20px 50px rgba(0,0,0,.12);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#1B1A17">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none;color:#F3F1EC"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #F3F1EC;border-radius:3px"></span></div>
+<div style="padding:10px 20px 0;flex:none;color:#F3F1EC;opacity:.75;font:700 24px 'IBM Plex Sans'">Honda EU22i</div>
+<div style="flex:1;margin-top:24px;background:#F3F1EC;border-top:1.5px solid #1B1A17;padding:18px 20px 26px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:3px"><span style="font:700 22px 'IBM Plex Sans'">Додати заправку</span><span style="font:400 13px 'IBM Plex Sans';color:#6E6A60">Бак {{ f.tankS }}&nbsp;л · зараз ≈&nbsp;{{ f.fuelLeft }}&nbsp;л · вільно {{ free5S }}&nbsp;л</span></div><span style="font:500 14px 'IBM Plex Sans';color:#6E6A60;padding-top:4px">Скасувати</span></div>
+<sc-if value="{{ f.running }}" hint-placeholder-val="{{ true }}">
+<div style="border:1.5px solid #C4321F;background:#FBE9E5;padding:14px;display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:3px"><span style="font:600 15px 'IBM Plex Sans';color:#8E2415">Генератор працює</span><span style="font:400 13px/1.4 'IBM Plex Sans';color:#5E2A20">Перед заправкою заглушіть двигун. Сесію буде завершено, дату заправки заповнено.</span></div>
+<div onClick="{{ f.stop }}" style="height:52px;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:12px;height:12px;background:#fff"></span>Зупинити й заправити</div></div>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:12px;opacity:{{ form5Op }};pointer-events:{{ form5Pe }}">
+<div style="display:grid;grid-template-columns:56px 1fr 56px;border:1.5px solid #1B1A17;height:66px">
+<div onClick="{{ dec5 }}" style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans';cursor:pointer;user-select:none;border-right:1px solid rgba(27,26,23,.2)" style-active="background:#E8E5DD">−</div>
+<div style="display:flex;align-items:baseline;justify-content:center;gap:6px;padding-top:13px"><span style="font:500 36px/1 'IBM Plex Mono';letter-spacing:-.02em">{{ l5 }}</span><span style="font:400 16px 'IBM Plex Sans';color:#6E6A60">л</span></div>
+<div onClick="{{ inc5 }}" style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans';cursor:pointer;user-select:none;border-left:1px solid rgba(27,26,23,.2)" style-active="background:#E8E5DD">+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+<sc-for list="{{ presets5 }}" as="p" hint-placeholder-count="3">
+<sc-if value="{{ p.ok }}" hint-placeholder-val="{{ true }}"><div onClick="{{ p.on }}" style="min-height:52px;border:1px solid rgba(27,26,23,.35);padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer" style-hover="background:#E8E5DD"><span style="font:500 12px/1.2 'IBM Plex Sans'">{{ p.label }}</span><span style="font:500 13px 'IBM Plex Mono';color:#6E6A60">{{ p.sub }}</span></div></sc-if>
+<sc-if value="{{ p.no }}" hint-placeholder-val="{{ false }}"><div style="min-height:52px;border:1px dashed rgba(27,26,23,.25);padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;color:#A39E93"><span style="font:500 12px/1.2 'IBM Plex Sans'">{{ p.label }}</span><span style="font:400 11px/1.2 'IBM Plex Sans'">{{ p.sub }}</span></div></sc-if>
+</sc-for>
+</div>
+<div onClick="{{ toggleFull5 }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;min-height:44px">
+<sc-if value="{{ full5 }}" hint-placeholder-val="{{ true }}"><span style="width:22px;height:22px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;justify-content:center;font:600 14px/1 'IBM Plex Sans';flex:none">✓</span></sc-if>
+<sc-if value="{{ notFull5 }}" hint-placeholder-val="{{ false }}"><span style="width:22px;height:22px;border:1.5px solid #1B1A17;flex:none"></span></sc-if>
+<div style="display:flex;flex-direction:column;gap:1px"><span style="font:500 14px 'IBM Plex Sans'">Заправлено до повного</span><span style="font:400 12px 'IBM Plex Sans';color:#6E6A60">Рівень у баку стане {{ f.tankS }}&nbsp;л</span></div>
+</div>
+<sc-if value="{{ calib5 }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.4 'IBM Plex Sans';color:#8A5300;background:#FCEFD9;padding:10px 12px">{{ calib5Text }} — розрахунковий залишок був неточним.</span></sc-if>
+<sc-if value="{{ over5 }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.4 'IBM Plex Sans';color:#8A5300;background:#FCEFD9;padding:10px 12px">Більше за вільне місце ({{ free5S }}&nbsp;л). Буде записано повний бак, а оцінку скориговано.</span></sc-if>
+<span style="font:400 13px 'IBM Plex Sans';color:#6E6A60">Після заправки ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#1B1A17">{{ after5S }}&nbsp;л</span> з {{ f.tankS }} · Сьогодні, <span style="font-family:'IBM Plex Mono'">{{ nowHM }}</span></span>
+</div>
+<div style="flex:1"></div>
+<sc-if value="{{ done5 }}" hint-placeholder-val="{{ false }}"><div style="min-height:56px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px"><span style="flex:1;font:400 14px 'IBM Plex Sans'">✓ Заправку збережено</span><div onClick="{{ restart5 }}" style="height:44px;padding:0 14px;background:#F3F1EC;color:#1B1A17;display:flex;align-items:center;gap:8px;cursor:pointer;font:600 14px 'IBM Plex Sans'"><span style="width:0;height:0;border-left:9px solid #1B1A17;border-top:6px solid transparent;border-bottom:6px solid transparent"></span>Запустити знову</div></div></sc-if>
+<sc-if value="{{ tankFull5 }}" hint-placeholder-val="{{ false }}"><div style="height:56px;border:1.5px dashed rgba(27,26,23,.3);color:#6E6A60;display:flex;align-items:center;justify-content:center;font:500 15px 'IBM Plex Sans'">Бак повний</div></sc-if>
+<sc-if value="{{ save5Show }}" hint-placeholder-val="{{ false }}"><div onClick="{{ save5 }}" style="height:56px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;justify-content:center;gap:8px;font:600 15px 'IBM Plex Sans';cursor:pointer" style-active="transform:scale(.98)">Зберегти <span style="font-family:'IBM Plex Mono'">{{ l5 }}</span>&nbsp;л</div></sc-if>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="dv-opt" id="5d">
+<div class="dv-olabel"><a class="dv-oid" href="#5d">5d</a><b>Темна · OLED і рівні</b> — справжній чорний фон, вимкнені генератори приглушені, працюючі підняті на тональну поверхню з кольоровою смугою генератора. Ієрархія через яскравість, а не через колір. Економить батарею під час відключень.</div>
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#000;border:1px solid rgba(0,0,0,.6);box-shadow:0 20px 50px rgba(0,0,0,.3);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#F5F2EA">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #F5F2EA;border-radius:3px"></span></div>
+<div style="flex:1;overflow:hidden;padding:12px 16px 0;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;padding:0 4px"><div style="display:flex;flex-direction:column;gap:6px"><span style="font:400 13px 'IBM Plex Sans';color:#8C877C">{{ E.summary }}</span><span style="font:700 30px/1 'IBM Plex Sans';letter-spacing:-.02em">Генератори</span></div><div style="width:44px;height:44px;background:#1A1918;display:flex;align-items:center;justify-content:center;font:400 24px/1 'IBM Plex Sans'">+</div></div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ E.gens }}" as="g" hint-placeholder-count="3">
+<sc-if value="{{ g.running }}" hint-placeholder-val="{{ true }}">
+<div style="background:#24231F;border-top:3px solid {{ g.accent }};padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="display:flex;align-items:center;gap:8px;min-width:0"><span style="width:3px;height:16px;background:{{ g.accent }};flex:none"></span><span style="font:600 17px 'IBM Plex Sans'">{{ g.name }}</span></div><span style="font:500 12px 'IBM Plex Sans';color:#7BD88F;white-space:nowrap">● з <span style="font-family:'IBM Plex Mono'">{{ g.since }}</span></span></div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><span style="font:600 30px/1 'IBM Plex Sans';letter-spacing:-.02em;font-variant-numeric:tabular-nums">{{ g.hmWords }}</span><span style="font:400 13px 'IBM Plex Sans';color:#A8A398">Пальне ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#F5F2EA">{{ g.fuelLeft }}&nbsp;л</span> · ~{{ g.hrsLeft }}&nbsp;год</span></div>
+<div onClick="{{ g.stop }}" style="width:76px;height:56px;background:#C0392B;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;font:600 13px 'IBM Plex Sans';flex:none"><span style="width:12px;height:12px;background:#fff"></span>Стоп</div></div>
+<sc-if value="{{ g.hasSvc }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'IBM Plex Sans';color:{{ g.svcInkD }}">▲ {{ g.svcShort }}</span></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ g.idle }}" hint-placeholder-val="{{ false }}">
+<div style="padding:12px 4px;border-bottom:1px solid #1C1B19;display:flex;align-items:center;gap:14px">
+<div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0"><div style="display:flex;align-items:center;gap:8px"><span style="width:3px;height:16px;background:{{ g.accent }};opacity:.6;flex:none"></span><span style="font:500 17px 'IBM Plex Sans';color:#BDB8AD">{{ g.name }}</span></div><span style="font:400 13px 'IBM Plex Sans';color:#8C877C;padding-left:11px">Остання сесія {{ g.last }} · ≈&nbsp;{{ g.fuelLeft }}&nbsp;л</span>
+<sc-if value="{{ g.hasSvc }}" hint-placeholder-val="{{ false }}"><span style="font:500 13px 'IBM Plex Sans';color:{{ g.svcInkD }};padding-left:11px">▲ {{ g.svcShort }}</span></sc-if></div>
+<div onClick="{{ g.start }}" style="width:76px;height:56px;background:#1A1918;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;font:600 13px 'IBM Plex Sans';color:#D9D5CB;flex:none"><span style="width:0;height:0;border-left:11px solid #D9D5CB;border-top:7px solid transparent;border-bottom:7px solid transparent"></span>Старт</div>
+</div>
+</sc-if>
+</sc-for>
+</div>
+</div>
+<div style="height:76px;flex:none;border-top:1px solid #1C1B19;display:grid;grid-template-columns:repeat(3,1fr);padding-bottom:12px">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:600 11px 'IBM Plex Sans'"><span style="width:20px;height:20px;background:#F5F2EA;-webkit-mask:url(assets/flash.svg) center/contain no-repeat;mask:url(assets/flash.svg) center/contain no-repeat"></span>Головна</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:400 11px 'IBM Plex Sans';color:#77736A"><span style="width:20px;height:20px;background:#77736A;-webkit-mask:url(assets/chart.svg) center/contain no-repeat;mask:url(assets/chart.svg) center/contain no-repeat"></span>Аналітика</div>
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:400 11px 'IBM Plex Sans';color:#77736A"><span style="width:20px;height:20px;background:#77736A;-webkit-mask:url(assets/cog.svg) center/contain no-repeat;mask:url(assets/cog.svg) center/contain no-repeat"></span>Налаштування</div>
+</div>
+</div>
+
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#000;border:1px solid rgba(0,0,0,.6);box-shadow:0 20px 50px rgba(0,0,0,.3);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#F5F2EA">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #F5F2EA;border-radius:3px"></span></div>
+<div style="flex:1;overflow-y:auto;padding:6px 16px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;font:500 14px 'IBM Plex Sans';color:#8C877C;height:36px;flex:none;padding:0 4px"><span>‹ Головна</span><span>Редагувати</span></div>
+<div style="display:flex;align-items:center;gap:10px;padding:0 4px;flex:none"><span style="width:4px;height:24px;background:#4C6EDB"></span><span style="font:700 28px/1.05 'IBM Plex Sans';letter-spacing:-.02em">Honda EU22i</span></div>
+<sc-if value="{{ f.running }}" hint-placeholder-val="{{ true }}">
+<div style="background:#24231F;border-top:3px solid #4C6EDB;padding:16px 18px;display:flex;flex-direction:column;gap:12px;flex:none">
+<div style="display:flex;justify-content:space-between;font:500 13px 'IBM Plex Sans';color:#A8A398"><span style="color:#7BD88F">● Сесія триває</span><span>з <span style="font-family:'IBM Plex Mono'">{{ f.since }}</span></span></div>
+<span style="font:500 48px/1 'IBM Plex Mono';letter-spacing:-.03em">{{ f.clock }}</span>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="display:flex;flex-direction:column;gap:2px"><span style="font:400 12px 'IBM Plex Sans';color:#A8A398">Використано</span><span style="font:500 16px 'IBM Plex Mono'">≈&nbsp;{{ f.used }}&nbsp;л</span></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font:400 12px 'IBM Plex Sans';color:#A8A398">У баку ⓘ</span><span style="font:500 16px 'IBM Plex Mono'">≈&nbsp;{{ f.fuelLeft }}&nbsp;л <span style="font:400 12px 'IBM Plex Sans';opacity:.7">~{{ f.hrsLeft }}&nbsp;год</span></span></div></div>
+<div style="display:grid;grid-template-columns:1fr auto;gap:8px"><div onClick="{{ f.stop }}" style="height:52px;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:12px;height:12px;background:#fff"></span>Зупинити</div><div style="height:52px;padding:0 14px;background:#33322D;display:flex;align-items:center;font:500 14px 'IBM Plex Sans'">Змінити час</div></div>
+</div>
+</sc-if>
+<sc-if value="{{ f.idle }}" hint-placeholder-val="{{ false }}">
+<div style="background:#121211;padding:16px;display:flex;flex-direction:column;gap:12px;flex:none"><span style="font:400 13px 'IBM Plex Sans';color:#A8A398">Пальне ≈&nbsp;{{ f.fuelLeft }}&nbsp;л з {{ f.tankS }} · ~{{ f.hrsLeft }}&nbsp;год</span>
+<div onClick="{{ f.start }}" style="height:52px;background:#F5F2EA;color:#000;display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:0;height:0;border-left:12px solid #000;border-top:8px solid transparent;border-bottom:8px solid transparent"></span>Запустити сесію</div></div>
+</sc-if>
+<div style="display:flex;gap:18px;font:500 14px 'IBM Plex Sans';color:#8C877C;flex:none;padding:0 4px"><span>Сесії 60</span><span>Заправки 33</span><span style="color:#F5F2EA;border-bottom:2px solid #F5F2EA;padding-bottom:6px">ТО 5</span></div>
+<div style="display:flex;flex-direction:column;flex:none;background:#121211;padding:2px 14px">
+<sc-for list="{{ tasks5 }}" as="t" hint-placeholder-count="5"><div style="padding:9px 0;border-bottom:1px solid #1E1D1B;display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline"><span style="font:500 14px 'IBM Plex Sans'">{{ t.title }}</span><span style="font:500 12px 'IBM Plex Sans';color:{{ t.inkD }};white-space:nowrap">{{ t.left }}</span></div><div style="position:relative;height:4px;background:#2A2926"><div style="height:4px;width:{{ t.pct }};background:{{ t.inkD }}"></div><span style="position:absolute;right:0;top:-3px;width:1.5px;height:10px;background:#8C877C"></span></div></div></sc-for>
+</div>
+</div>
+<div style="flex:none;padding:0 12px 26px"><div style="height:60px;background:#24231F;color:#F5F2EA;display:flex;align-items:center;gap:12px;padding:0 16px"><div style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font:500 13px 'IBM Plex Sans';color:#7BD88F">● {{ live5Title }}</span><span style="font:400 12px 'IBM Plex Sans';color:#8C877C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ live5Sub }}</span></div><span style="font:500 14px 'IBM Plex Sans';white-space:nowrap">На головну ›</span></div></div>
+</div>
+
+</div>
+
+
+
+</div>
+<div class="dv-opt" id="5f">
+<div class="dv-olabel"><a class="dv-oid" href="#5f">5f</a><b>Темна · заправка</b> — аркуш у палітрі <a class="dv-oid" href="#5d">5d</a>. Неактивна форма під банером не через прозорість, а через окремі «disabled»-кольори з контрастом ≥ 4,5:1.</div>
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#000;border:1px solid rgba(0,0,0,.3);box-shadow:0 20px 50px rgba(0,0,0,.18);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#F5F2EA">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none;color:#F5F2EA"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #F5F2EA;border-radius:3px"></span></div>
+<div style="padding:10px 20px 0;flex:none;color:#77736A;font:700 24px 'IBM Plex Sans'">Honda EU22i</div>
+<div style="flex:1;margin-top:24px;background:#121211;border-top:1px solid #33322D;padding:18px 20px 26px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:flex-start"><div style="display:flex;flex-direction:column;gap:3px"><span style="font:700 22px 'IBM Plex Sans'">Додати заправку</span><span style="font:400 13px 'IBM Plex Sans';color:#A8A398">Бак {{ f.tankS }}&nbsp;л · зараз ≈&nbsp;{{ f.fuelLeft }}&nbsp;л · вільно {{ free5S }}&nbsp;л</span></div><span style="font:500 14px 'IBM Plex Sans';color:#A8A398;padding-top:4px">Скасувати</span></div>
+<sc-if value="{{ f.running }}" hint-placeholder-val="{{ true }}">
+<div style="border:1.5px solid #E0533F;background:#2A1210;padding:14px;display:flex;flex-direction:column;gap:12px"><div style="display:flex;flex-direction:column;gap:3px"><span style="font:600 15px 'IBM Plex Sans';color:#FF8A78">▲ Генератор працює</span><span style="font:400 13px/1.4 'IBM Plex Sans';color:#E8C9C2">Перед заправкою заглушіть двигун. Сесію буде завершено, дату заправки заповнено.</span></div>
+<div onClick="{{ f.stop }}" style="height:52px;background:#C0392B;color:#fff;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;font:600 15px 'IBM Plex Sans'"><span style="width:12px;height:12px;background:#fff"></span>Зупинити й заправити</div></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:grid;grid-template-columns:56px 1fr 56px;border:1px solid #33322D;height:66px;color:#8C877C"><div style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans'">−</div><div style="display:flex;align-items:baseline;justify-content:center;gap:6px;padding-top:13px"><span style="font:500 36px/1 'IBM Plex Mono'">{{ l5 }}</span><span style="font:400 16px 'IBM Plex Sans'">л</span></div><div style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans'">+</div></div>
+<span style="font:400 13px 'IBM Plex Sans';color:#8C877C">Форма стане доступною після зупинки.</span>
+</div>
+</sc-if>
+<sc-if value="{{ f.idle }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:grid;grid-template-columns:56px 1fr 56px;border:1.5px solid #F5F2EA;height:66px">
+<div onClick="{{ dec5 }}" style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans';cursor:pointer;user-select:none;border-right:1px solid #33322D">−</div>
+<div style="display:flex;align-items:baseline;justify-content:center;gap:6px;padding-top:13px"><span style="font:500 36px/1 'IBM Plex Mono'">{{ l5 }}</span><span style="font:400 16px 'IBM Plex Sans';color:#A8A398">л</span></div>
+<div onClick="{{ inc5 }}" style="display:flex;align-items:center;justify-content:center;font:400 28px/1 'IBM Plex Sans';cursor:pointer;user-select:none;border-left:1px solid #33322D">+</div></div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"><sc-for list="{{ presets5 }}" as="p" hint-placeholder-count="3"><sc-if value="{{ p.ok }}" hint-placeholder-val="{{ true }}"><div onClick="{{ p.on }}" style="min-height:52px;background:#24231F;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer"><span style="font:500 12px/1.2 'IBM Plex Sans'">{{ p.label }}</span><span style="font:500 13px 'IBM Plex Mono';color:#A8A398">{{ p.sub }}</span></div></sc-if><sc-if value="{{ p.no }}" hint-placeholder-val="{{ false }}"><div style="min-height:52px;border:1px dashed #4A4842;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:2px;color:#8C877C"><span style="font:500 12px/1.2 'IBM Plex Sans'">{{ p.label }}</span><span style="font:400 11px/1.2 'IBM Plex Sans'">{{ p.sub }}</span></div></sc-if></sc-for></div>
+<div onClick="{{ toggleFull5 }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;min-height:44px"><sc-if value="{{ full5 }}" hint-placeholder-val="{{ true }}"><span style="width:22px;height:22px;background:#F5F2EA;color:#000;display:flex;align-items:center;justify-content:center;font:600 14px/1 'IBM Plex Sans';flex:none">✓</span></sc-if><sc-if value="{{ notFull5 }}" hint-placeholder-val="{{ false }}"><span style="width:22px;height:22px;border:1.5px solid #F5F2EA;flex:none"></span></sc-if><div style="display:flex;flex-direction:column;gap:1px"><span style="font:500 14px 'IBM Plex Sans'">Заправлено до повного</span><span style="font:400 12px 'IBM Plex Sans';color:#A8A398">Рівень у баку стане {{ f.tankS }}&nbsp;л</span></div></div>
+<sc-if value="{{ calib5 }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.4 'IBM Plex Sans';color:#FFC266;background:#2A2010;padding:10px 12px">{{ calib5Text }} — розрахунковий залишок був неточним.</span></sc-if>
+<sc-if value="{{ over5 }}" hint-placeholder-val="{{ false }}"><span style="font:400 13px/1.4 'IBM Plex Sans';color:#FFC266;background:#2A2010;padding:10px 12px">Більше за вільне місце ({{ free5S }}&nbsp;л). Буде записано повний бак, а оцінку скориговано.</span></sc-if>
+<span style="font:400 13px 'IBM Plex Sans';color:#A8A398">Після заправки ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#F5F2EA">{{ after5S }}&nbsp;л</span> з {{ f.tankS }} · Сьогодні, <span style="font-family:'IBM Plex Mono'">{{ nowHM }}</span></span>
+</div>
+</sc-if>
+<div style="flex:1"></div>
+<sc-if value="{{ done5 }}" hint-placeholder-val="{{ false }}"><div style="min-height:56px;background:#24231F;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 16px"><span style="flex:1;font:400 14px 'IBM Plex Sans'">✓ Заправку збережено</span><div onClick="{{ restart5 }}" style="height:44px;padding:0 14px;background:#F5F2EA;color:#000;display:flex;align-items:center;gap:8px;cursor:pointer;font:600 14px 'IBM Plex Sans'"><span style="width:0;height:0;border-left:9px solid #000;border-top:6px solid transparent;border-bottom:6px solid transparent"></span>Запустити знову</div></div></sc-if>
+<sc-if value="{{ tankFull5 }}" hint-placeholder-val="{{ false }}"><div style="height:56px;border:1px dashed #4A4842;color:#A8A398;display:flex;align-items:center;justify-content:center;font:500 15px 'IBM Plex Sans'">Бак повний</div></sc-if>
+<sc-if value="{{ save5Show }}" hint-placeholder-val="{{ false }}"><div onClick="{{ save5 }}" style="height:56px;background:#F5F2EA;color:#000;display:flex;align-items:center;justify-content:center;gap:8px;font:600 15px 'IBM Plex Sans';cursor:pointer">Зберегти <span style="font-family:'IBM Plex Mono'">{{ l5 }}</span>&nbsp;л</div></sc-if>
+</div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="5g">
+<div class="dv-olabel"><a class="dv-oid" href="#5g">5g</a><b>Live-панель · згорнутий стан</b> — окремий набір: працюють усі три. Умова згортання: <code>others.length ≥ 2</code>, де others — працюючі, крім поточного генератора.</div>
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#F3F1EC;border:1px solid rgba(0,0,0,.3);box-shadow:0 20px 50px rgba(0,0,0,.18);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#1B1A17">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none;color:#1B1A17"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #1B1A17;border-radius:3px"></span></div>
+<div style="flex:1;overflow:hidden;padding:6px 20px 16px;display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;justify-content:space-between;align-items:center;font:500 14px 'IBM Plex Sans';color:#6E6A60;height:36px;flex:none"><span>‹ Головна</span><span>Редагувати</span></div>
+<div style="display:flex;align-items:center;gap:10px;flex:none"><span style="width:4px;height:24px;background:#4C6EDB"></span><span style="font:700 28px/1.05 'IBM Plex Sans';letter-spacing:-.02em">Honda EU22i</span></div>
+<div style="background:#1B1A17;color:#F3F1EC;padding:16px 18px;display:flex;flex-direction:column;gap:12px;flex:none">
+<div style="display:flex;justify-content:space-between;font:500 13px 'IBM Plex Sans';color:#A8A398"><span style="color:#7BD88F">● Сесія триває</span><span>з <span style="font-family:'IBM Plex Mono'">{{ h5.since }}</span></span></div>
+<span style="font:500 48px/1 'IBM Plex Mono';letter-spacing:-.03em">{{ h5.clock }}</span>
+<span style="font:400 13px 'IBM Plex Sans';color:#A8A398">У баку ≈&nbsp;<span style="font-family:'IBM Plex Mono';color:#F3F1EC">{{ h5.fuelLeft }}&nbsp;л</span> · ~{{ h5.hrsLeft }}&nbsp;год</span>
+</div>
+<div style="flex:1;border:1px dashed rgba(27,26,23,.25);display:flex;align-items:center;justify-content:center;font:12px ui-monospace,Menlo,monospace;color:#8C877C">решта екрана як у 5a</div>
+</div>
+<div style="flex:none;padding:0 12px 26px"><div style="height:60px;background:#1B1A17;color:#F3F1EC;display:flex;align-items:center;gap:12px;padding:0 16px"><div style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font:500 13px 'IBM Plex Sans';color:#7BD88F">● Ще {{ liveHN }} працюють</span><span style="font:400 12px 'IBM Plex Sans';color:#A8A398;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ liveHNames }}</span></div><span style="font:500 14px 'IBM Plex Sans';white-space:nowrap">На головну ›</span></div></div>
+</div>
+</div>
+</div>
+
+<div class="dv-opt" id="5h">
+<div class="dv-olabel"><a class="dv-oid" href="#5h">5h</a><b>Нічний червоний (5e) → підказка в Налаштуваннях</b> — замість власного режиму: інструкція для системного фільтра. Позначка ▲ з 5e перенесена в 5a/5d як некольоровий сигнал попередження.</div>
+<div style="display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start">
+<div style="position:relative;width:360px;height:760px;border-radius:44px;overflow:hidden;background:#F3F1EC;border:1px solid rgba(0,0,0,.3);box-shadow:0 20px 50px rgba(0,0,0,.18);display:flex;flex-direction:column;font-family:'IBM Plex Sans',sans-serif;color:#1B1A17">
+<div style="height:44px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;font:600 14px 'IBM Plex Sans';flex:none;color:#1B1A17"><span>{{ nowHM }}</span><span style="width:24px;height:11px;border:1.5px solid #1B1A17;border-radius:3px"></span></div>
+<div style="flex:1;overflow:hidden;padding:12px 20px 0;display:flex;flex-direction:column;gap:18px">
+<span style="font:700 30px/1 'IBM Plex Sans';letter-spacing:-.02em">Налаштування</span>
+<div style="display:flex;flex-direction:column;gap:6px"><span style="font:500 12px 'IBM Plex Sans';color:#6E6A60">Вигляд</span>
+<div style="border-top:1.5px solid #1B1A17">
+<div style="height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(27,26,23,.15)"><span style="font:400 15px 'IBM Plex Sans'">Тема</span><span style="font:400 15px 'IBM Plex Sans';color:#6E6A60">Як у системі ›</span></div>
+<div style="min-height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(27,26,23,.15);gap:12px"><span style="font:500 15px 'IBM Plex Sans'">Нічний червоний режим</span><span style="font:400 15px 'IBM Plex Sans';color:#6E6A60">›</span></div>
+</div></div>
+<div style="background:#1B1A17;color:#F3F1EC;padding:18px;display:flex;flex-direction:column;gap:12px">
+<span style="font:600 16px 'IBM Plex Sans'">Червоний екран уночі</span>
+<span style="font:400 13px/1.45 'IBM Plex Sans';color:#C9C4B8">Не збиває адаптацію очей до темряви, коли йдете до генератора. Працює для всього телефона, включно з клавіатурою.</span>
+<div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid #3A3833;padding-top:12px">
+<span style="font:600 13px 'IBM Plex Sans'">iPhone</span>
+<span style="font:400 13px/1.45 'IBM Plex Sans';color:#C9C4B8">1. Параметри → Доступність → Дисплей і розмір тексту → Фільтри кольорів → увімкнути, обрати «Колірний відтінок», інтенсивність і відтінок — на максимум.</span>
+<span style="font:400 13px/1.45 'IBM Plex Sans';color:#C9C4B8">2. Доступність → Швидка команда → Фільтри кольорів. Тепер потрійне натискання бічної кнопки вмикає й вимикає режим.</span>
+<span style="font:600 13px 'IBM Plex Sans';margin-top:4px">Android</span>
+<span style="font:400 13px/1.45 'IBM Plex Sans';color:#C9C4B8">Залежить від виробника: шукайте «Корекція кольору» або «Фільтр кольору» в налаштуваннях доступності.</span>
+</div>
+<div style="height:48px;border:1px solid #57534B;display:flex;align-items:center;justify-content:center;font:500 14px 'IBM Plex Sans'">Відкрити налаштування доступності</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p class="dv-next">Специфікація: design_handoff_v3/README.md · токени: tokens.ts · логіка пального: fuel.ts · форматування: format.ts</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { now: Date.now(), running: { honda: Date.now() - 8280000 }, rA: {}, rB: { honda: Date.now() - 8280000, atlas: Date.now() - 2460000 }, l3: 1.2, rC: {}, rD: { honda: Date.now() - 8520000, atlas: Date.now() - 2460000 }, l4: 1.0, rE: { honda: Date.now() - 8640000, atlas: Date.now() - 2460000 }, rF: { honda: Date.now() - 8640000, atlas: Date.now() - 2460000 } };
+  componentDidMount() { this.t = setInterval(() => this.setState({ now: Date.now() }), 1000); }
+  componentWillUnmount() { clearInterval(this.t); }
+  toggle(id) {
+    this.setState(s => { const r = { ...s.running }; if (r[id]) delete r[id]; else r[id] = Date.now(); return { running: r }; });
+  }
+  t4base() {
+    const N = '\u00A0';
+    return [
+      { id: 'honda', name: 'Honda EU22i', model: 'Інвертор 2,2' + N + 'кВт', tank: 3.6, lph: 0.51, fuel: 3.6, hours: 206.0, last: '5 жовт.', accent: '#4C6EDB', svc: 'Заміна масла · прострочено на' + N + '4' + N + 'год', svcInk: '#C4321F', svcInkD: '#FF8A78' },
+      { id: 'hyundai', name: 'Hyundai HHY 7020FE', model: '6,5' + N + 'кВт, електростарт', tank: 25, lph: 1.6, fuel: 18, hours: 148.2, last: '4 жовт.', accent: '#8A5CC9', svc: 'Повітряний фільтр · залишилось 12' + N + 'год', svcInk: '#B86E0A', svcInkD: '#FFC266' },
+      { id: 'atlas', name: 'Atlas Copco QES 30', model: 'Дизель 30' + N + 'кВА', tank: 72, lph: 5.2, fuel: 41, hours: 193.1, last: '2 жовт.', accent: '#C9508C', svc: '', svcInk: '', svcInkD: '' },
+    ];
+  }
+  t4burn(k) { return (this.state.burn4 || {})[k] || {}; }
+  t4setBurn(k, id, v) { this.setState(s => { const b = { ...(s.burn4 || {}) }; b[k] = { ...(b[k] || {}), [id]: v }; return { burn4: b }; }); }
+  t4stop(k, id) {
+    const st = (this.state[k] || {})[id]; if (!st) return;
+    const g = this.t4base().find(x => x.id === id);
+    const used = g.lph * (Date.now() - st) / 3600000;
+    clearTimeout(this['ut_' + k]);
+    this.t4setBurn(k, id, (this.t4burn(k)[id] || 0) + used);
+    const hrs = (Date.now() - st) / 3600000;
+    this.setState(s => { const r = { ...s[k] }; delete r[id]; const ho = { ...(s.hrs4 || {}) }; ho[k] = { ...(ho[k] || {}), [id]: ((ho[k] || {})[id] || 0) + hrs }; return { [k]: r, hrs4: ho, ['u_' + k]: { id, st, used, hrs } }; });
+    this['ut_' + k] = setTimeout(() => this.setState({ ['u_' + k]: null }), 5000);
+  }
+  t4undo(k) {
+    const u = this.state['u_' + k]; if (!u) return; clearTimeout(this['ut_' + k]);
+    this.t4setBurn(k, u.id, (this.t4burn(k)[u.id] || 0) - u.used);
+    this.setState(s => { const ho = { ...(s.hrs4 || {}) }; ho[k] = { ...(ho[k] || {}), [u.id]: ((ho[k] || {})[u.id] || 0) - u.hrs }; return { [k]: { ...s[k], [u.id]: u.st }, hrs4: ho, ['u_' + k]: null }; });
+  }
+  t5base() {
+    const N = '\u00A0';
+    const short = { honda: 'Масло · прострочено 4' + N + 'год', hyundai: 'Фільтр повітря · ще 12' + N + 'год', atlas: '' };
+    return this.t4base().map(g => ({ ...g, svcShort: short[g.id], accent: g.id === 'atlas' ? '#2F86A6' : g.accent }));
+  }
+  t5vals() {
+    const N = '\u00A0';
+    const b = () => this.t5base();
+    if (!this.state.rG && !this._g) { this._g = 1; const e = this.state.rE || {}; const t = Date.now(); const ho = e.honda || t - 8640000, at = e.atlas || t - 2460000; setTimeout(() => this.setState({ rG: { honda: ho, atlas: at }, rH: { honda: ho, atlas: at, hyundai: t - 1500000 } }), 0); }
+    const E = this.t4('rE', b), F = this.t4('rG', b), H = this.t4('rH', b);
+    const f = F.byId[0];
+    const c = n => n.toFixed(1).replace('.', ',');
+    const free = Math.round(f.freeN * 10) / 10;
+    const L = this.state.l5 ?? Math.max(0.1, free);
+    const full = this.state.full5 ?? true;
+    const setL = (v, fl) => this.setState({ l5: Math.max(0.1, Math.round(v * 10) / 10), ...(fl === undefined ? {} : { full5: fl }) });
+    const diff = L - free;
+    const done = !!this.state.done5;
+    const tankFull = free < 0.05;
+    const over = !done && !tankFull && !full && diff > 0.05;
+    const calib = !done && !tankFull && full && Math.abs(diff) > 0.05;
+    const mk = (label, v) => { const ok = v <= free + 0.05; return { label, sub: ok ? c(v) + N + 'л' : 'більше за вільне', ok, no: !ok, on: ok ? () => setL(v, false) : () => {} }; };
+    const others = F.byId.filter(g => g.running && g.id !== 'honda');
+    const othersH = H.byId.filter(g => g.running && g.id !== 'honda');
+    return {
+      H, h5: H.byId[0], liveHN: othersH.length, liveHNames: othersH.map(g => g.name).join(', '),
+      tasks5: [
+        { title: 'Заміна масла', left: 'Прострочено на 4' + N + 'год', pct: '100%', ink: '#C4321F', inkD: '#FF8A78', inkN: '#FF6A55' },
+        { title: 'Повітряний фільтр', left: 'Залишилось 18' + N + 'год', pct: '88%', ink: '#B86E0A', inkD: '#FFC266', inkN: '#D9503E' },
+        { title: 'Перевірка акумулятора', left: 'Залишилось 70' + N + 'дн.', pct: '62%', ink: '#1B1A17', inkD: '#D9D5CB', inkN: '#8A2E24' },
+        { title: 'Свічка запалювання', left: 'Залишилось 245' + N + 'дн.', pct: '33%', ink: '#1B1A17', inkD: '#D9D5CB', inkN: '#8A2E24' },
+        { title: 'Паливний фільтр', left: 'Залишилось 260' + N + 'год', pct: '13%', ink: '#1B1A17', inkD: '#D9D5CB', inkN: '#8A2E24' },
+      ],
+      E, F, f, live5One: others.length === 1 ? others : [], live5Many: others.length > 1, live5N: others.length,
+      live5Names: others.map(g => g.name).join(', '),
+      live5Title: others.length === 1 ? others[0].name : others.length ? `Ще ${others.length} працюють` : 'Інші генератори вимкнені',
+      live5Sub: others.length === 1 ? 'працює · ' + others[0].hmWords : others.map(g => g.name).join(', '), live5None: others.length === 0,
+      presets5: [{ label: 'До повного', sub: c(free) + N + 'л', ok: true, no: false, on: () => setL(free, true) }, mk('Як минулого разу', 3.2), mk('1 літр', 1)],
+      l5: c(L), inc5: () => setL(L + 0.1), dec5: () => setL(L - 0.1),
+      full5: full, notFull5: !full, toggleFull5: () => this.setState({ full5: !full }),
+      over5: over, calib5: calib, calib5Text: `Оцінку буде скориговано на ${diff > 0 ? '+' : '−'}${c(Math.abs(diff))}${N}л`,
+      free5S: c(free), after5S: full || over ? f.tankS : c(Math.min(f.tank, f.leftN + L)),
+      form5Op: f.running ? 0.35 : 1, form5Pe: f.running ? 'none' : 'auto', save5Show: !f.running && !done && !tankFull, tankFull5: !f.running && !done && tankFull,
+      info5: !!this.state.info5, toggleInfo5: () => this.setState(s => ({ info5: !s.info5 })),
+      done5: !!this.state.done5,
+      save5: () => {
+        const cur = this.t4burn('rG').honda || 0;
+        this.t4setBurn('rG', 'honda', (full || over) ? f.fuel - f.tank : cur - L);
+        clearTimeout(this.d5t);
+        this.setState({ done5: true, l5: null, full5: null });
+        this.d5t = setTimeout(() => this.setState({ done5: false }), 6000);
+      },
+      restart5: () => { clearTimeout(this.d5t); this.setState({ done5: false }); this.t3start('rG', 'honda'); },
+    };
+  }
+  t4(k, baseFn) {
+    const N = '\u00A0';
+    const map = this.state[k] || {}, burn = this.t4burn(k);
+    const c = n => n.toFixed(1).replace('.', ',');
+    const pad = n => String(n).padStart(2, '0');
+    const gens = (baseFn ? baseFn() : this.t4base()).map(g => {
+      const st = map[g.id];
+      const sec = st ? Math.max(0, Math.floor((this.state.now - st) / 1000)) : 0;
+      const hh = Math.floor(sec / 3600), mm = Math.floor(sec % 3600 / 60), ss = sec % 60;
+      const left = Math.min(g.tank, Math.max(0, g.fuel - (burn[g.id] || 0) - g.lph * sec / 3600));
+      return { ...g, running: !!st, idle: !st, hasSvc: !!g.svc, leftN: left, freeN: g.tank - left,
+        hmWords: `${hh}${N}год ${mm}${N}хв`, hmShort: `${hh}:${pad(mm)}`, clock: `${hh}:${pad(mm)}:${pad(ss)}`,
+        since: st ? new Date(st).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '',
+        used: c(g.lph * sec / 3600), fuelLeft: c(left), hrsLeft: c(left / g.lph), fuelPct: Math.round(left / g.tank * 100) + '%',
+        totalHours: c(g.hours + (((this.state.hrs4 || {})[k] || {})[g.id] || 0) + sec / 3600), tankS: c(g.tank), lphS: g.lph.toFixed(2).replace('.', ','),
+        stop: () => this.t4stop(k, g.id), start: () => this.t3start(k, g.id) };
+    });
+    const sorted = [...gens.filter(g => g.running), ...gens.filter(g => g.idle)];
+    const n = gens.filter(g => g.running).length;
+    const u = this.state['u_' + k];
+    const ug = u && gens.find(b => b.id === u.id);
+    return { gens: sorted, byId: gens, n, summary: n === 0 ? '3 генератори · усі вимкнені' : `3 генератори · ${n} ${n === 1 ? 'працює' : 'працюють'}`,
+      hasUndo: !!u, undoText: u ? `Записано ${c((this.state.now - u.st) / 3600000)}${N}год. роботи · ${ug.name}` : '', undo: () => this.t4undo(k) };
+  }
+  t4vals() {
+    const C = this.t4('rC'), D = this.t4('rD');
+    const e = D.byId[0];
+    const c = n => n.toFixed(1).replace('.', ',');
+    const L = this.state.l4 ?? 1.0;
+    const full = !!this.state.full4;
+    const setL = v => this.setState({ l4: Math.max(0.1, Math.round(v * 10) / 10), s4: false });
+    const free = e.freeN;
+    const over = !full && L > free + 0.05;
+    const after = Math.min(e.tank, e.leftN + L);
+    const mk = (label, v) => { const ok = v <= free + 0.05; return { label, sub: ok ? c(v) + '\u00A0л' : 'більше за вільне', ok, no: !ok, on: ok ? () => setL(v) : () => {} }; };
+    const others = D.byId.filter(g => g.running && g.id !== 'honda');
+    return {
+      C, D, e, liveOne: others.length === 1 ? others : [], liveMany: others.length > 1, liveManyN: others.length, anyLive: others.length > 0,
+      presets4: [{ label: 'До повного', sub: c(free) + '\u00A0л', ok: true, no: false, on: () => setL(Math.max(0.1, Math.round(free * 10) / 10)) }, mk('Як минулого разу', 3.2), mk('1 літр', 1)],
+      l4: c(L), inc4: () => setL(L + 0.1), dec4: () => setL(L - 0.1),
+      full4: full, notFull4: !full, toggleFull4: () => this.setState(s => ({ full4: !s.full4, s4: false })),
+      over4: over, freeS: c(free), afterS: full || over ? e.tankS : c(after),
+      formOp: e.running ? 0.35 : 1, formPe: e.running ? 'none' : 'auto',
+      s4: !!this.state.s4, ns4: !this.state.s4 && !e.running,
+      save4: () => {
+        const cur = this.t4burn('rD').honda || 0;
+        const nb = (full || over) ? e.fuel - e.tank : cur - L;
+        this.t4setBurn('rD', 'honda', nb);
+        this.setState({ s4: true });
+      },
+    };
+  }
+  t3stop(k, id) {
+    const st = this.state[k][id];
+    clearTimeout(this['ut_' + k]);
+    this.setState(s => { const r = { ...s[k] }; delete r[id]; return { [k]: r, ['u_' + k]: { id, st } }; });
+    this['ut_' + k] = setTimeout(() => this.setState({ ['u_' + k]: null }), 5000);
+  }
+  t3start(k, id) { this.setState(s => ({ [k]: { ...s[k], [id]: Date.now() } })); }
+  t3undo(k) { const u = this.state['u_' + k]; if (!u) return; clearTimeout(this['ut_' + k]); this.setState(s => ({ [k]: { ...s[k], [u.id]: u.st }, ['u_' + k]: null })); }
+  t3(k) {
+    const map = this.state[k] || {};
+    const c = n => n.toFixed(1).replace('.', ',');
+    const pad = n => String(n).padStart(2, '0');
+    const base = [
+      { id: 'honda', name: 'Honda EU22i', model: 'Інвертор 2,2 кВт', tank: 3.6, lph: 0.51, fuel: 3.6, last: '5 жовт.', accent: '#E8823A', svc: 'Заміна масла · прострочено на 4 год', svcInk: '#C4321F', svcInkD: '#FF7A66' },
+      { id: 'hyundai', name: 'Hyundai HHY 7020FE', model: '6,5 кВт, електростарт', tank: 25, lph: 1.6, fuel: 18, last: '4 жовт.', accent: '#4F8A6E', svc: 'Повітряний фільтр · залишилось 12 год', svcInk: '#B86E0A', svcInkD: '#FFB54D' },
+      { id: 'atlas', name: 'Atlas Copco QES 30', model: 'Дизель 30 кВА', tank: 72, lph: 5.2, fuel: 41, last: '2 жовт.', accent: '#5B6FB8', svc: '', svcInk: '', svcInkD: '' },
+    ];
+    const gens = base.map(g => {
+      const st = map[g.id];
+      const sec = st ? Math.max(0, Math.floor((this.state.now - st) / 1000)) : 0;
+      const hh = Math.floor(sec / 3600), mm = Math.floor(sec % 3600 / 60), ss = sec % 60;
+      const left = Math.max(0, g.fuel - g.lph * sec / 3600);
+      return { ...g, running: !!st, idle: !st, hasSvc: !!g.svc,
+        hm: `${hh}:${pad(mm)}`, clock: `${hh}:${pad(mm)}:${pad(ss)}`,
+        since: st ? new Date(st).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }) : '',
+        used: c(g.lph * sec / 3600), fuelLeft: c(left), hrsLeft: c(left / g.lph), fuelPct: Math.round(left / g.tank * 100) + '%',
+        fill: c(g.tank - left), stop: () => this.t3stop(k, g.id), start: () => this.t3start(k, g.id) };
+    });
+    const n = gens.filter(g => g.running).length;
+    const u = this.state['u_' + k];
+    const ug = u && base.find(b => b.id === u.id);
+    return { gens, n, summary: n === 0 ? '3 генератори · усі вимкнені' : `3 генератори · ${n} ${n === 1 ? 'працює' : 'працюють'}`,
+      hasUndo: !!u, undoText: u ? `Записано ${c((this.state.now - u.st) / 3600000)} год. роботи · ${ug.name}` : '', undo: () => this.t3undo(k) };
+  }
+  renderVals() {
+    const base = [
+      { id: 'honda', name: 'Honda EU22i', model: 'Inverter 2.2 kW', hours: '206.0', refills: 33, dueText: 'Oil change overdue', last: 'Oct 5', color: '#E8823A', tint: '#FBE4CF', initial: 'H' },
+      { id: 'hyundai', name: 'Hyundai HHY 7020FE', model: '6.5 kW, electric start', hours: '148.2', refills: 10, dueText: 'Air filter due soon', last: 'Oct 4', color: '#4F8A6E', tint: '#DCEBDF', initial: 'Hy' },
+      { id: 'atlas', name: 'Atlas Copco QES 30', model: 'Diesel 30 kVA', hours: '193.1', refills: 10, dueText: '', last: 'Oct 2', color: '#5B6FB8', tint: '#DDE2F3', initial: 'AC' },
+    ];
+    const pad = n => String(n).padStart(2, '0');
+    const fmt = st => {
+      const sec = Math.max(0, Math.floor((this.state.now - st) / 1000));
+      const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+      return { clock: `${h}:${pad(m)}:${pad(s)}`, short: `${h} h ${m} m`, litres: (sec / 3600 * 0.51).toFixed(1), since: new Date(st).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) };
+    };
+    const gens = base.map(g => {
+      const st = this.state.running[g.id];
+      const f = st ? fmt(st) : {};
+      return { ...g, ...f, running: !!st, idle: !st, hasDue: !!g.dueText, toggle: () => this.toggle(g.id),
+        status: st ? `Running since ${f.since}` : `${g.hours} h · last ran ${g.last}` };
+    });
+    const h = gens[0];
+    const tasks = [
+      { title: 'Oil change', left: '4 h overdue', pct: '100%', ink: '#C4321F' },
+      { title: 'Air filter', left: '18 h left', pct: '88%', ink: '#C27A12' },
+      { title: 'Battery check', left: '70 days', pct: '40%', ink: '#1B1A17' },
+      { title: 'Spark plug', left: '245 days', pct: '20%', ink: '#1B1A17' },
+      { title: 'Fuel filter', left: '260 h left', pct: '12%', ink: '#1B1A17' },
+    ];
+    const sessions = [
+      { date: 'Oct 4', range: '8:00 – 11:54 PM', dur: '3.9 h' },
+      { date: 'Sep 30', range: '6:00 – 8:12 PM', dur: '2.2 h' },
+      { date: 'Sep 27', range: '8:00 – 10:00 PM', dur: '2.0 h' },
+    ];
+    const mv = [['May', 80], ['Jun', 118], ['Jul', 122], ['Aug', 123], ['Sep', 88], ['Oct', 15]];
+    const months = mv.map(([label, v], i) => ({ label, h: Math.round(v / 123 * 76) + 'px', fill: i === 5 ? '#E8823A' : '#F3D3B5' }));
+    const runningGens = gens.filter(g => g.running);
+    const svc = {
+      honda: { svcName: 'Oil change', svcLeft: '4 h overdue', svcPct: '100%', svcInk: '#D64230', svcInkD: '#FF7A66' },
+      hyundai: { svcName: 'Air filter', svcLeft: 'due soon', svcPct: '86%', svcInk: '#C77A0A', svcInkD: '#FFB54D' },
+      atlas: { svcName: 'Fuel filter', svcLeft: '120 h left', svcPct: '40%', svcInk: '#2F7D5B', svcInkD: '#5FD39A' },
+    };
+    const spark = { honda: [3, 0, 2.2, 0, 2, 3.9, 2.3], hyundai: [0, 4, 0, 0, 3, 1, 0], atlas: [5, 0, 6, 0, 0, 4, 0] };
+    gens.forEach(g => { Object.assign(g, svc[g.id]); g.bars = spark[g.id].map((v, i) => ({ h: Math.max(3, Math.round(v / 6 * 30)) + 'px', today: i === 6 })); });
+    const pg = runningGens[0] || gens[0];
+    const L = this.state.litres ?? 5;
+    const setL = v => this.setState({ litres: Math.max(0.5, Math.round(v * 2) / 2) });
+    const fuelV = [110, 222, 290, 228, 185, 25];
+    const chart = mv.map(([label, v], i) => ({ label, hh: Math.round(v / 123 * 120) + 'px', fh: Math.round(fuelV[i] / 290 * 120) + 'px', val: v, fval: fuelV[i], cur: i === 5 }));
+    return { gens, h, tasks, sessions, months, runningGens, idleGens: gens.filter(g => g.idle),
+      runningCount: runningGens.length, noneRunning: runningGens.length === 0, anyRunning: runningGens.length > 0,
+      pg, pgShort: pg.name.split(' ')[0],
+      litres: L.toFixed(1), incL: () => setL(L + 0.5), decL: () => setL(L - 0.5),
+      quickL: [2, 5, 10, 20].map(v => ({ v, on: () => setL(v) })),
+      saved: !!this.state.saved, notSaved: !this.state.saved, save: () => { this.setState({ saved: true }); setTimeout(() => this.setState({ saved: false }), 1600); },
+      chart, ...this.t3vals(), ...this.t4vals(), ...this.t5vals() };
+  }
+  t3vals() {
+    const A = this.t3('rA'), B = this.t3('rB');
+    const d = B.gens[0];
+    const l3 = this.state.l3 ?? 1.2;
+    const setL3 = v => this.setState({ l3: Math.max(0.1, Math.round(v * 10) / 10), s3: false });
+    return {
+      A, B, d, liveOthers: B.gens.filter(g => g.running && g.id !== 'honda'),
+      nowHM: new Date(this.state.now).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' }),
+      tasks3: [
+        { title: 'Заміна масла', left: 'Прострочено на 4 год', pct: '100%', ink: '#C4321F', tag: 'Час ТО' },
+        { title: 'Повітряний фільтр', left: 'Залишилось 18 год', pct: '88%', ink: '#B86E0A', tag: 'Скоро ТО' },
+        { title: 'Перевірка акумулятора', left: 'Залишилось 70 дн.', pct: '62%', ink: '#1B1A17', tag: '' },
+        { title: 'Свічка запалювання', left: 'Залишилось 245 дн.', pct: '33%', ink: '#1B1A17', tag: '' },
+        { title: 'Паливний фільтр', left: 'Залишилось 260 год', pct: '13%', ink: '#1B1A17', tag: '' },
+      ],
+      l3: l3.toFixed(1).replace('.', ','), inc3: () => setL3(l3 + 0.1), dec3: () => setL3(l3 - 0.1),
+      presets3: [
+        { label: 'До повного', sub: d.fill + ' л', on: () => setL3(parseFloat(d.fill.replace(',', '.'))) },
+        { label: 'Як минулого разу', sub: '3,2 л', on: () => setL3(3.2) },
+        { label: 'Пів бака', sub: '1,8 л', on: () => setL3(1.8) },
+      ],
+      s3: !!this.state.s3, ns3: !this.state.s3, save3: () => this.setState({ s3: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

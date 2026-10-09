@@ -82,3 +82,6 @@ landing/_site/
 
 # Store screenshots (large PNGs, regenerate with scripts/demo-data)
 store/
+
+# Raw design exports (the handoff itself lives in docs/design/)
+_new-design/
