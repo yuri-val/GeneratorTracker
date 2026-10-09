@@ -9,6 +9,8 @@ import AnalyticsScreen from '../screens/analytics/AnalyticsScreen';
 import SettingsScreen from '../screens/settings/SettingsScreen';
 import { ICONS } from '../constants/icons';
 import { useAppTheme } from '../theme/useAppTheme';
+import { nativeHeaderStyle } from '../theme/navigation';
+import { FONT } from '../theme/tokens';
 
 /**
  * Native bottom tabs: UITabBar on iOS (Liquid Glass on iOS 26+), Material 3
@@ -38,6 +40,7 @@ function withTabStack(name: string, Component: React.ComponentType) {
         screenOptions={{
           headerShown: Platform.OS === 'ios',
           contentStyle: { backgroundColor: theme.colors.background },
+          ...nativeHeaderStyle(theme),
         }}
       >
         <Stack.Screen name={`${name}Root`} component={Component} />
@@ -60,11 +63,12 @@ export default function MainTabs() {
 
   return (
     <Tab.Navigator
-      tabBarActiveTintColor={theme.colors.primary}
+      tabBarActiveTintColor={theme.colors.onBackground}
       tabBarInactiveTintColor={theme.colors.onSurfaceVariant}
       activeIndicatorColor={theme.colors.primaryContainer}
       rippleColor={theme.colors.primaryContainer}
-      tabBarStyle={Platform.OS === 'android' ? { backgroundColor: theme.colors.elevation.level2 } : undefined}
+      tabLabelStyle={Platform.OS === 'android' ? { fontFamily: FONT.sans600, fontSize: 11 } : undefined}
+      tabBarStyle={Platform.OS === 'android' ? { backgroundColor: theme.colors.background } : undefined}
       hapticFeedbackEnabled
     >
       <Tab.Screen

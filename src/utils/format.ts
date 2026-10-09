@@ -68,3 +68,13 @@ export function fmtSummary(total: number, running: number, lang: string) {
   const verb = rules.select(running) === 'one' ? 'працює' : 'працюють';
   return `${total} ${noun} · ${running === 0 ? 'усі вимкнені' : `${running} ${verb}`}`;
 }
+
+const SLOT = '\u0000';
+/**
+ * Split a translated string around one interpolated value, so the value can be set in mono:
+ * splitAround(t, 'home.since', 'time') → ['з ', ''] for "з {{time}}".
+ */
+export function splitAround(t: (key: string, options?: Record<string, unknown>) => string, key: string, name: string, extra: Record<string, unknown> = {}): [string, string] {
+  const [before, after = ''] = t(key, { ...extra, [name]: SLOT }).split(SLOT);
+  return [before, after];
+}

@@ -4,8 +4,23 @@
     {
       "name": "landing",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8765", "-d", "landing/_site"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8765",
+        "-d",
+        "landing/_site"
+      ],
       "port": 8765
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && CI=1 BROWSER=none EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true npx expo start --web --port 8081 --clear"
+      ],
+      "port": 8081
     }
   ]
 }

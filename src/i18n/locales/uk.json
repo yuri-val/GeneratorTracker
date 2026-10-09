@@ -25,12 +25,20 @@
         "settings": "Налаштування"
     },
     "home": {
-        "title": "Генератор-Трекер",
+        "title": "Генератори",
         "totalHours": "Всього годин",
         "refills": "Заправки",
         "noGenerators": "Генераторів ще немає",
         "addFirstGenerator": "Натисніть +, щоб додати свій перший генератор",
-        "addFirstGeneratorIOS": "Натисніть + угорі, щоб додати перший генератор"
+        "addFirstGeneratorIOS": "Натисніть + угорі, щоб додати перший генератор",
+        "lastSession": "Остання сесія {{date}}",
+        "fuelApprox": "≈ {{litres}} л",
+        "fuelLeft": "Пальне ≈ {{litres}} л · ~{{hours}} год",
+        "since": "з {{time}}",
+        "start": "Старт",
+        "stop": "Стоп",
+        "summaryEmpty": "Додайте генератор, щоб вести облік",
+        "fuelLabel": "Пальне"
     },
     "analytics": {
         "title": "Аналітика",
@@ -94,14 +102,28 @@
         "deleteAccountWrongPassword": "Неправильний пароль. Нічого не видалено.",
         "deleteAccountReauth": "З міркувань безпеки вийдіть, увійдіть знову, а потім видаліть обліковий запис.",
         "deleteAccountCloudFailed": "Не вдалося видалити дані в хмарі. Перевірте з’єднання й спробуйте ще раз — дані на пристрої не втрачено.",
-        "deleteAccountAccountFailed": "Дані в хмарі видалено, але сам обліковий запис — ні. Увійдіть знову й повторіть видалення."
+        "deleteAccountAccountFailed": "Дані в хмарі видалено, але сам обліковий запис — ні. Увійдіть знову й повторіть видалення.",
+        "appearance": "Вигляд",
+        "theme": "Тема",
+        "themeSystem": "Як у системі",
+        "nightRed": "Нічний червоний режим",
+        "nightRedTitle": "Червоний екран уночі",
+        "nightRedBody": "Не збиває адаптацію очей до темряви, коли йдете до генератора. Працює для всього телефона, включно з клавіатурою.",
+        "nightRedIOS1": "Параметри → Доступність → Дисплей і розмір тексту → Фільтри кольорів → увімкнути, обрати «Колірний відтінок», інтенсивність і відтінок — на максимум.",
+        "nightRedIOS2": "Доступність → Швидка команда → Фільтри кольорів. Тепер потрійне натискання бічної кнопки вмикає й вимикає режим.",
+        "nightRedAndroid": "Залежить від виробника: шукайте «Корекція кольору» або «Фільтр кольору» в налаштуваннях доступності.",
+        "openAccessibility": "Відкрити налаштування доступності",
+        "appName": "Generator Tracker",
+        "themeLight": "Світла",
+        "themeDark": "Темна",
+        "nightRedClose": "Закрити"
     },
     "detail": {
         "generatorNotFound": "Генератор не знайдено",
         "activeSession": "Сесія триває",
         "startedAt": "Запущено",
-        "stopSession": "ЗУПИНИТИ",
-        "startSession": "ЗАПУСТИТИ СЕСІЮ",
+        "stopSession": "Зупинити",
+        "startSession": "Запустити сесію",
         "workSessions": "Сесії",
         "refills": "Заправки",
         "deleteGeneratorTitle": "Видалити генератор",
@@ -112,7 +134,19 @@
         "failedToStopSession": "Не вдалося зупинити сесію",
         "endedAt": "Завершено о",
         "failedToDeleteGenerator": "Не вдалося видалити генератор",
-        "generatorDeleted": "Генератор успішно видалено"
+        "generatorDeleted": "Генератор успішно видалено",
+        "editSessionTime": "Змінити час",
+        "used": "Використано",
+        "inTank": "У баку",
+        "fuelEstimateInfo": "Оцінка за середньою витратою {{lph}} л/год. Реальна залежить від навантаження.",
+        "maintenanceScaleHint": "Шкала — використаний ресурс до наступного ТО",
+        "sessionStoppedUndo": "Записано {{hours}} год. роботи · {{name}}",
+        "motorHours": "Мотогодини",
+        "lph": "л/год",
+        "tankLitres": "Бак, л",
+        "fuelLine": "Пальне {{fuel}} з {{tank}} · ~{{hours}} год",
+        "fuelUnknown": "Рівень пального невідомий — відмітьте заправку «до повного»",
+        "infoToggle": "Пояснення оцінки"
     },
     "generator": {
         "loadError": "Не вдалося завантажити генератор",
@@ -125,7 +159,9 @@
         "modelLabel": "Модель (опціонально)",
         "modelPlaceholder": "н-р, EU2200i Companion",
         "purchaseDateLabel": "Дата покупки",
-        "dateFormatHint": "Формат: РРРР-ММ-ДД (н-р, 2024-01-15)"
+        "dateFormatHint": "Формат: РРРР-ММ-ДД (н-р, 2024-01-15)",
+        "tankLabel": "Об'єм бака, л (опціонально)",
+        "tankHint": "Потрібен для оцінки залишку пального"
     },
     "workSession": {
         "deleteError": "Не вдалося видалити сесію роботи",
@@ -172,7 +208,29 @@
         "deleteConfirm": "Ви впевнені, що хочете видалити цю заправку? Цю дію неможливо скасувати.",
         "addButton": "Додати заправку",
         "emptyState": "Заправок ще немає",
-        "notesPlaceholder": "Додайте примітки до цієї заправки..."
+        "notesPlaceholder": "Додайте примітки до цієї заправки...",
+        "sheetSubtitle": "Бак {{tank}} л · зараз ≈ {{level}} л · вільно {{free}} л",
+        "runningTitle": "Генератор працює",
+        "runningBody": "Перед заправкою заглушіть двигун. Сесію буде завершено, дату заправки заповнено.",
+        "stopAndRefill": "Зупинити й заправити",
+        "presetToFull": "До повного",
+        "presetAsLastTime": "Як минулого разу",
+        "presetTooBig": "більше за вільне",
+        "markedFull": "Заправлено до повного",
+        "markedFullHint": "Рівень у баку стане {{tank}} л",
+        "calibrate": "Оцінку буде скориговано на {{diff}} л — розрахунковий залишок був неточним.",
+        "overFree": "Більше за вільне місце ({{free}} л). Буде записано повний бак, а оцінку скориговано.",
+        "after": "Після заправки ≈ {{after}} л з {{tank}}",
+        "saveAmount": "Зберегти {{litres}} л",
+        "tankFull": "Бак повний",
+        "saved": "Заправку збережено",
+        "startAgain": "Запустити знову",
+        "formDisabledHint": "Форма стане доступною після зупинки.",
+        "today": "Сьогодні",
+        "levelUnknown": "Бак {{tank}} л · рівень невідомий",
+        "stepperDecrease": "Менше",
+        "stepperIncrease": "Більше",
+        "fixedPreset": "{{litres}} л"
     },
     "maintenance": {
         "tabLabel": "ТО",
@@ -212,7 +270,11 @@
         "daysLeft": "Залишилось {{days}} дн.",
         "daysOverdue": "Прострочено на {{days}} дн.",
         "badgeDue": "{{count}} час ТО",
-        "badgeSoon": "{{count}} скоро"
+        "badgeSoon": "{{count}} скоро",
+        "shortHoursOverdue": "прострочено {{hours}} год",
+        "shortHoursLeft": "ще {{hours}} год",
+        "shortDaysOverdue": "прострочено {{days}} дн.",
+        "shortDaysLeft": "ще {{days}} дн."
     },
     "auth": {
         "createAccount": "Створити обліковий запис",
@@ -253,5 +315,11 @@
         "days": "Дні",
         "daysSuffix": "дн.",
         "lastService": "Останнє обслуговування"
+    },
+    "live": {
+        "running": "працює · {{duration}}",
+        "moreRunning": "Ще {{count}} працюють",
+        "toHome": "На головну ›",
+        "stopNamed": "Зупинити {{name}}"
     }
 }
