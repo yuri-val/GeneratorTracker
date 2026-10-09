@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { visibleText } from './helpers';
 
 // First bundle compile can be slow; give the initial hydration extra room.
 const HYDRATE_TIMEOUT = 90_000;
@@ -7,9 +8,7 @@ const waitForApp = async (page: Page) => {
   await page.getByText('No generators yet').waitFor({ timeout: HYDRATE_TIMEOUT });
 };
 
-// The Material top-tab label renders more than once on web; pick the first.
-const openMaintenanceTab = (page: Page) =>
-  page.getByRole('tab', { name: /Maintenance/ }).first().click();
+const openMaintenanceTab = (page: Page) => page.getByTestId('detail-tab-maintenance').first().click();
 
 test.describe('Maintenance feature (web e2e)', () => {
   test('create a generator and a maintenance task via the UI', async ({ page }) => {
@@ -36,9 +35,8 @@ test.describe('Maintenance feature (web e2e)', () => {
     // Back on the detail screen — ensure the Maintenance tab content is visible
     await openMaintenanceTab(page);
     await expect(page.getByText('Oil change').first()).toBeVisible();
-    await expect(page.getByText('Every 250 h').first()).toBeVisible();
-    // A fresh generator (0 engine hours) is well within the interval -> OK
-    await expect(page.getByText('OK').first()).toBeVisible();
+    // A fresh generator (0 engine hours) is well within the interval: the full interval is left
+    await expect(page.getByText('250 h left').first()).toBeVisible();
   });
 
   test('an overdue task reads "Due now" and resets to "OK" after servicing', async ({ page }) => {
@@ -79,19 +77,20 @@ test.describe('Maintenance feature (web e2e)', () => {
     await page.goto('/');
     await page.getByText('Seeded Gen').waitFor({ timeout: HYDRATE_TIMEOUT });
 
-    // Home card shows the "due" badge
-    await expect(page.getByText('1 due').first()).toBeVisible();
+    // Home row surfaces the overdue task with the ▲ cue
+    await expect(page.getByTestId('home-maintenance-g-seed')).toContainText('▲ Seeded Service · ');
+    await expect(page.getByTestId('home-maintenance-g-seed')).toContainText('days overdue');
 
     // Open the generator and go to Maintenance
     await page.getByText('Seeded Gen').first().click();
     await openMaintenanceTab(page);
 
-    await expect(page.getByText('Seeded Service').first()).toBeVisible();
-    await expect(page.getByText('Due now').first()).toBeVisible();
+    await expect(visibleText(page, 'Seeded Service', true).first()).toBeVisible();
+    await expect(visibleText(page, /^▲ \d+ days overdue$/).first()).toBeVisible();
 
-    // Mark it serviced -> resets to today -> OK
-    await page.getByText('Mark serviced').first().click();
-    await expect(page.getByText('OK').first()).toBeVisible();
-    await expect(page.getByText('Due now')).toHaveCount(0);
+    // Mark it serviced -> resets to today -> the whole interval is left
+    await page.getByTestId('mark-serviced-m-seed').click();
+    await expect(visibleText(page, '30 days left').first()).toBeVisible();
+    await expect(visibleText(page, /days overdue/)).toHaveCount(0);
   });
 });

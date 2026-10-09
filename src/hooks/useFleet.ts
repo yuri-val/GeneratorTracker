@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import type { Generator, MaintenanceTask, Refill, WorkSession } from '../models/types';
 import { getGenerators, getMaintenanceTasks, getRefills, getWorkSessions } from '../utils/storage';
@@ -6,7 +6,7 @@ import { calculateGeneratorStats } from '../utils/calculations';
 import { averageLph, estimateFuel, type FuelEstimate } from '../utils/fuel';
 import { generatorColor } from '../theme/tokens';
 import { worstTask, type TaskWithStatus } from '../utils/maintenanceView';
-import { sessionElapsedMs } from '../services/sessions';
+import { onSessionsChanged, sessionElapsedMs } from '../services/sessions';
 
 export interface FleetItem {
   generator: Generator;
@@ -58,7 +58,7 @@ export function buildFleet(
   return [...items.filter(i => i.running), ...items.filter(i => !i.running)];
 }
 
-/** Loads the fleet on focus; `reload()` after a start/stop/undo. */
+/** Loads the fleet on focus and after every start/stop/undo anywhere in the app. */
 export function useFleet() {
   const [raw, setRaw] = useState<{ g: Generator[]; s: WorkSession[]; r: Refill[]; t: MaintenanceTask[] } | null>(null);
 
@@ -72,6 +72,10 @@ export function useFleet() {
       reload().catch(error => console.error('Error loading generators:', error));
     }, [reload]),
   );
+  // Start/stop/undo from another place (snackbar action, live bar, refill sheet) while this screen stays focused.
+  useEffect(() => onSessionsChanged(() => {
+    reload().catch(error => console.error('Error loading generators:', error));
+  }), [reload]);
 
   return { raw, reload };
 }

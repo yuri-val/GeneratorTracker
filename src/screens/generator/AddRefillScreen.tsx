@@ -329,6 +329,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
               onPress={() => setMarkedFull(v => !v)}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: markedFull }}
+              aria-checked={markedFull}
               style={styles.checkRow}
               testID="refill-marked-full"
             >

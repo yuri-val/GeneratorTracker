@@ -274,6 +274,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
             onPress={() => setSegment(key)}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
+            aria-selected={active}
             accessibilityLabel={`${label} (${count})`}
             testID={`detail-tab-${key}`}
             style={[styles.tab, active && { borderBottomColor: gt.text }]}
