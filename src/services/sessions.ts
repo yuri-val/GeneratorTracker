@@ -5,6 +5,17 @@ import type { Refill, WorkSession } from '../models/types';
 import { getActiveWorkSession, getWorkSessions, saveRefill, saveWorkSession } from '../utils/storage';
 import { calculateActiveSessionHours, generateId, getCurrentDate, getCurrentTime } from '../utils/calculations';
 
+type Listener = () => void;
+const listeners = new Set<Listener>();
+/** Subscribe to start/stop/undo writes (the live bar on the tabs listens). Returns unsubscribe. */
+export const onSessionsChanged = (listener: Listener) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+const emit = () => listeners.forEach(l => l());
+
 /** Elapsed milliseconds of a running session (date + startTime are local). */
 export const sessionElapsedMs = (session: Pick<WorkSession, 'date' | 'startTime'>, now = Date.now()): number =>
   Math.max(0, now - new Date(`${session.date}T${session.startTime}`).getTime());
@@ -26,6 +37,7 @@ export async function startSession(generatorId: string): Promise<WorkSession> {
     syncStatus: 'pending',
   };
   await saveWorkSession(session);
+  emit();
   return session;
 }
 
@@ -51,6 +63,7 @@ export async function stopSession(running: WorkSession): Promise<StoppedSession>
     syncStatus: 'pending',
   };
   await saveWorkSession(stopped);
+  emit();
   return { running, stopped };
 }
 
@@ -70,6 +83,7 @@ export async function undoStop(running: WorkSession): Promise<boolean> {
     lastModified: new Date().toISOString(),
     syncStatus: 'pending',
   });
+  emit();
   return true;
 }
 

@@ -37,6 +37,9 @@ import {
   getAccountKind,
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
+import { NightRedSheet } from '../../components/NightRedSheet';
+import { useThemePreference } from '../../contexts/ThemePreferenceContext';
+import type { ThemePreference } from '../../utils/storage';
 
 // Read once from the app config so the About section never lags behind app.json.
 const APP_VERSION = Constants.expoConfig?.version ?? '';
@@ -49,6 +52,9 @@ export default function SettingsScreen() {
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
+  const { preference: themePreference, setPreference: setThemePreference } = useThemePreference();
+  const [nightRedOpen, setNightRedOpen] = useState(false);
+  const nightRed = <NightRedSheet visible={nightRedOpen} onClose={() => setNightRedOpen(false)} />;
   const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
 
   const handleLanguageChange = async (newLang: string) => {
@@ -256,6 +262,10 @@ export default function SettingsScreen() {
         onSync={handleManualSync}
         language={i18n.language.split('-')[0]}
         onLanguageChange={handleLanguageChange}
+        themePreference={themePreference}
+        onThemeChange={setThemePreference}
+        onNightRed={() => setNightRedOpen(true)}
+        nightRed={nightRed}
       />
     );
   }
@@ -406,6 +416,33 @@ export default function SettingsScreen() {
           </Animated.View>
         )}
 
+        <Animated.View entering={FadeInDown.delay(125).springify()}>
+          <List.Section>
+            <List.Subheader style={styles.sectionTitle}>{t('settings.appearance')}</List.Subheader>
+            <Surface elevation={1} style={styles.sectionCard}>
+              <Text variant="labelLarge" style={{ marginBottom: 8 }}>
+                {t('settings.theme')}
+              </Text>
+              <SegmentedButtons
+                value={themePreference}
+                onValueChange={value => setThemePreference(value as ThemePreference)}
+                buttons={[
+                  { value: 'system', label: t('settings.themeSystem'), testID: 'theme-system' },
+                  { value: 'light', label: t('settings.themeLight'), testID: 'theme-light' },
+                  { value: 'dark', label: t('settings.themeDark'), testID: 'theme-dark' },
+                ]}
+              />
+              <List.Item
+                title={t('settings.nightRed')}
+                onPress={() => setNightRedOpen(true)}
+                right={props => <List.Icon {...props} icon="chevron-right" />}
+                style={{ marginTop: 8, paddingHorizontal: 0 }}
+                testID="night-red"
+              />
+            </Surface>
+          </List.Section>
+        </Animated.View>
+
         <Animated.View entering={FadeInDown.delay(150).springify()}>
           <List.Section>
             <List.Subheader style={styles.sectionTitle}>{t('settings.language')}</List.Subheader>
@@ -427,7 +464,7 @@ export default function SettingsScreen() {
             <List.Subheader style={styles.sectionTitle}>{t('settings.about')}</List.Subheader>
             <Surface elevation={1} style={styles.sectionCard}>
               <List.Item
-                title={t('home.title')}
+                title={t('settings.appName')}
                 description={t('settings.version', { version: APP_VERSION })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
@@ -442,6 +479,7 @@ export default function SettingsScreen() {
           </List.Section>
         </Animated.View>
       </ScrollView>
+      {nightRed}
       <DeleteAccountDialog
         visible={deleteDialogVisible}
         email={user?.email}
@@ -471,6 +509,10 @@ interface SettingsIOSProps {
   onSync: () => void;
   language: string;
   onLanguageChange: (language: string) => void;
+  themePreference: ThemePreference;
+  onThemeChange: (preference: ThemePreference) => void;
+  onNightRed: () => void;
+  nightRed: React.ReactNode;
 }
 
 /** iOS: Settings as a native grouped form (SwiftUI Form) under the large-title bar. */
@@ -601,6 +643,25 @@ function SettingsIOS(props: SettingsIOSProps) {
 
   sections.push(
     {
+      key: 'appearance',
+      title: t('settings.appearance'),
+      fields: [
+        {
+          kind: 'picker',
+          key: 'theme',
+          label: t('settings.theme'),
+          value: props.themePreference,
+          options: [
+            { value: 'system', label: t('settings.themeSystem') },
+            { value: 'light', label: t('settings.themeLight') },
+            { value: 'dark', label: t('settings.themeDark') },
+          ],
+          onChange: value => props.onThemeChange(value as ThemePreference),
+        },
+        { kind: 'button', key: 'nightRed', label: t('settings.nightRed'), onPress: props.onNightRed, testID: 'night-red' },
+      ],
+    },
+    {
       key: 'language',
       fields: [
         {
@@ -620,7 +681,7 @@ function SettingsIOS(props: SettingsIOSProps) {
       key: 'about',
       title: t('settings.about'),
       footer: isUsingFirebaseEmulator ? t('settings.emulatorDescription') : undefined,
-      fields: [{ kind: 'info', key: 'version', label: t('home.title'), value: APP_VERSION }],
+      fields: [{ kind: 'info', key: 'version', label: t('settings.appName'), value: APP_VERSION }],
     }
   );
 
@@ -628,6 +689,7 @@ function SettingsIOS(props: SettingsIOSProps) {
     <>
       <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
       <NativeForm sections={sections} />
+      {props.nightRed}
     </>
   );
 }

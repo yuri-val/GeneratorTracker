@@ -161,7 +161,8 @@
         "purchaseDateLabel": "Purchase Date",
         "dateFormatHint": "Format: YYYY-MM-DD (e.g., 2024-01-15)",
         "tankLabel": "Tank capacity, L (optional)",
-        "tankHint": "Needed to estimate remaining fuel"
+        "tankHint": "Needed to estimate remaining fuel",
+        "tankInvalid": "Enter a tank capacity above zero, or leave it empty"
     },
     "workSession": {
         "deleteError": "Failed to delete work session",
