@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /get/
+Sitemap: https://yuri-val.github.io/GeneratorTracker/sitemap.xml

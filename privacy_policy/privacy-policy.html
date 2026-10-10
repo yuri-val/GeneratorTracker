@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — Generator Tracker</title>
+  <meta name="description" content="How Generator Tracker handles your
+data: local-first storage, optional cloud sync, no ads and no
+tracking.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="alternate" hreflang="en" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="alternate" hreflang="uk" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html">
+  <link rel="alternate" hreflang="x-default" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    })();
+  </script>
+  <style>
+    .doc { max-width: 760px; padding: clamp(40px, 6vw, 72px) 0 80px; }
+    .doc h1 { font-size: clamp(34px, 5vw, 48px); margin-bottom: 12px; }
+    .doc h2 { font-size: 26px; margin: 48px 0 14px; padding-top: 24px; border-top: 1px solid var(--line); }
+    .doc h3 { font-size: 19px; margin: 28px 0 10px; }
+    .doc p, .doc li { color: var(--text-2); }
+    .doc p { margin: 12px 0; }
+    .doc ul, .doc ol { padding-left: 22px; margin: 10px 0; }
+    .doc li + li { margin-top: 6px; }
+    .doc strong { color: var(--text); }
+    .doc a { color: var(--brand-text); }
+    .doc hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+    .doc code { padding: 2px 6px; border-radius: 6px; background: var(--card-2); font-size: 0.9em; }
+    .doc-langs { display: inline-flex; gap: 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header is-scrolled">
+    <div class="container header-inner">
+      <a class="brand" href="../">
+        <img src="../assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Theme" data-theme-toggle data-label-light="Switch to the light theme" data-label-dark="Switch to the dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
+        <nav class="doc-langs" aria-label="Language">
+          <a class="lang-switch" href="privacy-policy.html" hreflang="en" lang="en">EN</a>
+          <a class="lang-switch" href="privacy-policy-uk.html" hreflang="uk" lang="uk">UA</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+  <main class="container doc">
+<h1 id="privacy-policy-for-generator-tracker">Privacy Policy for
+Generator Tracker</h1>
+<p><strong>Last Updated:</strong> October 6, 2026</p>
+<h2 id="introduction">Introduction</h2>
+<p>Generator Tracker (“we”, “our”, or “the app”) is committed to
+protecting your privacy. This Privacy Policy explains how we handle your
+information when you use our mobile application.</p>
+<p><strong>Key Privacy Principles:</strong></p>
+<ul>
+<li>🔒 <strong>Local-First</strong>: Your data stays on your device by
+default</li>
+<li>🎯 <strong>Optional Cloud Sync</strong>: You choose whether to
+sync</li>
+<li>🚫 <strong>No Tracking</strong>: We don’t track, profile, or sell
+your data</li>
+<li>✅ <strong>Open Source</strong>: Our code is transparent and
+auditable</li>
+</ul>
+<h2 id="information-we-collect">Information We Collect</h2>
+<h3 id="data-you-create-stored-locally">1. Data You Create (Stored
+Locally)</h3>
+<p>When you use Generator Tracker, you create and store data
+<strong>locally on your device</strong> using AsyncStorage:</p>
+<ul>
+<li><strong>Generators</strong>: Name, model, purchase date</li>
+<li><strong>Work Sessions</strong>: Date, start/end times, hours worked,
+notes</li>
+<li><strong>Refills</strong>: Date, fuel amount, notes</li>
+<li><strong>Maintenance tasks</strong>: Task name, service intervals
+(engine hours and/or days), last service date and engine hours,
+notes</li>
+</ul>
+<p><strong>This data:</strong></p>
+<ul>
+<li>✅ Stays on your device</li>
+<li>✅ Is NOT sent anywhere unless you sign in</li>
+<li>✅ Can be deleted anytime in the app or by uninstalling the app</li>
+</ul>
+<h3 id="optional-account-information-firebase-authentication">2.
+Optional Account Information (Firebase Authentication)</h3>
+<p><strong>ONLY if you choose to sign in</strong> for cloud
+synchronization:</p>
+<p><strong>Email/Password Sign-In:</strong></p>
+<ul>
+<li>Email address</li>
+<li>Encrypted password (we never see your actual password)</li>
+</ul>
+<p><strong>Google Sign-In (web version only):</strong></p>
+<ul>
+<li>Email address</li>
+<li>Profile name (if provided by Google)</li>
+<li>Profile photo URL (if provided by Google)</li>
+</ul>
+<p><strong>Anonymous Sign-In:</strong></p>
+<ul>
+<li>Randomly generated user ID (no personal information)</li>
+</ul>
+<h3 id="synchronized-data-firebase-firestore">3. Synchronized Data
+(Firebase Firestore)</h3>
+<p><strong>ONLY if you sign in</strong>, your generator data is uploaded
+to Firebase Firestore:</p>
+<ul>
+<li>All generators, work sessions, refills, and maintenance tasks you’ve
+created</li>
+<li>User ID to associate data with your account</li>
+<li>Timestamps for synchronization and conflict resolution</li>
+</ul>
+<p><strong>This data:</strong></p>
+<ul>
+<li>✅ Is encrypted in transit (HTTPS)</li>
+<li>✅ Is stored in Google Cloud (Firebase) servers</li>
+<li>✅ Is accessible only to you when signed in</li>
+<li>✅ Can be deleted at any time in the app (Settings → Delete Account)
+or by email request; signing out does not delete it</li>
+</ul>
+<h2 id="how-we-use-your-information">How We Use Your Information</h2>
+<h3 id="local-usage-no-account">Local Usage (No Account)</h3>
+<ul>
+<li>Display your generator tracking data</li>
+<li>Calculate statistics and analytics</li>
+<li>Provide app functionality</li>
+</ul>
+<p><strong>No data leaves your device.</strong></p>
+<h3 id="cloud-sync-usage-with-account">Cloud Sync Usage (With
+Account)</h3>
+<ul>
+<li>Synchronize data across your devices</li>
+<li>Backup your data to prevent loss</li>
+<li>Restore data when you reinstall the app</li>
+<li>Resolve conflicts when editing on multiple devices</li>
+</ul>
+<p><strong>We do NOT:</strong></p>
+<ul>
+<li>❌ Analyze your usage patterns</li>
+<li>❌ Show advertisements</li>
+<li>❌ Sell or share your data with third parties</li>
+<li>❌ Use your data for any purpose other than syncing</li>
+</ul>
+<h2 id="data-storage-and-security">Data Storage and Security</h2>
+<h3 id="local-storage">Local Storage</h3>
+<ul>
+<li><strong>Method</strong>: React Native AsyncStorage</li>
+<li><strong>Location</strong>: Your device’s internal storage</li>
+<li><strong>Encryption</strong>: Standard device encryption (if enabled
+on your device)</li>
+<li><strong>Access</strong>: Only Generator Tracker app can access this
+data</li>
+</ul>
+<h3 id="cloud-storage-firebase">Cloud Storage (Firebase)</h3>
+<ul>
+<li><strong>Provider</strong>: Google Firebase (Google Cloud
+Platform)</li>
+<li><strong>Location</strong>: Based on your Firebase project
+region</li>
+<li><strong>Encryption</strong>:
+<ul>
+<li>In transit: TLS/HTTPS</li>
+<li>At rest: Google Cloud encryption</li>
+</ul></li>
+<li><strong>Access Control</strong>: Firebase Security Rules ensure only
+authenticated users access their own data</li>
+</ul>
+<h3 id="security-measures">Security Measures</h3>
+<ul>
+<li>✅ No passwords stored in plaintext</li>
+<li>✅ Authentication tokens securely managed by Firebase</li>
+<li>✅ HTTPS for all network communication</li>
+<li>✅ No sensitive data in app logs</li>
+</ul>
+<h2 id="data-sharing-and-third-parties">Data Sharing and Third
+Parties</h2>
+<h3 id="we-do-not-share-your-data">We Do NOT Share Your Data</h3>
+<p>Generator Tracker does <strong>not sell, rent, or share</strong> your
+personal data with third parties for marketing or advertising
+purposes.</p>
+<h3 id="third-party-services-we-use">Third-Party Services We Use</h3>
+<p><strong>Google Firebase</strong> (ONLY if you sign in):</p>
+<ul>
+<li><strong>Purpose</strong>: Authentication and data
+synchronization</li>
+<li><strong>Data Shared</strong>: Account information and app data (as
+described above)</li>
+<li><strong>Privacy Policy</strong>:
+https://firebase.google.com/support/privacy</li>
+</ul>
+<p><strong>Google Sign-In</strong> (ONLY if you choose this sign-in
+method):</p>
+<ul>
+<li><strong>Purpose</strong>: Authentication via Google account</li>
+<li><strong>Data Shared</strong>: Email, name, profile photo (as
+provided by Google)</li>
+<li><strong>Privacy Policy</strong>:
+https://policies.google.com/privacy</li>
+</ul>
+<h3 id="no-analytics-or-tracking">No Analytics or Tracking</h3>
+<ul>
+<li>❌ No Google Analytics</li>
+<li>❌ No Facebook Pixel</li>
+<li>❌ No advertising SDKs</li>
+<li>❌ No usage tracking</li>
+<li>❌ No crash reporting with personal data</li>
+</ul>
+<h2 id="your-rights-and-choices">Your Rights and Choices</h2>
+<h3 id="access-your-data">Access Your Data</h3>
+<ul>
+<li>✅ View all your data directly in the app</li>
+<li>✅ Export data (functionality planned for future versions)</li>
+</ul>
+<h3 id="delete-your-data">Delete Your Data</h3>
+<p><strong>Option 1: Delete your account in the app</strong></p>
+<ol type="1">
+<li>Open Settings while signed in</li>
+<li>Tap “Delete Account” and confirm (email accounts confirm with their
+password)</li>
+<li>Your account and all data synced to the cloud (generators, work
+sessions, refills, maintenance tasks) are deleted immediately and
+permanently</li>
+</ol>
+<p>Data on your device is not deleted: it stays available offline and is
+no longer linked to any account.</p>
+<p><strong>Option 2: Delete local data</strong></p>
+<ul>
+<li>Delete records in the app, or uninstall the app to remove all local
+data immediately</li>
+</ul>
+<p><strong>Option 3: Request deletion by email</strong></p>
+<ul>
+<li>If you can no longer access the app, email yuri.valigursky@gmail.com
+from the address of your account</li>
+<li>We will delete your account and all associated data within 30
+days</li>
+</ul>
+<p>Signing out does not delete cloud data.</p>
+<h3 id="control-synchronization">Control Synchronization</h3>
+<ul>
+<li>✅ Use the app without signing in (no cloud sync)</li>
+<li>✅ Sign in to enable sync</li>
+<li>✅ Sign out to stop syncing (local data remains)</li>
+</ul>
+<h2 id="childrens-privacy">Children’s Privacy</h2>
+<p>Generator Tracker is not directed at children under 13 years of age.
+We do not knowingly collect personal information from children under
+13.</p>
+<p>If you are a parent or guardian and believe your child has provided
+us with personal information, please contact us at
+yuri.valigursky@gmail.com.</p>
+<h2 id="data-retention">Data Retention</h2>
+<h3 id="local-data">Local Data</h3>
+<ul>
+<li>Retained until you uninstall the app</li>
+<li>No automatic deletion</li>
+</ul>
+<h3 id="cloud-data-firebase">Cloud Data (Firebase)</h3>
+<ul>
+<li>Retained while your account is active</li>
+<li>Deleted immediately when you delete your account in the app, or
+within 30 days of an email request</li>
+<li>Automatic backup retention: Firebase’s standard retention
+policy</li>
+</ul>
+<h2 id="international-data-transfers">International Data Transfers</h2>
+<p>If you are located outside the United States, please note:</p>
+<ul>
+<li>Firebase servers may be located globally</li>
+<li>Data may be transferred to and stored in countries outside your
+residence</li>
+<li>We rely on Google Cloud’s data protection measures</li>
+</ul>
+<h2 id="changes-to-this-privacy-policy">Changes to This Privacy
+Policy</h2>
+<p>We may update this Privacy Policy from time to time. Changes will be
+posted:</p>
+<ul>
+<li>In this document (with updated “Last Updated” date)</li>
+</ul>
+<p><strong>Material changes</strong> will also be reflected in the app
+store listing.</p>
+<h2 id="open-source">Open Source</h2>
+<p>Generator Tracker is open source software:</p>
+<ul>
+<li><strong>License</strong>: MIT License</li>
+<li><strong>Repository</strong>:
+https://github.com/yuri-val/GeneratorTracker</li>
+<li><strong>Code Review</strong>: You can review our code to verify
+privacy practices</li>
+</ul>
+<h2 id="contact-us">Contact Us</h2>
+<p>If you have questions about this Privacy Policy or our privacy
+practices:</p>
+<p><strong>Email</strong>: yuri.valigursky@gmail.com <strong>Response
+Time</strong>: We aim to respond within 7 business days</p>
+<hr />
+<p><strong>Summary</strong></p>
+<p>🔒 <strong>Privacy-First Design</strong>: Local storage by default,
+optional cloud sync 📱 <strong>User Control</strong>: You decide what
+data to sync and when 🚫 <strong>No Tracking</strong>: Zero analytics,
+ads, or third-party tracking ✅ <strong>Transparent</strong>: Open
+source code, clear policies</p>
+<p>Thank you for trusting Generator Tracker with your data.</p>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-bottom" style="margin-top:0;border-top:0;padding-top:0">
+      <p><a href="../">Generator Tracker</a> · <a href="https://github.com/yuri-val/GeneratorTracker">GitHub</a> · <a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></p>
+      <p>© 2026 Yuri Valigursky · MIT License</p>
+    </div>
+  </footer>
+  <script src="../main.js" defer></script>
+</body>
+</html>

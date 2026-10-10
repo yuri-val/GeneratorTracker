@@ -1,0 +1,44 @@
+# Generator Tracker
+
+> Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.
+
+Mobile app for Android (7.0+) and iPhone/iPad (iOS 16.4+) that tracks generator run hours, fuel refills
+and maintenance intervals. Offline-first: data lives on the device, an account is optional and used only
+for syncing between the owner's devices. No ads, no analytics SDKs. Open source under the MIT license.
+Current version: 3.0.0 (released 2026-10-10). Languages: English, Ukrainian.
+Author: Yuri Valigursky.
+
+## Pages
+- [Home, English](https://yuri-val.github.io/GeneratorTracker/)
+- [Головна, українською](https://yuri-val.github.io/GeneratorTracker/uk/): Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.
+- [Privacy policy](https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html)
+- [Політика конфіденційності](https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html)
+
+## Install
+- [Google Play](https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en)
+- [App Store](https://apps.apple.com/app/id6819560707)
+- [Smart link that opens the right store for the device](https://yuri-val.github.io/GeneratorTracker/get/)
+
+## Features
+- Start and stop from Home: Running generators move to the top with a live timer and a big Stop button; idle ones sit below with Start. Stopped by mistake? Undo brings the session back with its original start time.
+- Fuel left, estimated: Give a generator its tank size and the app keeps a running estimate — "≈ 2.4 L · ~4.8 h left" — from refills and run time. A refill takes a few taps: to full, same as last time or a stepper.
+- Maintenance reminders: Oil, filters, spark plugs — set intervals by engine hours, by days or both. Each task shows how much of the interval is used, and overdue work is flagged on the home screen with ▲.
+- Clear analytics: Run hours and fuel by month for the last six months, split by generator colour — petrol and diesel are never summed into one bar — plus totals per generator.
+- Any number of generators: From a single home backup unit to a rental fleet. Several generators can run at once; a live bar keeps the running ones a tap away on every screen.
+- Sync across devices: Sign in to keep a phone and a tablet in step. Edits made offline merge safely once you are back online.
+- Readable day and night: Warm paper light theme, true-black dark theme for OLED and night outages, plus a guide to the system red filter. English or Ukrainian.
+
+## FAQ
+- Are there ads or in-app purchases? No. There are no ads, no subscriptions and no in-app purchases.
+- Does it work without the internet? Yes. Everything is stored on your device and works offline. If you sign in, changes sync automatically when a connection is available.
+- Which devices are supported? Android phones, tablets and foldables on Android 7.0 and newer; iPhone and iPad on iOS and iPadOS 16.4 and newer.
+- Can I use it for several generators? Yes — add as many as you need. Each one keeps its own sessions, refills, service plan and statistics.
+- How do I delete my data? Data stored only on your phone is removed when you delete it in the app or uninstall the app. To delete your account and everything synced to the cloud, open Settings → Delete Account; if you no longer have the app, email yuri.valigursky@gmail.com. Details are in the privacy policy.
+- Which languages are available? English and Ukrainian. The app follows your device language and can be switched in Settings.
+- Is the source code open? Yes. Generator Tracker is open source under the MIT license — the full code, including this website, is on GitHub.
+
+## Source and changes
+- [Source code on GitHub](https://github.com/yuri-val/GeneratorTracker)
+- [Release notes](https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes)
+- [Changelog](https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md)
+- [MIT license](https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE)

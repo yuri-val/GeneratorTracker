@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generator Tracker — мотогодини, пальне й ТО для кожного генератора</title>
+  <meta name="description" content="Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/uk/">
+  <link rel="alternate" hreflang="en" href="https://yuri-val.github.io/GeneratorTracker/">
+  <link rel="alternate" hreflang="uk" href="https://yuri-val.github.io/GeneratorTracker/uk/">
+  <link rel="alternate" hreflang="x-default" href="https://yuri-val.github.io/GeneratorTracker/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <meta name="application-name" content="Generator Tracker">
+  <meta name="apple-mobile-web-app-title" content="Generator Tracker">
+  <meta name="apple-itunes-app" content="app-id=6819560707">
+  <meta name="google-play-app" content="app-id=com.yurival.GeneratorTracker">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Generator Tracker">
+  <meta property="og:locale" content="uk_UA">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta property="og:title" content="Generator Tracker — мотогодини, пальне й ТО для кожного генератора">
+  <meta property="og:description" content="Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.">
+  <meta property="og:url" content="https://yuri-val.github.io/GeneratorTracker/uk/">
+  <meta property="og:image" content="https://yuri-val.github.io/GeneratorTracker/assets/og-uk.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Generator Tracker на Android та iPhone: мотогодини, пальне й ТО для кожного генератора">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Generator Tracker — мотогодини, пальне й ТО для кожного генератора">
+  <meta name="twitter:description" content="Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.">
+  <meta name="twitter:image" content="https://yuri-val.github.io/GeneratorTracker/assets/og-uk.png">
+  <meta name="twitter:image:alt" content="Generator Tracker на Android та iPhone: мотогодини, пальне й ТО для кожного генератора">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="manifest" href="../site.webmanifest">
+  <link rel="preload" href="../fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../fonts/plex-sans-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/screens/android-uk-active.jpg" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="../styles.css?v=1791592048">
+  <script>
+    // Apply the saved theme before the first paint and mark that scripts run (enables scroll-reveal styles).
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+      document.documentElement.classList.add('js');
+    })();
+  </script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#website",
+      "url": "https://yuri-val.github.io/GeneratorTracker/",
+      "name": "Generator Tracker",
+      "inLanguage": [
+        "en",
+        "uk"
+      ],
+      "publisher": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#author"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#author",
+      "name": "Yuri Valigursky",
+      "url": "https://github.com/yuri-val",
+      "sameAs": [
+        "https://github.com/yuri-val"
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/uk/#webpage",
+      "url": "https://yuri-val.github.io/GeneratorTracker/uk/",
+      "name": "Generator Tracker — мотогодини, пальне й ТО для кожного генератора",
+      "description": "Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.",
+      "inLanguage": "uk",
+      "isPartOf": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#website"
+      },
+      "about": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#app"
+      },
+      "dateModified": "2026-10-10",
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://yuri-val.github.io/GeneratorTracker/assets/og-uk.png",
+        "width": 1200,
+        "height": 630
+      }
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#app",
+      "name": "Generator Tracker",
+      "url": "https://yuri-val.github.io/GeneratorTracker/",
+      "image": "https://yuri-val.github.io/GeneratorTracker/assets/app-icon.png",
+      "description": "Облік мотогодин, заправок і технічного обслуговування генератора. Працює офлайн, без реклами й стеження, відкритий код. У Google Play та App Store.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Android 7.0+, iOS 16.4+",
+      "softwareVersion": "3.0.0",
+      "dateModified": "2026-10-10",
+      "inLanguage": [
+        "en",
+        "uk"
+      ],
+      "installUrl": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk",
+        "https://apps.apple.com/app/id6819560707"
+      ],
+      "downloadUrl": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk",
+        "https://apps.apple.com/app/id6819560707"
+      ],
+      "sameAs": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk",
+        "https://apps.apple.com/app/id6819560707",
+        "https://github.com/yuri-val/GeneratorTracker"
+      ],
+      "featureList": [
+        "Старт і стоп з головного екрана",
+        "Залишок пального",
+        "Нагадування про ТО",
+        "Зрозуміла аналітика",
+        "Скільки завгодно генераторів",
+        "Синхронізація між пристроями",
+        "Зручно вдень і вночі"
+      ],
+      "screenshot": [
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/android-uk-active.jpg",
+          "caption": "Екран генератора на Android: активна сесія з живим годинником, залишок пального в баку, мотогодини та список сесій"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/ios-uk-home-dark.jpg",
+          "caption": "Головний екран на iPhone у чорній темі: працюючий генератор угорі з кнопкою «Стоп», решта нижче з кнопкою «Старт»"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/ios-uk-maintenance.jpg",
+          "caption": "Завдання ТО на iPhone зі смугами інтервалів: заміна мастила прострочена, повітряний фільтр скоро, свічка в нормі"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/android-uk-charts.jpg",
+          "caption": "Аналітика на iPhone: мотогодини й пальне по місяцях стовпчиками з кольорами генераторів і підсумки за весь час"
+        }
+      ],
+      "author": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#author"
+      },
+      "license": "https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/uk/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Чи є реклама або покупки в застосунку?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ні. Жодної реклами, підписок і покупок у застосунку."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Чи працює він без інтернету?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Так. Усе зберігається на пристрої й працює офлайн. Якщо ви ввійдете в обліковий запис, зміни синхронізуються автоматично, коли з'явиться зв'язок."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Які пристрої підтримуються?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Телефони, планшети й складні смартфони на Android 7.0 і новіших; iPhone та iPad на iOS та iPadOS 16.4 і новіших."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Можна вести кілька генераторів?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Так, скільки завгодно. У кожного свої сесії, заправки, план ТО і статистика."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Як видалити свої дані?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Дані, що зберігаються лише на телефоні, зникають, коли ви видаляєте їх у застосунку або видаляєте сам застосунок. Щоб видалити обліковий запис і все, що синхронізовано з хмарою, відкрийте Налаштування → Видалити обліковий запис; якщо застосунку вже немає, напишіть на yuri.valigursky@gmail.com. Подробиці — у політиці конфіденційності."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Які мови доступні?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Українська та англійська. Застосунок бере мову пристрою, її можна змінити в налаштуваннях."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Код відкритий?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Так. Generator Tracker — відкритий проєкт під ліцензією MIT: увесь код, включно з цим сайтом, є на GitHub."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Перейти до змісту</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="./">
+        <img src="../assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Головна" data-nav>
+        <ul role="list">
+          <li><a href="#features">Можливості</a></li>
+          <li><a href="#how">Як це працює</a></li>
+          <li><a href="#platforms">Платформи</a></li>
+          <li><a href="#privacy">Приватність</a></li>
+          <li><a href="#faq">Питання</a></li>
+          <li class="nav-cta"><a class="btn" href="#get">Завантажити</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Тема" data-theme-toggle data-label-light="Увімкнути світлу тему" data-label-dark="Увімкнути темну тему">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
+        <a class="lang-switch" href="../" hreflang="en" lang="en" aria-label="Змінити мову: English" title="English">EN</a>
+        <a class="btn btn-small header-cta" href="#get">Завантажити</a>
+        <button class="icon-btn menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-toggle>
+          <span class="sr-only">Меню</span>
+          <span class="menu-bar"></span><span class="menu-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+            <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="pill">
+            <svg class="pill-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+            <svg class="pill-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            <span>Уже в Google Play та App Store</span>
+          </p>
+          <h1 id="hero-title">Знайте кожну годину роботи вашого <em>генератора</em>.</h1>
+          <p class="lead">Запуск і зупинка генератора одним дотиком, залишок пального в баку й жодної пропущеної заміни мастила — для одного домашнього резервного генератора чи цілого парку. Працює офлайн. Синхронізується, лише якщо ви цього хочете.</p>
+          <div class="store-badges">
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>Завантажте в</small><strong>Google Play</strong></span>
+            </a>
+            <a class="store-badge" href="https://apps.apple.com/app/id6819560707" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>Завантажте в</small><strong>App Store</strong></span>
+            </a>
+          </div>
+          <p class="hero-note">Без реклами · Без стеження · Відкритий код</p>
+        </div>
+
+        <div class="hero-visual">
+          <figure class="device device-android device-main">
+            <img src="../assets/screens/android-uk-active.jpg" width="540" height="1200" alt="Екран генератора на Android: активна сесія з живим годинником, залишок пального в баку, мотогодини та список сесій" fetchpriority="high" decoding="async">
+          </figure>
+          <figure class="device device-ios device-second">
+            <img src="../assets/screens/ios-uk-home-dark.jpg" width="540" height="1174" alt="Головний екран на iPhone у чорній темі: працюючий генератор угорі з кнопкою «Стоп», решта нижче з кнопкою «Старт»" fetchpriority="low" decoding="async">
+          </figure>
+          <div class="chip chip-running" aria-hidden="true">
+            <span class="chip-dot"></span>
+            <span class="chip-text"><small>Honda EU22i · працює</small><strong>2 год 16 хв</strong></span>
+          </div>
+          <div class="chip chip-avg" aria-hidden="true">
+            <span class="chip-rule"></span>
+            <span class="chip-text"><small>Пального в баку</small><strong class="num">≈ 2,4 л · ~4,8 год</strong></span>
+          </div>
+          <div class="chip chip-due" aria-hidden="true">
+            <span class="chip-icon">▲</span>
+            <span class="chip-text"><small>Заміна мастила</small><strong class="is-due">Прострочено 6 год</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <ul class="proof" role="list">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Повністю працює офлайн</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Без реклами й стеження</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Синхронізація за бажанням</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Відкритий код, MIT</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Українська та English</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Можливості</p>
+          <h2 id="features-title">Зроблено під сценарій відключення</h2>
+          <p class="lead">Зникло світло — запустили генератор одним дотиком — стежите за ним — не пропускаєте ТО. Решту застосунок порахує сам.</p>
+        </header>
+        <div class="bento">
+          <article class="card bento-card is-wide reveal">
+            <div class="bento-copy">
+              <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
+              <h3>Старт і стоп з головного екрана</h3><p>Генератори, що працюють, піднімаються вгору з живим таймером і великою кнопкою «Стоп», решта — нижче з кнопкою «Старт». Зупинили помилково? «Скасувати» поверне сесію з початковим часом.</p>
+            </div>
+            <div class="bento-shot" aria-hidden="true">
+              <div class="device device-android">
+                <img src="../assets/screens/android-uk-active.jpg" width="540" height="1200" alt="" loading="lazy" decoding="async">
+              </div>
+            </div>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7zM15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg></span>
+            <h3>Залишок пального</h3><p>Вкажіть об'єм бака — і застосунок оцінює залишок за заправками й часом роботи: «≈ 2,4 л · ~4,8 год». Заправка — кілька дотиків: до повного, як минулого разу або кнопками ±.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+            <h3>Зрозуміла аналітика</h3><p>Мотогодини й пальне по місяцях за пів року, з розбивкою за кольорами генераторів — бензин і дизель ніколи не складаються в один стовпчик, — плюс підсумки для кожного генератора.</p>
+          </article>
+          <article class="card bento-card is-wide is-reverse reveal">
+            <div class="bento-copy">
+              <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
+              <h3>Нагадування про ТО</h3><p>Мастило, фільтри, свічки — інтервали в мотогодинах, днях або і те, і те. Кожне завдання показує, яку частину інтервалу вже використано, а прострочене ТО видно на головному екрані зі знаком ▲.</p>
+            </div>
+            <ul class="ui-list" aria-hidden="true">
+              <li class="is-due">
+                <span class="ui-top"><strong>Заміна мастила</strong><span class="ui-status is-due">▲ Час ТО</span></span>
+                <small>прострочено 6,4 год</small>
+                <span class="ui-bar"><i style="width:100%"></i></span>
+              </li>
+              <li class="is-soon">
+                <span class="ui-top"><strong>Повітряний фільтр</strong><span class="ui-status is-soon">Скоро ТО</span></span>
+                <small>залишилось 18 год</small>
+                <span class="ui-bar"><i style="width:72%"></i></span>
+              </li>
+              <li>
+                <span class="ui-top"><strong>Свічка запалювання</strong><span class="ui-status is-ok">OK</span></span>
+                <small>залишилось 245 днів</small>
+                <span class="ui-bar"><i style="width:24%"></i></span>
+              </li>
+            </ul>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+            <h3>Скільки завгодно генераторів</h3><p>Від одного домашнього резервного генератора до прокатного парку. Кілька генераторів можуть працювати одночасно, а живий рядок тримає їх на відстані дотику на будь-якому екрані.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9M12 12v8m-3-3 3 3 3-3"/></svg></span>
+            <h3>Синхронізація між пристроями</h3><p>Увійдіть, щоб телефон і планшет показували одне й те саме. Зміни, зроблені офлайн, безпечно об'єднуються, щойно з'явиться зв'язок.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-1-.2-2-.5-2.9A4 4 0 0 1 15 6.5c0-1.2.5-2.3 1.3-3.1A9 9 0 0 0 12 3z"/><path d="M5 10h.01M9 7h.01M7 14h.01"/></svg></span>
+            <h3>Зручно вдень і вночі</h3><p>Світла тема кольору паперу, чорна тема для OLED і нічних відключень, а також підказка, як увімкнути системний червоний фільтр. Українська або англійська.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Як це працює</p>
+          <h2 id="how-title">Три кроки — і генератор на обліку</h2>
+          <p class="lead">Без майстра налаштувань та інструкцій. Усе інше застосунок рахує сам.</p>
+        </header>
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">1</span><span class="sr-only">Крок 1.</span>
+            <h3>Додайте генератор</h3><p>Назва, модель, потужність. Один чи цілий парк — у кожного своя історія.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">2</span><span class="sr-only">Крок 2.</span>
+            <h3>Завів — натиснули, заглушив — зупинили</h3><p>Натисніть «Старт» на головному екрані, коли зникло світло, і «Стоп», коли з'явилось. Витрачене пальне й мотогодини порахуються самі.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">3</span><span class="sr-only">Крок 3.</span>
+            <h3>ТО вчасно</h3><p>Задайте інтервали в мотогодинах або днях. Прострочене ТО позначено на головному екрані знаком ▲ — обслуговування буде до поломки, а не після.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section showcase" aria-label="Можливості">
+      <div class="container showcase-row">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="../assets/screens/ios-uk-active.jpg" width="540" height="1174" alt="Екран генератора на iPhone: годинник активної сесії, витрачене й залишок пального, мотогодини та список сесій" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Облік наживо</p>
+          <h2>Завівся — «Старт». Заглушили — «Стоп».</h2>
+          <p class="lead">Живий годинник із секундами, витрачене й залишок пального, великі квадратні кнопки, у які легко влучити в темряві під час відключення чи в рукавицях на об'єкті. Забули натиснути? Час початку можна виправити пізніше.</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="../assets/screens/ios-uk-maintenance.jpg" width="540" height="1174" alt="Завдання ТО на iPhone зі смугами інтервалів: заміна мастила прострочена, повітряний фільтр скоро, свічка в нормі" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Обслуговування</p>
+          <h2>ТО вчасно, а не після поломки.</h2>
+          <p class="lead">Кожне завдання рахує мотогодини й дні від останнього обслуговування і показує використану частину інтервалу смугою з позначкою межі. Прострочене й найближче ТО видно на головному екрані, виконане позначається одним дотиком.</p>
+        </div>
+      </div>
+      <div class="container showcase-row">
+        <figure class="device device-android showcase-device reveal">
+          <img src="../assets/screens/android-uk-refill.jpg" width="540" height="1200" alt="Заправка на Android: кнопки ± для літрів, варіанти «до повного» і «як минулого разу», позначка «заправлено до повного» і рівень після заправки" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Заправки</p>
+          <h2>Заправка за три дотики.</h2>
+          <p class="lead">Готові варіанти «до повного» і «як минулого разу», кнопки ± для решти та рівень у баку після заправки. Повний бак калібрує оцінку, а застосунок підкаже, якщо вона була неточною.</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="../assets/screens/ios-uk-charts.jpg" width="540" height="1174" alt="Аналітика на iPhone: мотогодини й пальне по місяцях стовпчиками з кольорами генераторів і підсумки за весь час" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Аналітика</p>
+          <h2>Куди йдуть мотогодини й пальне.</h2>
+          <p class="lead">Квадратні стовпчики по місяцях із розбивкою за кольорами генераторів, підсумки за весь час із літрами на годину і список по генераторах — для одного генератора чи для всіх разом.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compare" aria-labelledby="compare-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Порівняння</p>
+          <h2 id="compare-title">Паперовий журнал, таблиця чи застосунок?</h2>
+          <p class="lead">Записати години можна будь-де. Різниця в тому, що з цими записами можна зробити потім.</p>
+        </header>
+        <div class="table-wrap reveal">
+          <table class="compare">
+            <caption class="sr-only">Що вміють паперовий журнал, таблиця та Generator Tracker</caption>
+            <thead>
+              <tr>
+                <th scope="col">Що ви отримуєте</th>
+                <th scope="col">Паперовий журнал</th>
+                <th scope="col">Таблиця</th>
+                <th scope="col" class="is-app"><img src="../assets/app-icon.png" width="24" height="24" alt="" loading="lazy">Generator Tracker</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Працює без інтернету</th><td><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Частково</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Мотогодини додаються самі</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Частково</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Витрата пального на годину</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Частково</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Нагадування про ТО за годинами й днями</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Залишок пального й живий таймер</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Графіки по місяцях для кожного генератора</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Частково</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+              <tr><th scope="row">Однакові дані на телефоні й планшеті</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">Ні</span></span></td><td><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Так</span></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section platforms" id="platforms" aria-labelledby="platforms-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Платформи</p>
+          <h2 id="platforms-title">Нативно на Android та iPhone</h2>
+          <p class="lead">Не вебсторінка в обгортці. Material 3 на Android і нативний дизайн iOS — зокрема Liquid Glass — на iPhone та iPad.</p>
+        </header>
+        <div class="platform-grid">
+          <article class="card platform reveal">
+            <figure class="device device-android">
+              <img src="../assets/screens/android-uk-home.jpg" width="540" height="1200" alt="Список генераторів на Android у світлій темі" loading="lazy" decoding="async">
+            </figure>
+            <div class="platform-copy">
+              <h3>Android</h3>
+              <p>Навігація Material 3, системні діалоги й темна тема. Телефони, планшети та складні смартфони.</p>
+              <p class="req">Android 7.0 і новіші</p>
+              <a class="status is-live" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk" rel="noopener">Доступно в Google Play →</a>
+            </div>
+          </article>
+          <article class="card platform reveal">
+            <figure class="device device-ios">
+              <img src="../assets/screens/ios-uk-home.jpg" width="540" height="1174" alt="Список генераторів на iPhone у світлій темі" loading="lazy" decoding="async">
+            </figure>
+            <div class="platform-copy">
+              <h3>iPhone та iPad</h3>
+              <p>Нативні панелі навігації, форми SwiftUI, SF Symbols і Liquid Glass на iOS 26.</p>
+              <p class="req">iOS та iPadOS 16.4 і новіші</p>
+              <a class="status is-live" href="https://apps.apple.com/app/id6819560707" rel="noopener">Доступно в App Store →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="privacy" aria-labelledby="privacy-title">
+      <div class="container card privacy reveal">
+        <header class="section-head is-left">
+          <p class="eyebrow">Приватність</p>
+          <h2 id="privacy-title">Ваші дані належать вам</h2>
+          <p class="lead">Generator Tracker спершу зберігає все на вашому пристрої. Обліковий запис необов'язковий і потрібен лише для синхронізації ваших записів між вашими пристроями.</p>
+          <a class="text-link" href="../privacy_policy/privacy-policy-uk.html">Політика конфіденційності →</a>
+        </header>
+        <ul class="privacy-list" role="list">
+          <li><h3>Спершу локально</h3><p>Кожен запис зберігається на пристрої; застосунком можна повністю користуватися без облікового запису й без зв'язку.</p></li>
+          <li><h3>Без реклами й стеження</h3><p>Жодних аналітичних SDK, рекламних ідентифікаторів і профілювання. Нічого не продається і не передається.</p></li>
+          <li><h3>Відкритий код</h3><p>Увесь код — на GitHub під ліцензією MIT: будь-хто може перевірити, що робить застосунок.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="whats-new" aria-labelledby="news-title">
+      <div class="container card news reveal">
+        <header class="section-head is-left">
+          <p class="eyebrow">Що нового</p>
+          <h2 id="news-title">Що нового у версії 3.0.0</h2>
+          <p class="news-meta"><time datetime="2026-10-10">10 жовтня 2026</time></p>
+          <p class="lead">Generator Tracker 3.0 перероблено під те, що ви робите під час відключення: запустити генератор одним дотиком, стежити за ним і не пропустити ТО.</p>
+          <p class="news-links">
+            <a class="text-link" href="https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes" rel="noopener">Усі примітки до випусків →</a>
+            <a class="text-link" href="https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md" rel="noopener">Повний журнал змін →</a>
+          </p>
+        </header>
+        <div class="news-body">
+<section class="news-group"><h3>Що нового</h3><ul><li><strong>Старт і стоп з головного екрана</strong>: працюючі генератори піднімаються вгору з живим таймером, залишком пального й великою кнопкою «Стоп». Кілька генераторів можуть працювати одночасно.</li><li><strong>Скасування замість «Ви впевнені?»</strong>: «Стоп» спрацьовує одразу; якщо помилилися — «Скасувати» впродовж 5 секунд.</li><li><strong>Залишок пального</strong>: вкажіть об'єм бака в налаштуваннях генератора, щоб бачити, скільки приблизно пального й годин роботи лишилось. Позначка «Заправлено до повного» тримає оцінку точною.</li><li><strong>Новий аркуш заправки</strong>: степер, швидкі пресети (до повного, як минулого разу) і нагадування спершу заглушити двигун — «Зупинити й заправити» завершить сесію за вас. Після збереження «Запустити знову» — одним дотиком.</li><li><strong>Екран генератора</strong>: живий годинник, використане й залишок пального, мотогодини разом із поточною сесією та шкали ТО — скільки ресурсу до наступного обслуговування використано.</li><li><strong>Інші генератори одним поглядом</strong>: панель унизу показує, що ще працює, з кнопкою «Стоп».</li><li><strong>Новий вигляд</strong>: тепла світла тема й справжня чорна темна, що береже батарею, чіткі контрастні кнопки та вибір теми (світла, темна чи системна). У налаштуваннях також пояснено, як увімкнути червоний екран уночі.</li><li><strong>Зрозуміліша аналітика</strong>: мотогодини й пальне по місяцях стовпчиками з кольорами генераторів, підсумки та список по генераторах на одній сторінці.</li><li><strong>Нова іконка застосунку.</strong></li></ul></section>
+<section class="news-group"><h3>Змінено</h3><ul><li>Запуск, зупинка й видалення більше не показують спливних підтверджень.</li></ul></section>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container faq">
+        <header class="section-head reveal">
+          <p class="eyebrow">Питання</p>
+          <h2 id="faq-title">Відповіді на часті питання</h2>
+        </header>
+        <div class="faq-list reveal">
+          <details><summary>Чи є реклама або покупки в застосунку?</summary><p>Ні. Жодної реклами, підписок і покупок у застосунку.</p></details>
+          <details><summary>Чи працює він без інтернету?</summary><p>Так. Усе зберігається на пристрої й працює офлайн. Якщо ви ввійдете в обліковий запис, зміни синхронізуються автоматично, коли з'явиться зв'язок.</p></details>
+          <details><summary>Які пристрої підтримуються?</summary><p>Телефони, планшети й складні смартфони на Android 7.0 і новіших; iPhone та iPad на iOS та iPadOS 16.4 і новіших.</p></details>
+          <details><summary>Можна вести кілька генераторів?</summary><p>Так, скільки завгодно. У кожного свої сесії, заправки, план ТО і статистика.</p></details>
+          <details><summary>Як видалити свої дані?</summary><p>Дані, що зберігаються лише на телефоні, зникають, коли ви видаляєте їх у застосунку або видаляєте сам застосунок. Щоб видалити обліковий запис і все, що синхронізовано з хмарою, відкрийте Налаштування → Видалити обліковий запис; якщо застосунку вже немає, напишіть на <a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a>. Подробиці — у <a href="../privacy_policy/privacy-policy-uk.html">політиці конфіденційності</a>.</p></details>
+          <details><summary>Які мови доступні?</summary><p>Українська та англійська. Застосунок бере мову пристрою, її можна змінити в налаштуваннях.</p></details>
+          <details><summary>Код відкритий?</summary><p>Так. Generator Tracker — відкритий проєкт під ліцензією MIT: увесь код, включно з цим сайтом, є на <a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">GitHub</a>.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section" id="get" aria-labelledby="cta-title">
+      <div class="container card cta reveal">
+        <div class="cta-copy">
+          <img src="../assets/app-icon.png" width="72" height="72" alt="" loading="lazy">
+          <h2 id="cta-title">Візьміть свій генератор на облік.</h2>
+          <p class="lead">Офлайн і приватно. Встановлюється за хвилину.</p>
+          <div class="store-badges">
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>Завантажте в</small><strong>Google Play</strong></span>
+            </a>
+            <a class="store-badge" href="https://apps.apple.com/app/id6819560707" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>Завантажте в</small><strong>App Store</strong></span>
+            </a>
+          </div>
+        </div>
+        <div class="cta-qr">
+          <a class="qr-tile" href="../get/"><img src="../assets/qr-get.svg" width="148" height="148" alt="QR-код із посиланням на сторінку завантаження Generator Tracker" loading="lazy"></a>
+          <p><strong>Скануйте, щоб встановити</strong><span>Відкриє Google Play або App Store — залежно від вашого телефона.</span></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./">
+          <img src="../assets/app-icon.png" width="32" height="32" alt="" loading="lazy">
+          <span>Generator Tracker</span>
+        </a>
+        <p>Мотогодини, пальне й ТО для кожного генератора.</p>
+        <a class="lang-link" href="../" hreflang="en" lang="en">English</a>
+      </div>
+      <nav aria-labelledby="footer-product">
+        <h2 class="footer-title" id="footer-product">Продукт</h2>
+        <ul role="list">
+          <li><a href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=uk" rel="noopener">Google Play</a></li>
+          <li><a href="https://apps.apple.com/app/id6819560707" rel="noopener">App Store</a></li>
+          <li><a href="#whats-new">Що нового</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">Вихідний код</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="footer-resources">
+        <h2 class="footer-title" id="footer-resources">Ресурси</h2>
+        <ul role="list">
+          <li><a href="../privacy_policy/privacy-policy-uk.html">Політика конфіденційності</a></li>
+          <li><a href="../privacy_policy/privacy-policy.html">Privacy policy (EN)</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes" rel="noopener">Примітки до випусків</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md" rel="noopener">Журнал змін</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE" rel="noopener">Ліцензія MIT</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2 class="footer-title" id="footer-contact">Контакти</h2>
+        <address aria-labelledby="footer-contact">
+          <ul role="list">
+            <li><a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></li>
+            <li><a href="https://github.com/yuri-val/GeneratorTracker/issues" rel="noopener">GitHub Issues</a></li>
+          </ul>
+        </address>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>Версія застосунку 3.0.0, випущена 10 жовтня 2026.</p>
+      <p>© 2026 Юрій Валігурський. Google Play і логотип Google Play є товарними знаками Google LLC. App Store є знаком обслуговування Apple Inc.</p>
+    </div>
+  </footer>
+  <script src="../main.js?v=1791592048" defer></script>
+</body>
+</html>

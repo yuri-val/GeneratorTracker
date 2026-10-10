@@ -1,0 +1,23 @@
+{
+  "name": "Generator Tracker",
+  "short_name": "GenTracker",
+  "description": "Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#f3f1ec",
+  "theme_color": "#1b1a17",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

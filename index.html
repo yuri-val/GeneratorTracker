@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generator Tracker — run hours, fuel and maintenance for every generator</title>
+  <meta name="description" content="Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/">
+  <link rel="alternate" hreflang="en" href="https://yuri-val.github.io/GeneratorTracker/">
+  <link rel="alternate" hreflang="uk" href="https://yuri-val.github.io/GeneratorTracker/uk/">
+  <link rel="alternate" hreflang="x-default" href="https://yuri-val.github.io/GeneratorTracker/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <meta name="application-name" content="Generator Tracker">
+  <meta name="apple-mobile-web-app-title" content="Generator Tracker">
+  <meta name="apple-itunes-app" content="app-id=6819560707">
+  <meta name="google-play-app" content="app-id=com.yurival.GeneratorTracker">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Generator Tracker">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="uk_UA">
+  <meta property="og:title" content="Generator Tracker — run hours, fuel and maintenance for every generator">
+  <meta property="og:description" content="Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.">
+  <meta property="og:url" content="https://yuri-val.github.io/GeneratorTracker/">
+  <meta property="og:image" content="https://yuri-val.github.io/GeneratorTracker/assets/og-en.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Generator Tracker on Android and iPhone: run hours, fuel and maintenance for every generator">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Generator Tracker — run hours, fuel and maintenance for every generator">
+  <meta name="twitter:description" content="Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.">
+  <meta name="twitter:image" content="https://yuri-val.github.io/GeneratorTracker/assets/og-en.png">
+  <meta name="twitter:image:alt" content="Generator Tracker on Android and iPhone: run hours, fuel and maintenance for every generator">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preload" href="fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/plex-sans-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/screens/android-en-active.jpg" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="styles.css?v=1791592048">
+  <script>
+    // Apply the saved theme before the first paint and mark that scripts run (enables scroll-reveal styles).
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+      document.documentElement.classList.add('js');
+    })();
+  </script>
+  <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#website",
+      "url": "https://yuri-val.github.io/GeneratorTracker/",
+      "name": "Generator Tracker",
+      "inLanguage": [
+        "en",
+        "uk"
+      ],
+      "publisher": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#author"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#author",
+      "name": "Yuri Valigursky",
+      "url": "https://github.com/yuri-val",
+      "sameAs": [
+        "https://github.com/yuri-val"
+      ]
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#webpage",
+      "url": "https://yuri-val.github.io/GeneratorTracker/",
+      "name": "Generator Tracker — run hours, fuel and maintenance for every generator",
+      "description": "Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#website"
+      },
+      "about": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#app"
+      },
+      "dateModified": "2026-10-10",
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://yuri-val.github.io/GeneratorTracker/assets/og-en.png",
+        "width": 1200,
+        "height": 630
+      }
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#app",
+      "name": "Generator Tracker",
+      "url": "https://yuri-val.github.io/GeneratorTracker/",
+      "image": "https://yuri-val.github.io/GeneratorTracker/assets/app-icon.png",
+      "description": "Track generator run hours, fuel refills and service intervals. Works offline, no ads, no tracking, open source. On Google Play and the App Store.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Android 7.0+, iOS 16.4+",
+      "softwareVersion": "3.0.0",
+      "dateModified": "2026-10-10",
+      "inLanguage": [
+        "en",
+        "uk"
+      ],
+      "installUrl": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en",
+        "https://apps.apple.com/app/id6819560707"
+      ],
+      "downloadUrl": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en",
+        "https://apps.apple.com/app/id6819560707"
+      ],
+      "sameAs": [
+        "https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en",
+        "https://apps.apple.com/app/id6819560707",
+        "https://github.com/yuri-val/GeneratorTracker"
+      ],
+      "featureList": [
+        "Start and stop from Home",
+        "Fuel left, estimated",
+        "Maintenance reminders",
+        "Clear analytics",
+        "Any number of generators",
+        "Sync across devices",
+        "Readable day and night"
+      ],
+      "screenshot": [
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/android-en-active.jpg",
+          "caption": "Generator screen on Android: a running session with a live clock, fuel left in the tank, engine hours and the sessions list"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/ios-en-home-dark.jpg",
+          "caption": "Home screen on iPhone in the true-black dark theme: a running generator on top with a Stop button, idle generators below with Start"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/ios-en-maintenance.jpg",
+          "caption": "Maintenance tasks on iPhone with interval bars: oil change overdue, air filter due soon, spark plug OK"
+        },
+        {
+          "@type": "ImageObject",
+          "url": "https://yuri-val.github.io/GeneratorTracker/assets/screens/android-en-charts.jpg",
+          "caption": "Analytics on iPhone: run hours and fuel by month as bars split by generator colour, with all-time totals"
+        }
+      ],
+      "author": {
+        "@id": "https://yuri-val.github.io/GeneratorTracker/#author"
+      },
+      "license": "https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://yuri-val.github.io/GeneratorTracker/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Are there ads or in-app purchases?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. There are no ads, no subscriptions and no in-app purchases."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work without the internet?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Everything is stored on your device and works offline. If you sign in, changes sync automatically when a connection is available."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which devices are supported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Android phones, tablets and foldables on Android 7.0 and newer; iPhone and iPad on iOS and iPadOS 16.4 and newer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use it for several generators?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — add as many as you need. Each one keeps its own sessions, refills, service plan and statistics."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I delete my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Data stored only on your phone is removed when you delete it in the app or uninstall the app. To delete your account and everything synced to the cloud, open Settings → Delete Account; if you no longer have the app, email yuri.valigursky@gmail.com. Details are in the privacy policy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which languages are available?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "English and Ukrainian. The app follows your device language and can be switched in Settings."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is the source code open?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Generator Tracker is open source under the MIT license — the full code, including this website, is on GitHub."
+          }
+        }
+      ]
+    }
+  ]
+}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="./">
+        <img src="assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Main" data-nav>
+        <ul role="list">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#platforms">Platforms</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li class="nav-cta"><a class="btn" href="#get">Get the app</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Theme" data-theme-toggle data-label-light="Switch to the light theme" data-label-dark="Switch to the dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
+        <a class="lang-switch" href="uk/" hreflang="uk" lang="uk" aria-label="Switch language: Українська" title="Українська">UA</a>
+        <a class="btn btn-small header-cta" href="#get">Get the app</a>
+        <button class="icon-btn menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-toggle>
+          <span class="sr-only">Menu</span>
+          <span class="menu-bar"></span><span class="menu-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+            <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="pill">
+            <svg class="pill-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+            <svg class="pill-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+            <span>Now on Google Play and the App Store</span>
+          </p>
+          <h1 id="hero-title">Know every hour your generator <em>runs</em>.</h1>
+          <p class="lead">Start and stop a generator in one tap, see how much fuel is left and never miss an oil change — for one backup unit at home or a whole fleet. Works offline. Syncs only if you want it to.</p>
+          <div class="store-badges">
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>Get it on</small><strong>Google Play</strong></span>
+            </a>
+            <a class="store-badge" href="https://apps.apple.com/app/id6819560707" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>Download on the</small><strong>App Store</strong></span>
+            </a>
+          </div>
+          <p class="hero-note">No ads · No tracking · Open source</p>
+        </div>
+
+        <div class="hero-visual">
+          <figure class="device device-android device-main">
+            <img src="assets/screens/android-en-active.jpg" width="540" height="1200" alt="Generator screen on Android: a running session with a live clock, fuel left in the tank, engine hours and the sessions list" fetchpriority="high" decoding="async">
+          </figure>
+          <figure class="device device-ios device-second">
+            <img src="assets/screens/ios-en-home-dark.jpg" width="540" height="1174" alt="Home screen on iPhone in the true-black dark theme: a running generator on top with a Stop button, idle generators below with Start" fetchpriority="low" decoding="async">
+          </figure>
+          <div class="chip chip-running" aria-hidden="true">
+            <span class="chip-dot"></span>
+            <span class="chip-text"><small>Honda EU22i · running</small><strong>2 h 16 min</strong></span>
+          </div>
+          <div class="chip chip-avg" aria-hidden="true">
+            <span class="chip-rule"></span>
+            <span class="chip-text"><small>Fuel left</small><strong class="num">≈ 2.4 L · ~4.8 h</strong></span>
+          </div>
+          <div class="chip chip-due" aria-hidden="true">
+            <span class="chip-icon">▲</span>
+            <span class="chip-text"><small>Oil change</small><strong class="is-due">Overdue 6 h</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <ul class="proof" role="list">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Works fully offline</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>No ads, no tracking</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Optional cloud sync</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>Open source, MIT</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>English & Українська</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="features" aria-labelledby="features-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Features</p>
+          <h2 id="features-title">Built around the outage routine</h2>
+          <p class="lead">The power goes out — start the generator in one tap — keep an eye on it — don't miss the service. Everything else the app works out for you.</p>
+        </header>
+        <div class="bento">
+          <article class="card bento-card is-wide reveal">
+            <div class="bento-copy">
+              <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>
+              <h3>Start and stop from Home</h3><p>Running generators move to the top with a live timer and a big Stop button; idle ones sit below with Start. Stopped by mistake? Undo brings the session back with its original start time.</p>
+            </div>
+            <div class="bento-shot" aria-hidden="true">
+              <div class="device device-android">
+                <img src="assets/screens/android-en-active.jpg" width="540" height="1200" alt="" loading="lazy" decoding="async">
+              </div>
+            </div>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7zM15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg></span>
+            <h3>Fuel left, estimated</h3><p>Give a generator its tank size and the app keeps a running estimate — "≈ 2.4 L · ~4.8 h left" — from refills and run time. A refill takes a few taps: to full, same as last time or a stepper.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+            <h3>Clear analytics</h3><p>Run hours and fuel by month for the last six months, split by generator colour — petrol and diesel are never summed into one bar — plus totals per generator.</p>
+          </article>
+          <article class="card bento-card is-wide is-reverse reveal">
+            <div class="bento-copy">
+              <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
+              <h3>Maintenance reminders</h3><p>Oil, filters, spark plugs — set intervals by engine hours, by days or both. Each task shows how much of the interval is used, and overdue work is flagged on the home screen with ▲.</p>
+            </div>
+            <ul class="ui-list" aria-hidden="true">
+              <li class="is-due">
+                <span class="ui-top"><strong>Oil change</strong><span class="ui-status is-due">▲ Due now</span></span>
+                <small>6.4 h overdue</small>
+                <span class="ui-bar"><i style="width:100%"></i></span>
+              </li>
+              <li class="is-soon">
+                <span class="ui-top"><strong>Air filter</strong><span class="ui-status is-soon">Due soon</span></span>
+                <small>18 h left</small>
+                <span class="ui-bar"><i style="width:72%"></i></span>
+              </li>
+              <li>
+                <span class="ui-top"><strong>Spark plug</strong><span class="ui-status is-ok">OK</span></span>
+                <small>245 days left</small>
+                <span class="ui-bar"><i style="width:24%"></i></span>
+              </li>
+            </ul>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+            <h3>Any number of generators</h3><p>From a single home backup unit to a rental fleet. Several generators can run at once; a live bar keeps the running ones a tap away on every screen.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 1 1 .9-9.9A6 6 0 0 1 19 10a4 4 0 0 1-1 7.9M12 12v8m-3-3 3 3 3-3"/></svg></span>
+            <h3>Sync across devices</h3><p>Sign in to keep a phone and a tablet in step. Edits made offline merge safely once you are back online.</p>
+          </article>
+          <article class="card bento-card reveal">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-1-.2-2-.5-2.9A4 4 0 0 1 15 6.5c0-1.2.5-2.3 1.3-3.1A9 9 0 0 0 12 3z"/><path d="M5 10h.01M9 7h.01M7 14h.01"/></svg></span>
+            <h3>Readable day and night</h3><p>Warm paper light theme, true-black dark theme for OLED and night outages, plus a guide to the system red filter. English or Ukrainian.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">How it works</p>
+          <h2 id="how-title">Three steps, and the generator is on the record</h2>
+          <p class="lead">No setup wizard, no manual. Everything else the app works out by itself.</p>
+        </header>
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">1</span><span class="sr-only">Step 1.</span>
+            <h3>Add your generator</h3><p>Name, model and power. One unit or a whole fleet — each gets its own history.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">2</span><span class="sr-only">Step 2.</span>
+            <h3>Tap start, tap stop</h3><p>Tap Start on the home screen when the power goes out and Stop when it comes back. Fuel used and engine hours are worked out for you.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">3</span><span class="sr-only">Step 3.</span>
+            <h3>Service on time</h3><p>Set intervals in hours or days. The home screen marks what is overdue with ▲, so service happens before a breakdown.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section showcase" aria-label="Features">
+      <div class="container showcase-row">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="assets/screens/ios-en-active.jpg" width="540" height="1174" alt="Generator screen on iPhone with a running session clock, fuel used and left, engine hours and the sessions list" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Live tracking</p>
+          <h2>Start when it starts. Stop when it stops.</h2>
+          <p class="lead">A live clock to the second, fuel used and fuel left in the tank, and big square buttons that are easy to hit in the dark during an outage or with gloves on a job site. Forgot to tap? Fix the start time later.</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="assets/screens/ios-en-maintenance.jpg" width="540" height="1174" alt="Maintenance tasks on iPhone with interval bars: oil change overdue, air filter due soon, spark plug OK" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Maintenance</p>
+          <h2>Service on time, not after a breakdown.</h2>
+          <p class="lead">Each task tracks engine hours and days since the last service and shows the used part of the interval as a bar with a limit tick. Overdue and due-soon tasks are flagged on the home screen; one tap marks a task as serviced.</p>
+        </div>
+      </div>
+      <div class="container showcase-row">
+        <figure class="device device-android showcase-device reveal">
+          <img src="assets/screens/android-en-refill.jpg" width="540" height="1200" alt="Refill sheet on Android: litre stepper, to-full and same-as-last-time presets, filled-to-full checkbox and the level after the refill" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Refills</p>
+          <h2>A refill in three taps.</h2>
+          <p class="lead">Presets for "to full" and "same as last time", a stepper for anything else and a preview of the level after the refill. A full tank calibrates the estimate, and the app tells you when it was off.</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="assets/screens/ios-en-charts.jpg" width="540" height="1174" alt="Analytics on iPhone: run hours and fuel by month as bars split by generator colour, with all-time totals" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">Analytics</p>
+          <h2>See where the hours and the fuel go.</h2>
+          <p class="lead">Square monthly bars split by generator colour, all-time totals with litres per hour and a per-generator list — filter to one generator or look at all of them.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compare" aria-labelledby="compare-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Compared</p>
+          <h2 id="compare-title">Paper logbook, spreadsheet or the app?</h2>
+          <p class="lead">You can write hours down anywhere. The difference is what you can do with them afterwards.</p>
+        </header>
+        <div class="table-wrap reveal">
+          <table class="compare">
+            <caption class="sr-only">What a paper logbook, a spreadsheet and Generator Tracker can do</caption>
+            <thead>
+              <tr>
+                <th scope="col">What you get</th>
+                <th scope="col">Paper logbook</th>
+                <th scope="col">Spreadsheet</th>
+                <th scope="col" class="is-app"><img src="assets/app-icon.png" width="24" height="24" alt="" loading="lazy">Generator Tracker</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Works without internet</th><td><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Partly</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Hours added up automatically</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Partly</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Fuel consumption per hour</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Partly</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Service reminders by hours and days</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Fuel left estimate and live timer</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Monthly charts per generator</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-partly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg><span class="sr-only">Partly</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+              <tr><th scope="row">Same data on phone and tablet</th><td><span class="mark is-no"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg><span class="sr-only">No</span></span></td><td><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td><td class="is-app"><span class="mark is-yes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg><span class="sr-only">Yes</span></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section platforms" id="platforms" aria-labelledby="platforms-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Platforms</p>
+          <h2 id="platforms-title">Native on Android and iPhone</h2>
+          <p class="lead">Not a web page in a wrapper. Material 3 on Android, the native iOS design — including Liquid Glass — on iPhone and iPad.</p>
+        </header>
+        <div class="platform-grid">
+          <article class="card platform reveal">
+            <figure class="device device-android">
+              <img src="assets/screens/android-en-home.jpg" width="540" height="1200" alt="Generator list on Android in the light theme" loading="lazy" decoding="async">
+            </figure>
+            <div class="platform-copy">
+              <h3>Android</h3>
+              <p>Material 3 navigation, system dialogs and dark theme. Phones, tablets and foldables.</p>
+              <p class="req">Android 7.0 and newer</p>
+              <a class="status is-live" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en" rel="noopener">Available on Google Play →</a>
+            </div>
+          </article>
+          <article class="card platform reveal">
+            <figure class="device device-ios">
+              <img src="assets/screens/ios-en-home.jpg" width="540" height="1174" alt="Generator list on iPhone in the light theme" loading="lazy" decoding="async">
+            </figure>
+            <div class="platform-copy">
+              <h3>iPhone & iPad</h3>
+              <p>Native navigation bars, SwiftUI forms, SF Symbols and Liquid Glass on iOS 26.</p>
+              <p class="req">iOS and iPadOS 16.4 and newer</p>
+              <a class="status is-live" href="https://apps.apple.com/app/id6819560707" rel="noopener">Available on the App Store →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="privacy" aria-labelledby="privacy-title">
+      <div class="container card privacy reveal">
+        <header class="section-head is-left">
+          <p class="eyebrow">Privacy</p>
+          <h2 id="privacy-title">Your data stays yours</h2>
+          <p class="lead">Generator Tracker stores everything on your device first. An account is optional and used only to sync your own records between your devices.</p>
+          <a class="text-link" href="privacy_policy/privacy-policy.html">Read the privacy policy →</a>
+        </header>
+        <ul class="privacy-list" role="list">
+          <li><h3>Local-first</h3><p>Every record is saved on the device; the app is fully usable without an account or a connection.</p></li>
+          <li><h3>No ads, no tracking</h3><p>No analytics SDKs, no advertising IDs, no profiling. Nothing is sold or shared.</p></li>
+          <li><h3>Open source</h3><p>The full source code is on GitHub under the MIT license — anyone can check what the app does.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="whats-new" aria-labelledby="news-title">
+      <div class="container card news reveal">
+        <header class="section-head is-left">
+          <p class="eyebrow">What's new</p>
+          <h2 id="news-title">What's new in version 3.0.0</h2>
+          <p class="news-meta"><time datetime="2026-10-10">10 October 2026</time></p>
+          <p class="lead">Generator Tracker 3.0 is redesigned around what you do during a power cut: start the generator in one tap, keep an eye on it, and never miss maintenance.</p>
+          <p class="news-links">
+            <a class="text-link" href="https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes" rel="noopener">All release notes →</a>
+            <a class="text-link" href="https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md" rel="noopener">Full changelog →</a>
+          </p>
+        </header>
+        <div class="news-body">
+<section class="news-group"><h3>What&#x27;s New</h3><ul><li><strong>Start and Stop from the home screen</strong>: running generators move to the top with a live timer, fuel left and a big Stop button. Several generators can run at once.</li><li><strong>Undo instead of "Are you sure?"</strong>: Stop works immediately; tap Undo within 5 seconds if it was a mistake.</li><li><strong>Fuel left</strong>: add your tank size in the generator settings to see roughly how much fuel and how many hours are left. Marking a refill "filled to full" keeps the estimate accurate.</li><li><strong>New refill sheet</strong>: a stepper, quick presets (to full, same as last time) and a reminder to turn the engine off first — "Stop and refill" ends the session for you. After saving, "Start again" is one tap away.</li><li><strong>Generator screen</strong>: a live clock, fuel used and left, engine hours that include the running session, and maintenance bars showing how much of each service interval is used.</li><li><strong>Other generators at a glance</strong>: a bar at the bottom shows what else is running, with a Stop button.</li><li><strong>New look</strong>: a warm light theme and a true-black dark theme that saves battery, clear high-contrast buttons, and a theme setting (light, dark or system). Settings also explain how to turn on a red screen at night.</li><li><strong>Clearer analytics</strong>: monthly run hours and fuel as bars split by generator colour, totals and a per-generator list on one page.</li><li><strong>New app icon.</strong></li></ul></section>
+<section class="news-group"><h3>Changed</h3><ul><li>Starting, stopping and deleting no longer show confirmation pop-ups.</li></ul></section>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container faq">
+        <header class="section-head reveal">
+          <p class="eyebrow">FAQ</p>
+          <h2 id="faq-title">Questions, answered</h2>
+        </header>
+        <div class="faq-list reveal">
+          <details><summary>Are there ads or in-app purchases?</summary><p>No. There are no ads, no subscriptions and no in-app purchases.</p></details>
+          <details><summary>Does it work without the internet?</summary><p>Yes. Everything is stored on your device and works offline. If you sign in, changes sync automatically when a connection is available.</p></details>
+          <details><summary>Which devices are supported?</summary><p>Android phones, tablets and foldables on Android 7.0 and newer; iPhone and iPad on iOS and iPadOS 16.4 and newer.</p></details>
+          <details><summary>Can I use it for several generators?</summary><p>Yes — add as many as you need. Each one keeps its own sessions, refills, service plan and statistics.</p></details>
+          <details><summary>How do I delete my data?</summary><p>Data stored only on your phone is removed when you delete it in the app or uninstall the app. To delete your account and everything synced to the cloud, open Settings → Delete Account; if you no longer have the app, email <a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a>. Details are in the <a href="privacy_policy/privacy-policy.html">privacy policy</a>.</p></details>
+          <details><summary>Which languages are available?</summary><p>English and Ukrainian. The app follows your device language and can be switched in Settings.</p></details>
+          <details><summary>Is the source code open?</summary><p>Yes. Generator Tracker is open source under the MIT license — the full code, including this website, is on <a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">GitHub</a>.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section" id="get" aria-labelledby="cta-title">
+      <div class="container card cta reveal">
+        <div class="cta-copy">
+          <img src="assets/app-icon.png" width="72" height="72" alt="" loading="lazy">
+          <h2 id="cta-title">Put your generator on the record.</h2>
+          <p class="lead">Offline-first and private. Installs in a minute.</p>
+          <div class="store-badges">
+            <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>Get it on</small><strong>Google Play</strong></span>
+            </a>
+            <a class="store-badge" href="https://apps.apple.com/app/id6819560707" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>Download on the</small><strong>App Store</strong></span>
+            </a>
+          </div>
+        </div>
+        <div class="cta-qr">
+          <a class="qr-tile" href="get/"><img src="assets/qr-get.svg" width="148" height="148" alt="QR code linking to the Generator Tracker download page" loading="lazy"></a>
+          <p><strong>Scan to install</strong><span>Opens Google Play or the App Store — whichever fits your phone.</span></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="./">
+          <img src="assets/app-icon.png" width="32" height="32" alt="" loading="lazy">
+          <span>Generator Tracker</span>
+        </a>
+        <p>Run hours, fuel and maintenance for every generator.</p>
+        <a class="lang-link" href="uk/" hreflang="uk" lang="uk">Українська</a>
+      </div>
+      <nav aria-labelledby="footer-product">
+        <h2 class="footer-title" id="footer-product">Product</h2>
+        <ul role="list">
+          <li><a href="https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl=en" rel="noopener">Google Play</a></li>
+          <li><a href="https://apps.apple.com/app/id6819560707" rel="noopener">App Store</a></li>
+          <li><a href="#whats-new">What's new</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">Source code</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="footer-resources">
+        <h2 class="footer-title" id="footer-resources">Resources</h2>
+        <ul role="list">
+          <li><a href="privacy_policy/privacy-policy.html">Privacy policy</a></li>
+          <li><a href="privacy_policy/privacy-policy-uk.html">Політика конфіденційності (UA)</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes" rel="noopener">Release notes</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md" rel="noopener">Changelog</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE" rel="noopener">MIT license</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2 class="footer-title" id="footer-contact">Contact</h2>
+        <address aria-labelledby="footer-contact">
+          <ul role="list">
+            <li><a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></li>
+            <li><a href="https://github.com/yuri-val/GeneratorTracker/issues" rel="noopener">GitHub Issues</a></li>
+          </ul>
+        </address>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>App version 3.0.0, released 10 October 2026.</p>
+      <p>© 2026 Yuri Valigursky. Google Play and the Google Play logo are trademarks of Google LLC. App Store is a service mark of Apple Inc.</p>
+    </div>
+  </footer>
+  <script src="main.js?v=1791592048" defer></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Політика конфіденційності — Generator Tracker</title>
+  <meta name="description" content="Як Generator Tracker поводиться з
+вашими даними: локальне зберігання, синхронізація за бажанням, без
+реклами й стеження.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html">
+  <link rel="alternate" hreflang="en" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="alternate" hreflang="uk" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html">
+  <link rel="alternate" hreflang="x-default" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <script>
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+    })();
+  </script>
+  <style>
+    .doc { max-width: 760px; padding: clamp(40px, 6vw, 72px) 0 80px; }
+    .doc h1 { font-size: clamp(34px, 5vw, 48px); margin-bottom: 12px; }
+    .doc h2 { font-size: 26px; margin: 48px 0 14px; padding-top: 24px; border-top: 1px solid var(--line); }
+    .doc h3 { font-size: 19px; margin: 28px 0 10px; }
+    .doc p, .doc li { color: var(--text-2); }
+    .doc p { margin: 12px 0; }
+    .doc ul, .doc ol { padding-left: 22px; margin: 10px 0; }
+    .doc li + li { margin-top: 6px; }
+    .doc strong { color: var(--text); }
+    .doc a { color: var(--brand-text); }
+    .doc hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+    .doc code { padding: 2px 6px; border-radius: 6px; background: var(--card-2); font-size: 0.9em; }
+    .doc-langs { display: inline-flex; gap: 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header is-scrolled">
+    <div class="container header-inner">
+      <a class="brand" href="../uk/">
+        <img src="../assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <div class="header-actions" style="margin-left:auto">
+        <button class="icon-btn theme-toggle" type="button" aria-label="Theme" data-theme-toggle data-label-light="Switch to the light theme" data-label-dark="Switch to the dark theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
+        <nav class="doc-langs" aria-label="Language">
+          <a class="lang-switch" href="privacy-policy.html" hreflang="en" lang="en">EN</a>
+          <a class="lang-switch" href="privacy-policy-uk.html" hreflang="uk" lang="uk">UA</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+  <main class="container doc">
+<h1 id="політика-конфіденційності-generator-tracker">Політика
+конфіденційності Generator Tracker</h1>
+<p><strong>Останнє оновлення:</strong> 6 жовтня 2026 року</p>
+<h2 id="вступ">Вступ</h2>
+<p>Generator Tracker (“ми”, “наш” або “додаток”) прагне захистити вашу
+конфіденційність. Ця Політика конфіденційності пояснює, як ми обробляємо
+вашу інформацію під час використання нашого мобільного додатку.</p>
+<p><strong>Ключові принципи конфіденційності:</strong></p>
+<ul>
+<li>🔒 <strong>Локальне зберігання</strong>: Ваші дані залишаються на
+пристрої за замовчуванням</li>
+<li>🎯 <strong>Опціональна хмарна синхронізація</strong>: Ви вирішуєте,
+чи синхронізувати дані</li>
+<li>🚫 <strong>Без стеження</strong>: Ми не відстежуємо, не профілюємо і
+не продаємо ваші дані</li>
+<li>✅ <strong>Відкритий код</strong>: Наш код прозорий і піддається
+перевірці</li>
+</ul>
+<h2 id="інформація-яку-ми-збираємо">Інформація, яку ми збираємо</h2>
+<h3 id="дані-які-ви-створюєте-зберігаються-локально">1. Дані, які ви
+створюєте (зберігаються локально)</h3>
+<p>Коли ви використовуєте Generator Tracker, ви створюєте та зберігаєте
+дані <strong>локально на вашому пристрої</strong> через
+AsyncStorage:</p>
+<ul>
+<li><strong>Генератори</strong>: Назва, модель, дата покупки</li>
+<li><strong>Робочі сесії</strong>: Дата, час початку/завершення,
+відпрацьовані години, нотатки</li>
+<li><strong>Заправки</strong>: Дата, кількість палива, нотатки</li>
+<li><strong>Завдання ТО</strong>: Назва завдання, інтервали
+обслуговування (мотогодини та/або дні), дата й мотогодини останнього
+обслуговування, нотатки</li>
+</ul>
+<p><strong>Ці дані:</strong></p>
+<ul>
+<li>✅ Залишаються на вашому пристрої</li>
+<li>✅ НЕ відправляються нікуди, якщо ви не увійшли в систему</li>
+<li>✅ Можуть бути видалені в будь-який час у додатку або шляхом
+видалення додатку</li>
+</ul>
+<h3 id="опціональна-облікова-інформація-firebase-authentication">2.
+Опціональна облікова інформація (Firebase Authentication)</h3>
+<p><strong>ТІЛЬКИ якщо ви вирішите увійти в систему</strong> для хмарної
+синхронізації:</p>
+<p><strong>Вхід через Email/Пароль:</strong></p>
+<ul>
+<li>Адреса електронної пошти</li>
+<li>Зашифрований пароль (ми ніколи не бачимо ваш справжній пароль)</li>
+</ul>
+<p><strong>Вхід через Google (лише вебверсія):</strong></p>
+<ul>
+<li>Адреса електронної пошти</li>
+<li>Ім’я профілю (якщо надано Google)</li>
+<li>URL фото профілю (якщо надано Google)</li>
+</ul>
+<p><strong>Анонімний вхід:</strong></p>
+<ul>
+<li>Випадково згенерований ID користувача (без особистої
+інформації)</li>
+</ul>
+<h3 id="синхронізовані-дані-firebase-firestore">3. Синхронізовані дані
+(Firebase Firestore)</h3>
+<p><strong>ТІЛЬКИ якщо ви увійшли в систему</strong>, ваші дані про
+генератори завантажуються в Firebase Firestore:</p>
+<ul>
+<li>Всі генератори, робочі сесії, заправки та завдання ТО, які ви
+створили</li>
+<li>ID користувача для прив’язки даних до вашого облікового запису</li>
+<li>Мітки часу для синхронізації та вирішення конфліктів</li>
+</ul>
+<p><strong>Ці дані:</strong></p>
+<ul>
+<li>✅ Шифруються під час передачі (HTTPS)</li>
+<li>✅ Зберігаються на серверах Google Cloud (Firebase)</li>
+<li>✅ Доступні тільки вам після входу в систему</li>
+<li>✅ Можуть бути видалені будь-коли в додатку (Налаштування → Видалити
+обліковий запис) або на запит електронною поштою; вихід із системи їх не
+видаляє</li>
+</ul>
+<h2 id="як-ми-використовуємо-вашу-інформацію">Як ми використовуємо вашу
+інформацію</h2>
+<h3 id="локальне-використання-без-облікового-запису">Локальне
+використання (без облікового запису)</h3>
+<ul>
+<li>Відображення даних відстеження генераторів</li>
+<li>Розрахунок статистики та аналітики</li>
+<li>Забезпечення функціональності додатку</li>
+</ul>
+<p><strong>Дані не залишають ваш пристрій.</strong></p>
+<h3
+id="використання-хмарної-синхронізації-з-обліковим-записом">Використання
+хмарної синхронізації (з обліковим записом)</h3>
+<ul>
+<li>Синхронізація даних між вашими пристроями</li>
+<li>Резервне копіювання даних для запобігання втрати</li>
+<li>Відновлення даних при переустановці додатку</li>
+<li>Вирішення конфліктів при редагуванні на кількох пристроях</li>
+</ul>
+<p><strong>Ми НЕ:</strong></p>
+<ul>
+<li>❌ Аналізуємо ваші моделі використання</li>
+<li>❌ Показуємо рекламу</li>
+<li>❌ Продаємо або передаємо ваші дані третім сторонам</li>
+<li>❌ Використовуємо ваші дані для будь-якої мети, окрім
+синхронізації</li>
+</ul>
+<h2 id="зберігання-даних-та-безпека">Зберігання даних та безпека</h2>
+<h3 id="локальне-зберігання">Локальне зберігання</h3>
+<ul>
+<li><strong>Метод</strong>: React Native AsyncStorage</li>
+<li><strong>Розташування</strong>: Внутрішня пам’ять вашого
+пристрою</li>
+<li><strong>Шифрування</strong>: Стандартне шифрування пристрою (якщо
+увімкнено на вашому пристрої)</li>
+<li><strong>Доступ</strong>: Тільки додаток Generator Tracker може
+отримати доступ до цих даних</li>
+</ul>
+<h3 id="хмарне-зберігання-firebase">Хмарне зберігання (Firebase)</h3>
+<ul>
+<li><strong>Провайдер</strong>: Google Firebase (Google Cloud
+Platform)</li>
+<li><strong>Розташування</strong>: Залежить від регіону вашого Firebase
+проекту</li>
+<li><strong>Шифрування</strong>:
+<ul>
+<li>При передачі: TLS/HTTPS</li>
+<li>При зберіганні: Шифрування Google Cloud</li>
+</ul></li>
+<li><strong>Контроль доступу</strong>: Firebase Security Rules
+гарантують, що тільки автентифіковані користувачі мають доступ до
+власних даних</li>
+</ul>
+<h3 id="заходи-безпеки">Заходи безпеки</h3>
+<ul>
+<li>✅ Паролі не зберігаються у відкритому вигляді</li>
+<li>✅ Токени автентифікації безпечно керуються Firebase</li>
+<li>✅ HTTPS для всієї мережевої комунікації</li>
+<li>✅ Жодних чутливих даних у логах додатку</li>
+</ul>
+<h2 id="передача-даних-та-треті-сторони">Передача даних та треті
+сторони</h2>
+<h3 id="ми-не-передаємо-ваші-дані">Ми НЕ передаємо ваші дані</h3>
+<p>Generator Tracker <strong>не продає, не здає в оренду і не
+передає</strong> ваші особисті дані третім сторонам для маркетингових
+або рекламних цілей.</p>
+<h3 id="сторонні-сервіси-які-ми-використовуємо">Сторонні сервіси, які ми
+використовуємо</h3>
+<p><strong>Google Firebase</strong> (ТІЛЬКИ якщо ви увійшли в
+систему):</p>
+<ul>
+<li><strong>Мета</strong>: Автентифікація та синхронізація даних</li>
+<li><strong>Передані дані</strong>: Облікова інформація та дані додатку
+(як описано вище)</li>
+<li><strong>Політика конфіденційності</strong>:
+https://firebase.google.com/support/privacy</li>
+</ul>
+<p><strong>Google Sign-In</strong> (ТІЛЬКИ якщо ви обрали цей метод
+входу):</p>
+<ul>
+<li><strong>Мета</strong>: Автентифікація через обліковий запис
+Google</li>
+<li><strong>Передані дані</strong>: Email, ім’я, фото профілю (як надано
+Google)</li>
+<li><strong>Політика конфіденційності</strong>:
+https://policies.google.com/privacy</li>
+</ul>
+<h3 id="без-аналітики-та-відстеження">Без аналітики та відстеження</h3>
+<ul>
+<li>❌ Без Google Analytics</li>
+<li>❌ Без Facebook Pixel</li>
+<li>❌ Без рекламних SDK</li>
+<li>❌ Без відстеження використання</li>
+<li>❌ Без звітів про збої з особистими даними</li>
+</ul>
+<h2 id="ваші-права-та-вибір">Ваші права та вибір</h2>
+<h3 id="доступ-до-ваших-даних">Доступ до ваших даних</h3>
+<ul>
+<li>✅ Переглядайте всі свої дані безпосередньо в додатку</li>
+<li>✅ Експорт даних (функціональність заплановано для майбутніх
+версій)</li>
+</ul>
+<h3 id="видалення-ваших-даних">Видалення ваших даних</h3>
+<p><strong>Варіант 1: Видалити обліковий запис у додатку</strong></p>
+<ol type="1">
+<li>Відкрийте Налаштування, увійшовши в систему</li>
+<li>Натисніть «Видалити обліковий запис» і підтвердьте (облікові записи
+з email підтверджують паролем)</li>
+<li>Ваш обліковий запис і всі дані, синхронізовані з хмарою (генератори,
+робочі сесії, заправки, завдання ТО), буде видалено негайно й
+назавжди</li>
+</ol>
+<p>Дані на вашому пристрої не видаляються: вони залишаються доступними
+офлайн і більше не пов’язані з жодним обліковим записом.</p>
+<p><strong>Варіант 2: Видалити локальні дані</strong></p>
+<ul>
+<li>Видаліть записи в додатку або видаліть сам додаток, щоб одразу
+прибрати всі локальні дані</li>
+</ul>
+<p><strong>Варіант 3: Запит на видалення електронною поштою</strong></p>
+<ul>
+<li>Якщо ви більше не маєте доступу до додатку, напишіть на
+yuri.valigursky@gmail.com з адреси вашого облікового запису</li>
+<li>Ми видалимо ваш обліковий запис та всі пов’язані дані протягом 30
+днів</li>
+</ul>
+<p>Вихід із системи не видаляє хмарні дані.</p>
+<h3 id="контроль-синхронізації">Контроль синхронізації</h3>
+<ul>
+<li>✅ Використовуйте додаток без входу в систему (без хмарної
+синхронізації)</li>
+<li>✅ Увійдіть, щоб увімкнути синхронізацію</li>
+<li>✅ Вийдіть, щоб зупинити синхронізацію (локальні дані
+залишаються)</li>
+</ul>
+<h2 id="конфіденційність-дітей">Конфіденційність дітей</h2>
+<p>Generator Tracker не призначений для дітей віком до 13 років. Ми
+свідомо не збираємо особисту інформацію від дітей віком до 13 років.</p>
+<p>Якщо ви є батьком або опікуном і вважаєте, що ваша дитина надала нам
+особисту інформацію, будь ласка, зв’яжіться з нами за адресою
+yuri.valigursky@gmail.com.</p>
+<h2 id="зберігання-даних">Зберігання даних</h2>
+<h3 id="локальні-дані">Локальні дані</h3>
+<ul>
+<li>Зберігаються до видалення додатку</li>
+<li>Без автоматичного видалення</li>
+</ul>
+<h3 id="хмарні-дані-firebase">Хмарні дані (Firebase)</h3>
+<ul>
+<li>Зберігаються доки ваш обліковий запис активний</li>
+<li>Видаляються негайно, коли ви видаляєте обліковий запис у додатку,
+або протягом 30 днів після запиту електронною поштою</li>
+<li>Автоматичне резервне зберігання: Стандартна політика зберігання
+Firebase</li>
+</ul>
+<h2 id="міжнародні-передачі-даних">Міжнародні передачі даних</h2>
+<p>Якщо ви знаходитесь поза Сполученими Штатами, зверніть увагу:</p>
+<ul>
+<li>Сервери Firebase можуть знаходитись по всьому світу</li>
+<li>Дані можуть передаватись та зберігатись в країнах поза вашим місцем
+проживання</li>
+<li>Ми покладаємось на заходи захисту даних Google Cloud</li>
+</ul>
+<h2 id="зміни-до-цієї-політики-конфіденційності">Зміни до цієї Політики
+конфіденційності</h2>
+<p>Ми можемо час від часу оновлювати цю Політику конфіденційності. Зміни
+будуть опубліковані:</p>
+<ul>
+<li>В цьому документі (з оновленою датою “Останнє оновлення”)</li>
+</ul>
+<p><strong>Істотні зміни</strong> також буде відображено в описі додатку
+в магазині.</p>
+<h2 id="відкритий-код">Відкритий код</h2>
+<p>Generator Tracker - це програмне забезпечення з відкритим кодом:</p>
+<ul>
+<li><strong>Ліцензія</strong>: MIT License</li>
+<li><strong>Репозиторій</strong>:
+https://github.com/yuri-val/GeneratorTracker</li>
+<li><strong>Перевірка коду</strong>: Ви можете переглянути наш код для
+підтвердження практик конфіденційності</li>
+</ul>
+<h2 id="звяжіться-з-нами">Зв’яжіться з нами</h2>
+<p>Якщо у вас є питання щодо цієї Політики конфіденційності або наших
+практик конфіденційності:</p>
+<p><strong>Email</strong>: yuri.valigursky@gmail.com <strong>Час
+відповіді</strong>: Ми прагнемо відповісти протягом 7 робочих днів</p>
+<hr />
+<p><strong>Підсумок</strong></p>
+<p>🔒 <strong>Дизайн з пріоритетом конфіденційності</strong>: Локальне
+зберігання за замовчуванням, опціональна хмарна синхронізація 📱
+<strong>Контроль користувача</strong>: Ви вирішуєте, які дані
+синхронізувати і коли 🚫 <strong>Без стеження</strong>: Нуль аналітики,
+реклами або відстеження третіми сторонами ✅
+<strong>Прозорість</strong>: Відкритий код, зрозумілі політики</p>
+<p>Дякуємо за довіру до Generator Tracker з вашими даними.</p>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-bottom" style="margin-top:0;border-top:0;padding-top:0">
+      <p><a href="../uk/">Generator Tracker</a> · <a href="https://github.com/yuri-val/GeneratorTracker">GitHub</a> · <a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></p>
+      <p>© 2026 Yuri Valigursky · MIT License</p>
+    </div>
+  </footer>
+  <script src="../main.js" defer></script>
+</body>
+</html>
