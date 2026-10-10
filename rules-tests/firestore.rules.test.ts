@@ -109,6 +109,19 @@ describe('owner access', () => {
   });
 });
 
+describe('3.0 fields', () => {
+  it('accepts tankCapacity on a generator and time/isFull on a refill (optional, no rules change)', async () => {
+    const db = env.authenticatedContext('alice').firestore();
+    await assertSucceeds(setDoc(doc(db, 'users/alice/generators/g1'), { ...generator('alice'), tankCapacity: 3.6 }));
+    await assertSucceeds(
+      setDoc(doc(db, 'users/alice/generators/g1/refills/r1'), {
+        id: 'r1', generatorId: 'g1', date: '2026-10-01', time: '22:41', amount: 1.2, isFull: true,
+        createdAt: NOW, lastModified: NOW, userId: 'alice',
+      }),
+    );
+  });
+});
+
 describe('isolation between users', () => {
   it('denies unauthenticated access', async () => {
     await seed([['users/alice/generators/g1', generator('alice')]]);

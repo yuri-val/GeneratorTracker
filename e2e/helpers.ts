@@ -13,11 +13,14 @@ export const goToTab = async (page: Page, label: 'Home' | 'Analytics' | 'Setting
 };
 
 /** Create a generator through the UI and return to Home. */
-export const createGenerator = async (page: Page, name: string, model?: string) => {
+export const createGenerator = async (page: Page, name: string, model?: string, tankLitres?: number) => {
   await page.getByTestId('fab-add-generator').click();
   await page.getByTestId('input-generator-name').fill(name);
   if (model) {
     await page.getByTestId('input-generator-model').fill(model);
+  }
+  if (tankLitres) {
+    await page.getByTestId('input-generator-tank').fill(String(tankLitres));
   }
   await page.getByTestId('save-generator').click();
   await expect(page.getByText(name).first()).toBeVisible();
@@ -39,9 +42,9 @@ export const goBack = (page: Page) => page.getByRole('button', { name: 'Back' })
 export const visibleText = (page: Page, text: string | RegExp, exact = false) =>
   page.getByText(text, { exact }).filter({ visible: true });
 
-/** Material top-tab labels render more than once on web; click the first match. */
+/** Generator screen tabs (3.0: text tabs with a count). */
 export const openDetailTab = (page: Page, label: 'Sessions' | 'Refills' | 'Maintenance') =>
-  page.getByRole('tab', { name: new RegExp(label) }).first().click();
+  page.getByTestId(`detail-tab-${label === 'Sessions' ? 'sessions' : label.toLowerCase()}`).first().click();
 
 /**
  * Seed the offline store before the app boots. Keys mirror src/utils/storage.ts

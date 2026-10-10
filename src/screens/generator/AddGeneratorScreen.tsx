@@ -30,6 +30,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(toLocalDateString());
+  const [tankText, setTankText] = useState('');
   const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -56,6 +57,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
         setName(gen.name);
         setModel(gen.model || '');
         setPurchaseDate(gen.purchaseDate);
+        setTankText(gen.tankCapacity ? String(gen.tankCapacity) : '');
       }
     } catch (error) {
       console.error('Error loading generator:', error);
@@ -63,9 +65,14 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
     }
   };
 
+  // Tank capacity (3.0) is optional; without it the fuel estimate is hidden.
+  const tankValue = parseFloat(tankText.replace(',', '.'));
+  const tankInvalid = tankText.trim() !== '' && (isNaN(tankValue) || tankValue <= 0 || tankValue > 10000);
+  const tankCapacity = tankText.trim() && !tankInvalid ? Math.round(tankValue * 10) / 10 : undefined;
+
   const handleSave = async () => {
     setSubmitted(true);
-    if (!name.trim()) {
+    if (!name.trim() || tankInvalid) {
       return;
     }
 
@@ -76,6 +83,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
         name: name.trim(),
         model: model.trim() || undefined,
         purchaseDate,
+        tankCapacity: tankCapacity,
         createdAt: isEdit && existingGenerator ? existingGenerator.createdAt : now,
         lastModified: now,
         syncStatus: 'pending',
@@ -133,6 +141,24 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
                 { kind: 'date', key: 'purchaseDate', label: t('form.purchaseDate'), value: purchaseDate, onChange: setPurchaseDate },
               ],
             },
+            {
+              key: 'tank',
+              footer: t('generator.tankHint'),
+              error: submitted && tankInvalid ? t('generator.tankInvalid') : undefined,
+              fields: [
+                {
+                  kind: 'text',
+                  key: 'tank',
+                  label: t('generator.tankLabel'),
+                  value: tankText,
+                  onChange: setTankText,
+                  placeholder: t('form.optional'),
+                  keyboard: 'decimal',
+                  suffix: t('common.litersAbbr'),
+                  testID: 'input-generator-tank',
+                },
+              ],
+            },
           ]}
         />
       </>
@@ -183,6 +209,22 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
             />
           </View>
         </Pressable>
+
+        <TextInput
+          mode="outlined"
+          label={t('generator.tankLabel')}
+          value={tankText}
+          onChangeText={setTankText}
+          keyboardType="decimal-pad"
+          left={<TextInput.Icon icon="fuel" />}
+          right={<TextInput.Affix text={t('common.litersAbbr')} />}
+          error={submitted && tankInvalid}
+          style={[styles.input, { marginTop: 4 }]}
+          testID="input-generator-tank"
+        />
+        <HelperText type={submitted && tankInvalid ? 'error' : 'info'} visible>
+          {submitted && tankInvalid ? t('generator.tankInvalid') : t('generator.tankHint')}
+        </HelperText>
 
         {showDatePicker && (
           <DateTimePicker

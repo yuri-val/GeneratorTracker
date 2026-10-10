@@ -1,281 +1,173 @@
-import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
-import { Card, FAB, Text, Avatar, Chip, Divider } from 'react-native-paper';
-import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import React, { useMemo, useState } from 'react';
+import { View, StyleSheet, RefreshControl, Pressable } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
-import { Generator, GeneratorStats, MaintenanceSummary } from '../../models/types';
-import { getGenerators, getWorkSessions, getRefills, getMaintenanceTasks } from '../../utils/storage';
-import { calculateGeneratorStats, formatDate, getGeneratorMaintenanceSummary } from '../../utils/calculations';
 import { SyncStatusIndicator } from '../../components/SyncStatusIndicator';
-import { StatBlock } from '../../components/StatBlock';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { AppIcon } from '../../components/AppIcon';
-import { ICONS } from '../../constants/icons';
+import { GtText, PageHeader, PageSummary, StatusBarScrim, TAB_BAR_OFFSET, useSnackbarBottomOffset } from '../../components/gt';
+import { IdleRow, RunningCard } from '../../components/fleet/FleetRows';
 import { useAppTheme } from '../../theme/useAppTheme';
-import { appColors } from '../../theme';
-import { isIOS, surfaces, textColors } from '../../theme/platform';
+import { isIOS } from '../../theme/platform';
 import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
 import { contentColumn } from '../../theme/layout';
+import { space } from '../../theme/tokens';
+import { buildFleet, useFleet, type FleetItem } from '../../hooks/useFleet';
+import { useNow } from '../../hooks/useNow';
+import { useSessionActions } from '../../hooks/useSessionActions';
+import { fmtSummary } from '../../utils/format';
 
-type GeneratorWithStats = Generator & { stats: GeneratorStats; maintenance: MaintenanceSummary };
-
-// Android/web: the FAB floats FAB_MARGIN above the tab bar and the list leaves room
-// for it. iOS has no FAB — the add action lives in the navigation bar.
-const FAB_MARGIN = 16;
-const FAB_CLEARANCE = FAB_MARGIN + 56 + 16;
-
+/**
+ * Home (3.0, design 5a / 5d): running generators on top as inverted cards with a Stop button,
+ * idle ones below as rows with Start. Times refresh once a minute.
+ */
 export default function HomeScreen() {
   const theme = useAppTheme();
+  const { gt } = theme;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t, i18n } = useTranslation();
-  const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
   const tabBarOverlap = useTabBarOverlap();
-  const surface = surfaces(theme);
-  const text = textColors(theme);
+  const { raw, reload } = useFleet();
+  const [refreshing, setRefreshing] = useState(false);
+  const anyRunning = !!raw?.s.some(s => s.isActive);
+  const now = useNow(60_000, anyRunning);
+  const { start, stop } = useSessionActions(reload);
+  useSnackbarBottomOffset(TAB_BAR_OFFSET);
 
-  const loadGenerators = async () => {
-    try {
-      const generatorList = await getGenerators();
-      const workSessions = await getWorkSessions();
-      const refills = await getRefills();
-      const maintenanceTasks = await getMaintenanceTasks();
-
-      const generatorsWithStats: GeneratorWithStats[] = generatorList.map(gen => {
-        const genSessions = workSessions.filter(s => s.generatorId === gen.id);
-        const genRefills = refills.filter(r => r.generatorId === gen.id);
-        const stats = calculateGeneratorStats(genSessions, genRefills);
-        const genTasks = maintenanceTasks.filter(m => m.generatorId === gen.id);
-        const maintenance = getGeneratorMaintenanceSummary(genTasks, stats.totalHours);
-        return { ...gen, stats, maintenance };
-      });
-
-      setGenerators(generatorsWithStats);
-    } catch (error) {
-      console.error('Error loading generators:', error);
-    }
-  };
+  const fleet = useMemo(() => (raw ? buildFleet(raw.g, raw.s, raw.r, raw.t, now) : []), [raw, now]);
+  const runningCount = fleet.filter(i => i.running).length;
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadGenerators();
+    await reload();
     setRefreshing(false);
   };
-
-  useFocusEffect(
-    useCallback(() => {
-      loadGenerators();
-    }, [])
-  );
 
   const addGenerator = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     navigation.navigate('AddGenerator', {});
   };
 
-  const renderGenerator = ({ item, index }: { item: GeneratorWithStats; index: number }) => {
-    const maintenanceColor = item.maintenance.level === 'due' ? theme.colors.error : appColors.warning;
-    return (
-      <Animated.View entering={FadeInUp.delay(index * 80).springify()}>
-        <Card
-          mode={isIOS ? 'contained' : 'elevated'}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.navigate('GeneratorDetail', { generatorId: item.id });
-          }}
-          style={[styles.card, isIOS && [styles.cardIOS, { backgroundColor: surface.card }]]}
-        >
-          <Card.Title
-            title={item.name}
-            subtitle={item.model || undefined}
-            titleVariant="titleLarge"
-            titleStyle={isIOS ? { color: text.primary as string } : undefined}
-            subtitleStyle={isIOS ? { color: text.secondary as string } : undefined}
-            left={props =>
-              isIOS ? (
-                <View style={[styles.iosAvatar, { backgroundColor: theme.colors.primary }]}>
-                  <AppIcon name="engine" size={20} color={theme.colors.onPrimary} />
-                </View>
-              ) : (
-                <Avatar.Icon
-                  {...props}
-                  icon={ICONS.engine.mci}
-                  style={{ backgroundColor: theme.colors.primary }}
-                  color={theme.colors.onPrimary}
-                />
-              )
-            }
-          />
-          <Card.Content>
-            <View style={styles.statsRow}>
-              <StatBlock
-                value={`${item.stats.totalHours.toFixed(1)}${t('common.hoursAbbr')}`}
-                label={t('home.totalHours')}
-                icon="clock"
-                color={theme.colors.secondary}
-              />
-              <Divider style={styles.statDivider} />
-              <StatBlock
-                value={item.stats.totalRefills.toString()}
-                label={t('home.refills')}
-                icon="fuel"
-                color={theme.colors.primary}
-              />
-            </View>
-          </Card.Content>
-          {(item.stats.lastWorkSessionDate || item.maintenance.level !== 'ok') && (
-            <Card.Actions>
-              {item.maintenance.level !== 'ok' && (
-                <Chip
-                  icon={() => <AppIcon name="wrench" size={14} color={maintenanceColor} />}
-                  compact
-                  textStyle={{ fontSize: 12, color: maintenanceColor }}
-                  style={{ backgroundColor: maintenanceColor + '22' }}
-                >
-                  {item.maintenance.dueCount > 0
-                    ? t('maintenance.badgeDue', { count: item.maintenance.dueCount })
-                    : t('maintenance.badgeSoon', { count: item.maintenance.soonCount })}
-                </Chip>
-              )}
-              {item.stats.lastWorkSessionDate && (
-                <Chip
-                  icon={() => <AppIcon name="clock" size={14} color={theme.colors.primary} />}
-                  compact
-                  textStyle={{ fontSize: 12 }}
-                >
-                  {t('common.last')}: {formatDate(item.stats.lastWorkSessionDate, i18n.language)}
-                </Chip>
-              )}
-            </Card.Actions>
-          )}
-        </Card>
-      </Animated.View>
-    );
+  const open = (item: FleetItem) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    navigation.navigate('GeneratorDetail', { generatorId: item.generator.id });
   };
 
-  const list = (
-    <FlatList
-      data={generators}
-      renderItem={renderGenerator}
-      keyExtractor={item => item.id}
-      contentInsetAdjustmentBehavior="automatic"
-      style={isIOS ? { backgroundColor: surface.screen } : undefined}
-      contentContainerStyle={[styles.listContent, contentColumn, !isIOS && { paddingBottom: tabBarOverlap + FAB_CLEARANCE }]}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
-      }
-      ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-          <AppIcon name="engineOff" size={80} color={text.secondary} />
-          <Text variant="titleMedium" style={[styles.emptyText, { color: text.secondary as string }]}>
-            {t('home.noGenerators')}
-          </Text>
-          <Text variant="bodyMedium" style={{ color: text.secondary as string, textAlign: 'center' }}>
-            {t(isIOS ? 'home.addFirstGeneratorIOS' : 'home.addFirstGenerator')}
-          </Text>
-        </View>
+  const renderItem = ({ item }: { item: FleetItem }) => {
+    const props = {
+      item,
+      now,
+      onOpen: () => open(item),
+      onStart: () => start(item.generator.id),
+      onStop: () => item.running && stop(item.running, item.generator.name),
+    };
+    return item.running ? <RunningCard {...props} /> : <IdleRow {...props} />;
+  };
+
+  const summary = fleet.length > 0 ? fmtSummary(fleet.length, runningCount, i18n.language) : t('home.summaryEmpty');
+
+  // iOS: the native large title "Генератори" and "+" live in the navigation bar; the summary line and
+  // the 1.5 px ink rule open the list. Android/web: the whole header is drawn here (no FAB in 3.0).
+  const listHeader = isIOS ? (
+    <PageSummary summary={summary} testID="home-summary" />
+  ) : (
+    <PageHeader
+      title={t('home.title')}
+      summary={summary}
+      summaryTestID="home-summary"
+      trailing={
+        <>
+          <SyncStatusIndicator />
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('generator.addTitle')}
+            testID="fab-add-generator"
+            onPress={addGenerator}
+            style={({ pressed }) => [
+              styles.addButton,
+              gt.dark ? { backgroundColor: pressed ? gt.raised : '#1A1918' } : { borderColor: gt.text, borderWidth: 1.5 },
+              !gt.dark && pressed && { backgroundColor: gt.pressed },
+            ]}
+          >
+            <AppIcon name="add" size={22} color={gt.text} />
+          </Pressable>
+        </>
       }
     />
   );
 
-  const header = (
-    <ScreenHeader
-      title={t('home.title')}
-      largeTitle
-      scrollEdge
-      trailing={<SyncStatusIndicator />}
-      actions={
-        isIOS
-          ? [
-              {
-                key: 'add',
-                label: t('generator.addTitle'),
-                icon: 'add',
-                variant: 'prominent',
-                onPress: addGenerator,
-                testID: 'fab-add-generator',
-              },
-            ]
-          : []
+  const list = (
+    <Animated.FlatList
+      data={fleet}
+      renderItem={renderItem}
+      keyExtractor={item => item.generator.id}
+      itemLayoutAnimation={LinearTransition.duration(250)}
+      contentInsetAdjustmentBehavior="automatic"
+      style={{ backgroundColor: gt.bg }}
+      ListHeaderComponent={listHeader}
+      ItemSeparatorComponent={Separator}
+      contentContainerStyle={[styles.listContent, contentColumn, { paddingBottom: tabBarOverlap + 24 }]}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={gt.textMuted} />}
+      ListEmptyComponent={
+        raw ? (
+          <View style={styles.empty}>
+            <AppIcon name="engineOff" size={64} color={gt.textMuted} />
+            <GtText variant="cardTitle" color={gt.text} style={styles.center}>
+              {t('home.noGenerators')}
+            </GtText>
+            <GtText variant="body" color={gt.textMuted} style={styles.center}>
+              {t(isIOS ? 'home.addFirstGeneratorIOS' : 'home.addFirstGenerator')}
+            </GtText>
+          </View>
+        ) : null
       }
     />
   );
 
   if (isIOS) {
-    // The list is the screen's root so the native large title collapses on scroll.
     return (
       <>
-        {header}
+        <ScreenHeader
+          title={t('home.title')}
+          largeTitle
+          scrollEdge
+          trailing={<SyncStatusIndicator />}
+          actions={[
+            {
+              key: 'add',
+              label: t('generator.addTitle'),
+              icon: 'add',
+              variant: 'prominent',
+              onPress: addGenerator,
+              testID: 'fab-add-generator',
+            },
+          ]}
+        />
         {list}
       </>
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {header}
+    <View style={[styles.flex, { backgroundColor: gt.bg }]}>
       {list}
-      <Animated.View entering={ZoomIn.delay(300)} style={[styles.fabContainer, { bottom: tabBarOverlap + FAB_MARGIN }]}>
-        <FAB
-          icon={ICONS.add.mci}
-          testID="fab-add-generator"
-          style={[styles.fab, { backgroundColor: theme.colors.primary }]}
-          color={theme.colors.onPrimary}
-          onPress={addGenerator}
-        />
-      </Animated.View>
+      <StatusBarScrim />
     </View>
   );
 }
 
+function Separator() {
+  return <View style={{ height: space.s }} />;
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContent: {
-    padding: 16,
-  },
-  card: {
-    marginBottom: 16,
-  },
-  cardIOS: {
-    borderRadius: 16,
-  },
-  iosAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  statDivider: {
-    width: 1,
-    height: 40,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 80,
-    paddingHorizontal: 40,
-    gap: 12,
-  },
-  emptyText: {
-    marginTop: 8,
-  },
-  fabContainer: {
-    position: 'absolute',
-    right: 20,
-  },
-  fab: {
-    borderRadius: 16,
-  },
+  flex: { flex: 1 },
+  center: { textAlign: 'center' },
+  listContent: { paddingHorizontal: space.screenX },
+  addButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  empty: { alignItems: 'center', paddingTop: 72, paddingHorizontal: 32, gap: 12 },
 });

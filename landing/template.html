@@ -11,8 +11,8 @@
   <link rel="alternate" hreflang="uk" href="{{site_url}}uk/">
   <link rel="alternate" hreflang="x-default" href="{{site_url}}">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfaf8">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0b0d10">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
   <meta name="application-name" content="Generator Tracker">
   <meta name="apple-mobile-web-app-title" content="Generator Tracker">
   <meta name="apple-itunes-app" content="app-id=6819560707">
@@ -37,8 +37,8 @@
   <link rel="icon" href="{{dir_root}}favicon.png" type="image/png" sizes="64x64">
   <link rel="apple-touch-icon" href="{{dir_root}}apple-touch-icon.png">
   <link rel="manifest" href="{{dir_root}}site.webmanifest">
-  <link rel="preload" href="{{dir_root}}fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
-{{font_preload_extra}}
+  <link rel="preload" href="{{dir_root}}fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{dir_root}}fonts/plex-sans-700.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{dir_root}}assets/screens/android-{{lang}}-active.jpg" as="image" fetchpriority="high">
   <link rel="stylesheet" href="{{dir_root}}styles.css?v={{build_id}}">
   <script>
@@ -86,8 +86,7 @@
 
   <main id="main">
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-bg" aria-hidden="true"><div class="hero-grid-bg"></div><div class="hero-glow"></div></div>
-      <div class="container hero-inner">
+            <div class="container hero-inner">
         <div class="hero-copy">
           <p class="pill">
             <svg class="pill-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
@@ -121,11 +120,11 @@
             <span class="chip-text"><small>{{chip_running_t}}</small><strong>{{chip_running_v}}</strong></span>
           </div>
           <div class="chip chip-avg" aria-hidden="true">
-            <span class="chip-icon is-blue"><svg viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16M3 21h13M7 7h5v4H7zM15 9h2a2 2 0 0 1 2 2v6a1.5 1.5 0 0 0 3 0V8l-3-3"/></svg></span>
-            <span class="chip-text"><small>{{chip_avg_t}}</small><strong>{{chip_avg_v}}</strong></span>
+            <span class="chip-rule"></span>
+            <span class="chip-text"><small>{{chip_avg_t}}</small><strong class="num">{{chip_avg_v}}</strong></span>
           </div>
           <div class="chip chip-due" aria-hidden="true">
-            <span class="chip-icon is-brand"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
+            <span class="chip-icon">▲</span>
             <span class="chip-text"><small>{{chip_due_t}}</small><strong class="is-due">{{chip_due_v}}</strong></span>
           </div>
         </div>
@@ -175,20 +174,20 @@
               <h3>{{f_service_t}}</h3><p>{{f_service_d}}</p>
             </div>
             <ul class="ui-list" aria-hidden="true">
-              <li>
-                <span class="ui-ico is-due"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
-                <span class="ui-main"><strong>{{ui_oil}}</strong><small>{{ui_oil_s}}</small></span>
-                <span class="ui-status is-due">{{ui_due_now}}</span>
+              <li class="is-due">
+                <span class="ui-top"><strong>{{ui_oil}}</strong><span class="ui-status is-due">▲ {{ui_due_now}}</span></span>
+                <small>{{ui_oil_s}}</small>
+                <span class="ui-bar"><i style="width:100%"></i></span>
+              </li>
+              <li class="is-soon">
+                <span class="ui-top"><strong>{{ui_air}}</strong><span class="ui-status is-soon">{{ui_due_soon}}</span></span>
+                <small>{{ui_air_s}}</small>
+                <span class="ui-bar"><i style="width:72%"></i></span>
               </li>
               <li>
-                <span class="ui-ico is-soon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
-                <span class="ui-main"><strong>{{ui_air}}</strong><small>{{ui_air_s}}</small></span>
-                <span class="ui-status is-soon">{{ui_due_soon}}</span>
-              </li>
-              <li>
-                <span class="ui-ico is-ok"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.6 5.3L3 17.7 6.3 21l6.1-6.1a4 4 0 0 0 5.3-5.6l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span>
-                <span class="ui-main"><strong>{{ui_plug}}</strong><small>{{ui_plug_s}}</small></span>
-                <span class="ui-status is-ok">{{ui_ok}}</span>
+                <span class="ui-top"><strong>{{ui_plug}}</strong><span class="ui-status is-ok">{{ui_ok}}</span></span>
+                <small>{{ui_plug_s}}</small>
+                <span class="ui-bar"><i style="width:24%"></i></span>
               </li>
             </ul>
           </article>
@@ -255,7 +254,17 @@
       </div>
       <div class="container showcase-row">
         <figure class="device device-android showcase-device reveal">
-          <img src="{{dir_root}}assets/screens/android-{{lang}}-charts.jpg" width="540" height="1200" alt="{{show3_alt}}" loading="lazy" decoding="async">
+          <img src="{{dir_root}}assets/screens/android-{{lang}}-refill.jpg" width="540" height="1200" alt="{{show4_alt}}" loading="lazy" decoding="async">
+        </figure>
+        <div class="showcase-copy reveal">
+          <p class="eyebrow">{{show4_eyebrow}}</p>
+          <h2>{{show4_title}}</h2>
+          <p class="lead">{{show4_text}}</p>
+        </div>
+      </div>
+      <div class="container showcase-row is-reversed">
+        <figure class="device device-ios showcase-device reveal">
+          <img src="{{dir_root}}assets/screens/ios-{{lang}}-charts.jpg" width="540" height="1174" alt="{{show3_alt}}" loading="lazy" decoding="async">
         </figure>
         <div class="showcase-copy reveal">
           <p class="eyebrow">{{show3_eyebrow}}</p>

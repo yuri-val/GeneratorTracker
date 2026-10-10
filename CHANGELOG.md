@@ -5,14 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.0.0] - 2026-10-10
+
+**Redesign** (design handoff `docs/design/redesign-3.0`, plan `docs/REDESIGN_3.0.md`): the app is built around
+the outage routine — the power goes out → start a generator in one tap → watch it → don't miss maintenance.
+Data model changes are optional fields only; sync and Firestore rules are unchanged.
+
+### Added
+- **Start / Stop from Home.** Running generators move to the top as cards with a per-minute timer ("2 h 22 min"),
+  fuel left and a Stop button; idle generators are rows with Start. A summary line counts generators and how many
+  run. Several generators can run at once.
+- **Undo instead of confirmations.** Stop happens immediately (success haptic) with a 5 s "Undo" snackbar that
+  restores the session with its original start time.
+- **Fuel estimate.** Optional tank capacity per generator; the level is replayed from refills and sessions at the
+  average consumption, shown as "≈ 2.4 L · ~4.6 h". A refill marked "filled to full" (or one larger than the free
+  space) calibrates the estimate; before the first full refill the level shows "—".
+- **Refill sheet**: stepper, presets (to full / same as last time / 1 L or 20 L), "filled to full" checkbox,
+  calibration messages, after-refill preview; while the generator runs the form is blocked with "Stop and refill",
+  and after saving a "Start again" snackbar starts a new session. Refills store their time.
+- **Generator screen**: session card with a live clock (seconds), used / in-tank fuel with an (i) explanation,
+  Stop and Edit time; engine hours include the running session; text tabs with counts; maintenance rows with a bar
+  of the used service interval and a limit tick.
+- **Live bar** for other running generators: footer on the generator screen and above the tab bar on
+  Analytics / Settings; one generator → Stop, two or more → "Go to Home".
+- **Analytics redesigned** in the same language: one page with a square generator filter, all-time totals (engine
+  hours, litres, L/h), monthly run hours and fuel for the last 6 months as square bars split by generator colour
+  (petrol and diesel are never summed into one bar), and a "By generator" list with shares; custom-drawn instead
+  of the chart library.
+- **Settings → Appearance**: theme (system / light / dark) and "Night red mode" instructions for the system colour
+  filter with a shortcut to the system settings.
 
 ### Changed
+- New visual language: warm paper light theme and true-black OLED dark theme, IBM Plex Sans (labels) and IBM Plex
+  Mono (digits only), square corners, red only for Stop and problems, generator identity colours, ▲ as a non-colour
+  maintenance cue. Native chrome stays native (iOS bars and tab bar, Material navigation on Android).
+- Android Home: the header "+" replaces the floating action button.
+- Settings (Android/web): flat hairline sections and the shared page header; sign out is a neutral button (red is
+  for destructive actions only). iOS native forms (Settings, generator, session, maintenance) use the app background,
+  IBM Plex Sans and muted section captions instead of the system grouped grey.
+- Android/web: the top app bar is flat on the page colour (no tonal elevation); tab pages keep a page-coloured strip
+  under the transparent Android status bar so scrolled content never shows through it; theme/language segments are
+  ink-filled when selected.
 - New app icon: a white lightning bolt inside a glowing orange 3/4 "run-hours" ring with gauge ticks on dark
   glass — the same visual language as the app's dark theme and the landing page, readable down to 29 px and in
   tinted/grayscale modes. Android gets a proper adaptive icon (separate background layer, mark inside the 66 dp
   safe zone) and a monochrome layer for themed icons. Splash, web favicon, landing icons and OG images follow.
   Sources and geometry live in `scripts/icons/build-icons.mjs` (`assets/icon-source/`).
+
+### Removed
+- Success alerts after starting/stopping a session and after deleting a generator.
+- Unused components (GradientCard, StatBlock, WorkSessionsList, RefillsList, MaintenanceList, GroupedListRow,
+  PlatformSegmented) and packages (`@react-navigation/material-top-tabs`, `react-native-tab-view`,
+  `react-native-pager-view`, `expo-linear-gradient`, `@react-native-segmented-control/segmented-control`).
+- The Overview / Charts switch and the pie chart in Analytics.
+
+### Fixed (in the design handoff code, before release)
+- Fuel events use local times (the handoff read the refill time from the UTC part of `createdAt`), sessions end at
+  their recorded stop time (overnight sessions, stop-and-refill in the same minute), and a partial refill no longer
+  counts from an empty tank.
 
 ## [2.6.0] - 2026-10-06
 

@@ -4,5 +4,7 @@
     "strict": true,
     // TypeScript 6 no longer includes every @types/* package implicitly.
     "types": ["jest", "node"]
-  }
+  },
+  // The 3.0 design handoff keeps reference copies of code that lives in src/.
+  "exclude": ["node_modules", "docs/design"]
 }

@@ -154,8 +154,24 @@ Key design principles:
 
 **Platform-native UI (since 2.5.0):** iOS uses native chrome (native tabs/bars with Liquid Glass, SF Symbols,
 SwiftUI forms via `@expo/ui`), Android uses Material 3 (Paper + native Material tabs), web keeps Paper. Build screens
-with `ScreenHeader`, `AppIcon`/`ICONS`, `PlatformSegmented`, `NativeForm` (iOS forms), `surfaces()`/`textColors()`
-and `contentColumn` — see "Platform-Native Design" in `DESIGN_GUIDE.md` for the rules.
+with `ScreenHeader`, `AppIcon`/`ICONS`, `NativeForm` (iOS forms), `surfaces()`/`textColors()` and `contentColumn`
+— see "Platform-Native Design" in `DESIGN_GUIDE.md` for the rules.
+
+**3.0 design (since 3.0.0) — overrides the colours/typography of `DESIGN_GUIDE.md`:** the source of truth is the
+handoff in `docs/design/redesign-3.0/` (README = spec, `Generator Tracker 3.0.dc.html` = mocks) and
+`docs/REDESIGN_3.0.md` (plan and decisions). In code:
+- Tokens in `src/theme/tokens.ts` (light 5a / dark 5d), resolved per scheme on `useAppTheme().gt`; Paper themes use
+  ink as primary and `roundness: 0`. IBM Plex Sans for labels, IBM Plex Mono for digits only (`src/theme/fonts.ts`).
+- UI kit `src/components/gt`: `GtText`/`Num`, `SquareButton` (red = Stop/destructive only), `AccentRule`
+  (generator colour), `PageHeader`/`PageSummary` (tab-root headers), `FilterChips`, `StackedBars` (square bars split
+  by generator colour), app-wide `SnackbarProvider` (`useSnackbar`, `useSnackbarBottomOffset`).
+- Don't attach the iOS 26 tab bar accessory conditionally (it rebuilds SwiftUI's TabView and crashes); the live bar is
+  a footer above the tab bar (`TabLiveBar`).
+- Data for Home/detail/live bar: `useFleet` + `buildFleet` (`src/hooks/useFleet.ts`); start/stop/undo/refill go through
+  `src/services/sessions.ts` (emits `onSessionsChanged`) and `useSessionActions` (Stop: no confirm, 5 s Undo).
+- Fuel estimate `src/utils/fuel.ts`, formatting `src/utils/format.ts` (Intl, NBSP), maintenance texts/bars
+  `src/utils/maintenanceView.ts`; timers via `useNow` (60 s Home/live bar, 1 s detail clock).
+- Native chrome stays native; nested pressables are avoided (web renders nested `<button>`s).
 
 **Before implementing any UI change:**
 1. Read `DESIGN_GUIDE.md` for complete style specifications
@@ -251,10 +267,10 @@ Example flow:
 ### Creating Reusable Components
 
 Place in `src/components/` following existing patterns:
+- **gt/**: the 3.0 UI kit (text, square buttons, snackbar)
+- **fleet/**: Home rows/cards (`FleetRows`), `LiveBar`, `TabLiveBar`
 - **EmailAuthForm.tsx**: Form with validation
-- **SignInButton.tsx**: Authentication UI
 - **SyncStatusIndicator.tsx**: Status display
-- **WorkSessionsList.tsx** / **RefillsList.tsx**: List components with FlatList, pull-to-refresh, empty states
 
 Use props pattern with theme colors passed down:
 ```typescript
@@ -264,28 +280,10 @@ interface ComponentProps {
 }
 ```
 
-### Tab Navigation Pattern
+### Tabs inside a screen
 
-For Material Top Tabs (as in GeneratorDetailScreen):
-1. Install dependencies if needed:
-   - `@react-navigation/material-top-tabs`
-   - `react-native-tab-view`
-   - `react-native-pager-view`
-
-2. Create tab navigator and inline tab components:
-   ```typescript
-   const Tab = createMaterialTopTabNavigator();
-
-   const FirstTab = () => <YourListComponent {...props} />;
-   const SecondTab = () => <YourOtherListComponent {...props} />;
-
-   return (
-     <Tab.Navigator screenOptions={{...}}>
-       <Tab.Screen name="First" component={FirstTab} />
-       <Tab.Screen name="Second" component={SecondTab} />
-     </Tab.Navigator>
-   );
-   ```
+Since 3.0 the generator screen uses plain text tabs (a `Pressable` row with counts and a 2 px underline, one
+`FlatList` below) on every platform — there is no Material top-tab navigator any more.
 
 ## Authentication & Sync
 
@@ -481,7 +479,7 @@ src/
 2. **src/services/sync.ts** - Sync orchestration and conflict resolution
 3. **src/models/types.ts** - All data models and interfaces
 4. **src/screens/generator/GeneratorDetailScreen.tsx** - Complex screen example with tabs and active session pattern
-5. **src/constants/colors.ts** - Theme system
+5. **src/theme/tokens.ts** + **src/theme/index.ts** - Theme system (3.0 tokens → Paper themes)
 
 ## Environment Setup
 

@@ -1,515 +1,291 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, useWindowDimensions } from 'react-native';
-import { Chip, Surface, Text } from 'react-native-paper';
-import Animated, { FadeInUp } from 'react-native-reanimated';
-import { BarChart, PieChart } from 'react-native-gifted-charts';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, StyleSheet, ScrollView, RefreshControl, Pressable } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
+import type { RootStackParamList } from '../../navigation/types';
 import { ScreenHeader } from '../../components/ScreenHeader';
-import { PlatformSegmented } from '../../components/PlatformSegmented';
 import { AppIcon } from '../../components/AppIcon';
-import { isIOS, surfaces, textColors } from '../../theme/platform';
-import { Generator, WorkSession, Refill, GeneratorStats } from '../../models/types';
-import { getGenerators, getWorkSessions, getRefills } from '../../utils/storage';
-import { calculateGeneratorStats } from '../../utils/calculations';
+import { AccentRule, FilterChips, GtText, Num, PageHeader, PageSummary, StackedBars, StatusBarScrim } from '../../components/gt';
+import { isIOS } from '../../theme/platform';
+import type { Generator, Refill, WorkSession } from '../../models/types';
+import { getGenerators, getRefills, getWorkSessions } from '../../utils/storage';
 import { useAppTheme } from '../../theme/useAppTheme';
-import {
-  getHoursOverTime,
-  getFuelOverTime,
-  getGeneratorComparison,
-  getFuelDistribution,
-} from '../../utils/analytics';
-import { contentColumn, CONTENT_MAX_WIDTH } from '../../theme/layout';
+import { generatorColor, space } from '../../theme/tokens';
+import { contentColumn } from '../../theme/layout';
+import { fuelByMonth, hoursByMonth, totalsByGenerator } from '../../utils/analytics';
+import { fmtNumber, fmtSummary, hourUnit, litreUnit, NBSP } from '../../utils/format';
 
-type GeneratorWithStats = Generator & { stats: GeneratorStats };
+const ALL = 'all';
 
-// A bar chart draws its y-axis labels to the left of `width`, so the plot must leave room
-// for them inside the card: content padding + card padding on both sides + the label column.
-// The x-axis line is clamped to the plot (it defaults to width + endSpacing and overflows).
-const Y_AXIS_LABEL_WIDTH = 35;
-const CHART_HORIZONTAL_INSET = 16 * 2 + 20 * 2 + Y_AXIS_LABEL_WIDTH;
-
+/**
+ * Analytics (3.0): totals, monthly run hours and fuel as square bars split by generator colour, and a
+ * per-generator list. Same visual language as Home: ink rule, mono digits, generator accent rules.
+ */
 export default function AnalyticsScreen() {
-  const theme = useAppTheme();
+  const { gt } = useAppTheme();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const tabBarOverlap = useTabBarOverlap();
-  const { width: windowWidth } = useWindowDimensions();
-  const surface = surfaces(theme);
-  const text = textColors(theme);
   const { t, i18n } = useTranslation();
+  const lang = i18n.language;
 
-  const [generators, setGenerators] = useState<GeneratorWithStats[]>([]);
-  const [workSessions, setWorkSessions] = useState<WorkSession[]>([]);
-  const [refillsList, setRefillsList] = useState<Refill[]>([]);
+  const [generators, setGenerators] = useState<Generator[]>([]);
+  const [sessions, setSessions] = useState<WorkSession[]>([]);
+  const [refills, setRefills] = useState<Refill[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedView, setSelectedView] = useState('overview');
-  const [selectedGeneratorId, setSelectedGeneratorId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>(ALL);
 
-  const loadAnalytics = async () => {
+  const load = useCallback(async () => {
     try {
-      const gens = await getGenerators();
-      // Only count records of generators that exist: stray records of a deleted
-      // generator must never inflate the totals.
-      const generatorIds = new Set(gens.map(g => g.id));
-      const sessions = (await getWorkSessions()).filter(s => generatorIds.has(s.generatorId));
-      const refills = (await getRefills()).filter(r => generatorIds.has(r.generatorId));
-
-      const gensWithStats: GeneratorWithStats[] = gens.map(g => {
-        const genSessions = sessions.filter(s => s.generatorId === g.id);
-        const genRefills = refills.filter(r => r.generatorId === g.id);
-        return { ...g, stats: calculateGeneratorStats(genSessions, genRefills) };
-      });
-
-      setGenerators(gensWithStats);
-      setWorkSessions(sessions);
-      setRefillsList(refills);
+      const gens = [...(await getGenerators())].sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+      // Only records of existing generators: strays of a deleted one must never inflate the totals.
+      const ids = new Set(gens.map(g => g.id));
+      setGenerators(gens);
+      setSessions((await getWorkSessions()).filter(s => ids.has(s.generatorId)));
+      setRefills((await getRefills()).filter(r => ids.has(r.generatorId)));
     } catch (error) {
       console.error('Error loading analytics:', error);
+    } finally {
+      setLoaded(true);
     }
-  };
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadAnalytics();
-    setRefreshing(false);
-  };
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      loadAnalytics();
-    }, [])
+      load();
+    }, [load]),
   );
 
-  const filteredSessions = useMemo(
-    () => selectedGeneratorId
-      ? workSessions.filter(s => s.generatorId === selectedGeneratorId)
-      : workSessions,
-    [workSessions, selectedGeneratorId]
-  );
-  const filteredRefills = useMemo(
-    () => selectedGeneratorId
-      ? refillsList.filter(r => r.generatorId === selectedGeneratorId)
-      : refillsList,
-    [refillsList, selectedGeneratorId]
-  );
-  const filteredGenerators = useMemo(
-    () => selectedGeneratorId
-      ? generators.filter(g => g.id === selectedGeneratorId)
-      : generators,
-    [generators, selectedGeneratorId]
-  );
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await load();
+    setRefreshing(false);
+  };
 
-  const totalGenerators = filteredGenerators.length;
-  const totalHours = useMemo(
-    () => Math.round(filteredSessions.reduce((sum, s) => sum + s.hours, 0) * 10) / 10,
-    [filteredSessions]
-  );
-  const totalFuel = useMemo(
-    () => Math.round(filteredRefills.reduce((sum, r) => sum + r.amount, 0) * 10) / 10,
-    [filteredRefills]
-  );
-  const avgHours = totalGenerators > 0 ? Math.round((totalHours / totalGenerators) * 10) / 10 : 0;
+  // Identity colours follow creation order, exactly like Home.
+  const colorOf = useMemo(() => {
+    const map = new Map(generators.map((g, i) => [g.id, generatorColor(i)]));
+    return (id: string) => map.get(id) ?? gt.textMuted;
+  }, [generators, gt.textMuted]);
 
-  const hoursChartData = useMemo(
-    () => getHoursOverTime(filteredSessions, theme.colors.primary, i18n.language),
-    [filteredSessions, i18n.language]
-  );
-  const fuelChartData = useMemo(
-    () => getFuelOverTime(filteredRefills, theme.colors.primary, i18n.language),
-    [filteredRefills, i18n.language]
-  );
-  const comparisonData = useMemo(
-    () => getGeneratorComparison(generators, theme.colors.primary),
-    [generators]
-  );
-  const pieData = useMemo(
-    () => getFuelDistribution(generators, refillsList, t('common.litersAbbr')),
-    [generators, refillsList, t]
-  );
+  const activeFilter = filter !== ALL && generators.some(g => g.id === filter) ? filter : ALL;
+  const selected = activeFilter === ALL ? generators : generators.filter(g => g.id === activeFilter);
+  const order = selected.map(g => g.id);
+  const totals = useMemo(() => totalsByGenerator(selected, sessions, refills), [selected, sessions, refills]);
+  const hours = totals.reduce((s, x) => s + x.hours, 0);
+  const litres = totals.reduce((s, x) => s + x.litres, 0);
+  const lph = hours > 0 ? litres / hours : 0;
+  const hoursMonths = useMemo(() => hoursByMonth(sessions, order, lang), [sessions, order.join(), lang]);
+  const fuelMonths = useMemo(() => fuelByMonth(refills, order, lang), [refills, order.join(), lang]);
+  const hasMonthly = hoursMonths.some(m => m.total > 0) || fuelMonths.some(m => m.total > 0);
+  const maxHours = Math.max(0, ...totals.map(x => x.hours));
 
-  // Follows rotation/resizing and the content column (S-34).
-  const chartWidth = Math.min(windowWidth, CONTENT_MAX_WIDTH) - CHART_HORIZONTAL_INSET;
+  const running = sessions.filter(s => s.isActive).length;
+  const summary = generators.length > 0 ? fmtSummary(generators.length, running, lang) : t('home.summaryEmpty');
 
-  const renderOverview = () => (
-    <>
-      <View style={styles.statsGrid}>
-        <Animated.View entering={FadeInUp.delay(0).springify()} style={styles.statHalf}>
-          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
-            <AppIcon name="engine" size={24} color={theme.colors.primary} />
-            <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.primary }]}>
-              {totalGenerators}
-            </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
-              {t('analytics.generators')}
-            </Text>
-          </Surface>
-        </Animated.View>
+  const filterBar =
+    generators.length > 1 ? (
+      <FilterChips
+        accessibilityLabel={t('analytics.filterLabel')}
+        value={activeFilter}
+        onChange={setFilter}
+        options={[{ key: ALL, label: t('analytics.all') }, ...generators.map(g => ({ key: g.id, label: g.name, color: colorOf(g.id) }))]}
+      />
+    ) : null;
 
-        <Animated.View entering={FadeInUp.delay(80).springify()} style={styles.statHalf}>
-          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
-            <AppIcon name="clock" size={24} color={theme.colors.secondary} />
-            <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.secondary }]}>
-              {totalHours.toFixed(1)}
-            </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
-              {t('analytics.totalHours')}
-            </Text>
-          </Surface>
-        </Animated.View>
-
-        <Animated.View entering={FadeInUp.delay(160).springify()} style={styles.statHalf}>
-          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
-            <AppIcon name="fuel" size={24} color={theme.colors.primary} />
-            <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.primary }]}>
-              {totalFuel.toFixed(1)}
-            </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
-              {t('analytics.litersUsed')}
-            </Text>
-          </Surface>
-        </Animated.View>
-
-        <Animated.View entering={FadeInUp.delay(240).springify()} style={styles.statHalf}>
-          <Surface elevation={isIOS ? 0 : 2} style={[styles.statCard, isIOS && { backgroundColor: surface.card }]}>
-            <AppIcon name="chartLine" size={24} color={theme.colors.secondary} />
-            <Text variant="headlineMedium" style={[styles.statValue, { color: theme.colors.secondary }]}>
-              {avgHours.toFixed(1)}
-            </Text>
-            <Text variant="labelSmall" style={[styles.statLabel, { color: text.secondary as string }]}>
-              {t('analytics.avgHoursPerGen')}
-            </Text>
-          </Surface>
-        </Animated.View>
+  const stats = (
+    <View style={styles.block}>
+      <GtText variant="caption" color={gt.textMuted}>
+        {t('analytics.allTime')}
+      </GtText>
+      <View style={[styles.stats, { borderColor: gt.rule }]}>
+        <Stat label={t('detail.motorHours')} value={fmtNumber(hours, lang, hours >= 1000 ? 0 : 1)} testID="analytics-total-hours" />
+        <Stat label={t('analytics.fuelTotal')} value={fmtNumber(litres, lang, litres >= 1000 ? 0 : 1)} testID="analytics-total-fuel" />
+        <Stat label={t('detail.lph')} value={lph > 0 ? fmtNumber(lph, lang, 2) : '—'} testID="analytics-lph" />
       </View>
-
-      {totalGenerators === 0 && (
-        <View style={styles.emptyContainer}>
-          <AppIcon name="chartEmpty" size={64} color={text.secondary} />
-          <Text variant="titleMedium" style={{ color: text.secondary as string, marginTop: 16 }}>
-            {t('analytics.noDataAvailable')}
-          </Text>
-          <Text variant="bodyMedium" style={{ color: text.secondary as string, textAlign: 'center' }}>
-            {t('analytics.addGeneratorsHint')}
-          </Text>
-        </View>
-      )}
-    </>
+    </View>
   );
 
-  const renderCharts = () => (
-    <>
-      {hoursChartData.length > 0 && (
-        <Animated.View entering={FadeInUp.delay(0).springify()}>
-          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
-            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.operatingHours')}</Text>
-            <BarChart
-              data={hoursChartData}
-              barWidth={24}
-              barBorderRadius={6}
-              frontColor={theme.colors.primary}
-              noOfSections={4}
-              yAxisColor="transparent"
-              xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 10 }}
-              hideRules
-              isAnimated
-              animationDuration={600}
-              height={160}
-              width={chartWidth}
-              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
-              xAxisLength={chartWidth}
-            />
-          </Surface>
-        </Animated.View>
-      )}
+  const legend =
+    selected.length > 1 ? (
+      <View style={styles.legend}>
+        {selected.map(g => (
+          <View key={g.id} style={styles.legendItem}>
+            <AccentRule color={colorOf(g.id)} height={12} />
+            <GtText variant="caption" color={gt.textMuted} numberOfLines={1}>
+              {g.name}
+            </GtText>
+          </View>
+        ))}
+      </View>
+    ) : null;
 
-      {fuelChartData.length > 0 && (
-        <Animated.View entering={FadeInUp.delay(100).springify()}>
-          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
-            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelConsumption')}</Text>
-            <BarChart
-              data={fuelChartData}
-              barWidth={24}
-              barBorderRadius={6}
-              frontColor={theme.colors.secondary}
-              noOfSections={4}
-              yAxisColor="transparent"
-              xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 10 }}
-              hideRules
-              isAnimated
-              animationDuration={600}
-              height={160}
-              width={chartWidth}
-              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
-              xAxisLength={chartWidth}
-            />
-          </Surface>
-        </Animated.View>
-      )}
+  const chart = (title: string, unit: string, months: typeof hoursMonths, testID: string) => (
+    <View style={styles.block}>
+      <View>
+        <GtText variant="cardTitle" accessibilityRole="header">
+          {title}
+        </GtText>
+        <GtText variant="caption" color={gt.textMuted}>
+          {t('analytics.last6', { unit })}
+        </GtText>
+      </View>
+      <StackedBars
+        months={months}
+        colorOf={colorOf}
+        lang={lang}
+        unit={unit}
+        testID={testID}
+        monthValueLabel={(month, value) => t('analytics.monthValue', { month, value })}
+      />
+      {legend}
+    </View>
+  );
 
-      {!selectedGeneratorId && comparisonData.length > 1 && (
-        <Animated.View entering={FadeInUp.delay(200).springify()}>
-          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
-            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.generatorComparison')}</Text>
-            <BarChart
-              data={comparisonData}
-              barWidth={20}
-              barBorderRadius={4}
-              frontColor={theme.colors.primary}
-              noOfSections={4}
-              yAxisColor="transparent"
-              xAxisColor={theme.colors.outline}
-              yAxisTextStyle={{ color: text.secondary as string, fontSize: 11 }}
-              xAxisLabelTextStyle={{ color: text.secondary as string, fontSize: 9 }}
-              hideRules
-              isAnimated
-              animationDuration={600}
-              height={160}
-              width={chartWidth}
-              yAxisLabelWidth={Y_AXIS_LABEL_WIDTH}
-              xAxisLength={chartWidth}
-            />
-          </Surface>
-        </Animated.View>
-      )}
-
-      {!selectedGeneratorId && pieData.length > 1 && (
-        <Animated.View entering={FadeInUp.delay(300).springify()}>
-          <Surface elevation={isIOS ? 0 : 1} style={[styles.chartCard, isIOS && { backgroundColor: surface.card }]}>
-            <Text variant="titleMedium" style={styles.chartTitle}>{t('analytics.fuelDistribution')}</Text>
-            <View style={styles.pieContainer}>
-              <PieChart
-                data={pieData}
-                donut
-                radius={80}
-                innerRadius={50}
-                innerCircleColor={theme.colors.elevation.level1}
-                centerLabelComponent={() => (
-                  <Text variant="labelMedium" style={{ color: text.secondary as string }}>
-                    {totalFuel.toFixed(0)}{t('common.liters')}
-                  </Text>
-                )}
-              />
-              <View style={styles.pieLegend}>
-                {pieData.map((item, i) => (
-                  <View key={i} style={styles.legendItem}>
-                    <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-                    <Text variant="bodySmall" style={{ color: text.secondary as string, flex: 1 }}>
-                      {item.label}
-                    </Text>
-                    <Text variant="labelSmall" style={{ color: theme.colors.onSurface }}>
-                      {item.text}
-                    </Text>
+  const byGenerator =
+    activeFilter === ALL && generators.length > 0 ? (
+      <View style={styles.block}>
+        <View>
+          <GtText variant="cardTitle" accessibilityRole="header">
+            {t('analytics.byGenerator')}
+          </GtText>
+          {generators.length > 1 && (
+            <GtText variant="caption" color={gt.textMuted}>
+              {t('analytics.byGeneratorHint')}
+            </GtText>
+          )}
+        </View>
+        <View>
+          {[...totals]
+            .sort((a, b) => b.hours - a.hours)
+            .map(row => {
+              const g = generators.find(x => x.id === row.generatorId)!;
+              return (
+                <Pressable
+                  key={row.generatorId}
+                  onPress={() => navigation.navigate('GeneratorDetail', { generatorId: row.generatorId })}
+                  accessibilityRole="button"
+                  testID={`analytics-row-${row.generatorId}`}
+                  style={({ pressed }) => [styles.genRow, { borderBottomColor: gt.rule }, pressed && { backgroundColor: gt.pressed }]}
+                >
+                  <View style={styles.rowBetween}>
+                    <View style={styles.nameRow}>
+                      <AccentRule color={colorOf(row.generatorId)} />
+                      <GtText variant="rowTitle" numberOfLines={1} style={styles.flex}>
+                        {g.name}
+                      </GtText>
+                    </View>
+                    <GtText variant="rowTitle" mono>
+                      {fmtNumber(row.hours, lang)}
+                      <GtText variant="caption" color={gt.textMuted}>
+                        {NBSP}{hourUnit(lang)}
+                      </GtText>
+                    </GtText>
                   </View>
-                ))}
-              </View>
-            </View>
-          </Surface>
-        </Animated.View>
-      )}
-
-      {hoursChartData.length === 0 && fuelChartData.length === 0 && (
-        <View style={styles.emptyContainer}>
-          <AppIcon name="chartNoData" size={64} color={text.secondary} />
-          <Text variant="titleMedium" style={{ color: text.secondary as string, marginTop: 16 }}>
-            {t('analytics.notEnoughData')}
-          </Text>
-          <Text variant="bodyMedium" style={{ color: text.secondary as string, textAlign: 'center' }}>
-            {t('analytics.logMoreHint')}
-          </Text>
+                  <GtText variant="caption" color={gt.textMuted} style={styles.indent}>
+                    {t('analytics.rowDetail', {
+                      litres: fmtNumber(row.litres, lang),
+                      lph: row.lph > 0 ? fmtNumber(row.lph, lang, 2) : '—',
+                      sessions: row.sessions,
+                    })}
+                  </GtText>
+                  <View style={[styles.share, { backgroundColor: gt.barTrack }]}>
+                    <View style={{ width: `${maxHours > 0 ? (row.hours / maxHours) * 100 : 0}%`, height: 4, backgroundColor: colorOf(row.generatorId) }} />
+                  </View>
+                </Pressable>
+              );
+            })}
         </View>
+      </View>
+    ) : null;
+
+  const empty = (icon: 'chartEmpty' | 'chartNoData', title: string, hint: string) => (
+    <View style={styles.empty}>
+      <AppIcon name={icon} size={56} color={gt.textMuted} />
+      <GtText variant="cardTitle" style={styles.center}>
+        {title}
+      </GtText>
+      <GtText variant="body" color={gt.textMuted} style={styles.center}>
+        {hint}
+      </GtText>
+    </View>
+  );
+
+  const body = !loaded ? null : generators.length === 0 ? (
+    empty('chartEmpty', t('analytics.noDataAvailable'), t('analytics.addGeneratorsHint'))
+  ) : (
+    <>
+      {filterBar}
+      {stats}
+      {hasMonthly ? (
+        <>
+          {chart(t('analytics.hoursByMonth'), hourUnit(lang), hoursMonths, 'chart-hours')}
+          {chart(t('analytics.fuelByMonth'), litreUnit(lang), fuelMonths, 'chart-fuel')}
+        </>
+      ) : (
+        empty('chartNoData', t('analytics.notEnoughData'), t('analytics.logMoreHint'))
       )}
+      {byGenerator}
     </>
   );
 
-  const viewSwitcher = (
-    <PlatformSegmented
-      value={selectedView}
-      onValueChange={setSelectedView}
-      options={[
-        { value: 'overview', label: t('analytics.overview'), icon: 'grid' },
-        { value: 'charts', label: t('analytics.charts'), icon: 'chartLine' },
-      ]}
-      style={isIOS ? styles.segmentedIOS : styles.segmentedButtons}
-    />
-  );
-
-  const header = (
-    <ScreenHeader
-      title={t('analytics.title')}
-      largeTitle
-      scrollEdge
-      menu={
-        isIOS && generators.length > 1
-          ? {
-              label: t('analytics.allGenerators'),
-              icon: 'filter',
-              actions: [
-                {
-                  key: 'all',
-                  label: t('analytics.allGenerators'),
-                  selected: selectedGeneratorId === null,
-                  onPress: () => setSelectedGeneratorId(null),
-                },
-                ...generators.map(g => ({
-                  key: g.id,
-                  label: g.name,
-                  selected: selectedGeneratorId === g.id,
-                  onPress: () => setSelectedGeneratorId(g.id),
-                })),
-              ],
-            }
-          : undefined
-      }
-    />
+  const scroll = (
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      style={{ backgroundColor: gt.bg }}
+      contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 32 }]}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={gt.textMuted} />}
+    >
+      {isIOS ? <PageSummary summary={summary} testID="analytics-summary" /> : <PageHeader title={t('analytics.title')} summary={summary} summaryTestID="analytics-summary" />}
+      {body}
+    </ScrollView>
   );
 
   if (isIOS) {
-    // Native: the scroll view is the screen root (collapsing large title); the
-    // generator filter is a pull-down menu in the navigation bar.
     return (
       <>
-        {header}
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={{ backgroundColor: surface.screen }}
-          contentContainerStyle={[styles.content, contentColumn]}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
-          }
-        >
-          {viewSwitcher}
-          {selectedView === 'overview' ? renderOverview() : renderCharts()}
-        </ScrollView>
+        <ScreenHeader title={t('analytics.title')} largeTitle scrollEdge />
+        {scroll}
       </>
     );
   }
-
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      {header}
-      <View style={contentColumn}>{viewSwitcher}</View>
+    <View style={[styles.flex, { backgroundColor: gt.bg }]}>
+      {scroll}
+      <StatusBarScrim />
+    </View>
+  );
+}
 
-      {generators.length > 1 && (
-        <View style={[styles.filterContainer, contentColumn]}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filterBar}
-          >
-            <Chip
-              selected={selectedGeneratorId === null}
-              onPress={() => setSelectedGeneratorId(null)}
-              showSelectedOverlay
-            >
-              {t('analytics.allGenerators')}
-            </Chip>
-            {generators.map(g => (
-              <Chip
-                key={g.id}
-                selected={selectedGeneratorId === g.id}
-                onPress={() => setSelectedGeneratorId(g.id)}
-                showSelectedOverlay
-              >
-                {g.name}
-              </Chip>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-
-      <ScrollView
-        contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />
-        }
-      >
-        {selectedView === 'overview' ? renderOverview() : renderCharts()}
-      </ScrollView>
+function Stat({ label, value, testID }: { label: string; value: string; testID?: string }) {
+  const { gt } = useAppTheme();
+  return (
+    <View style={styles.stat}>
+      <GtText variant="caption" color={gt.textMuted} numberOfLines={1}>
+        {label}
+      </GtText>
+      <GtText variant="sheetTitle" weight="500" mono testID={testID}>
+        <Num weight="500">{value}</Num>
+      </GtText>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontWeight: '700',
-  },
-  segmentedIOS: {
-    marginBottom: 16,
-  },
-  segmentedButtons: {
-    marginHorizontal: 16,
-    marginVertical: 12,
-  },
-  filterContainer: {
-    paddingBottom: 8,
-  },
-  filterBar: {
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  content: {
-    padding: 16,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  statHalf: {
-    width: '47%',
-  },
-  statCard: {
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    gap: 8,
-  },
-  statValue: {
-    fontWeight: '700',
-  },
-  statLabel: {
-    textTransform: 'uppercase',
-    textAlign: 'center',
-  },
-  chartCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-  },
-  chartTitle: {
-    marginBottom: 16,
-    fontWeight: '600',
-  },
-  pieContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  pieLegend: {
-    flex: 1,
-    gap: 8,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: 60,
-    paddingHorizontal: 32,
-    gap: 8,
-  },
+  flex: { flex: 1 },
+  center: { textAlign: 'center' },
+  content: { paddingHorizontal: space.screenX, gap: 26 },
+  block: { gap: 12 },
+  stats: { flexDirection: 'row', borderTopWidth: 1, borderBottomWidth: 1, paddingVertical: 12 },
+  stat: { flex: 1, gap: 2 },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6, maxWidth: '100%' },
+  rowBetween: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  genRow: { paddingVertical: 12, borderBottomWidth: 1, gap: 4 },
+  indent: { marginLeft: 11 },
+  share: { height: 4, marginTop: 6, marginLeft: 11 },
+  empty: { alignItems: 'center', paddingVertical: 48, paddingHorizontal: 24, gap: 10 },
 });

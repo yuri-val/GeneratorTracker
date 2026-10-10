@@ -5,6 +5,7 @@ import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useColorScheme } from 'react-native';
 import { PaperProvider, adaptNavigationTheme } from 'react-native-paper';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { RootStackParamList } from './src/navigation/types';
 import MainTabs from './src/navigation/MainTabs';
 import GeneratorDetailScreen from './src/screens/generator/GeneratorDetailScreen';
@@ -14,6 +15,10 @@ import AddRefillScreen from './src/screens/generator/AddRefillScreen';
 import AddMaintenanceScreen from './src/screens/generator/AddMaintenanceScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { darkTheme, lightTheme } from './src/theme';
+import { useAppFonts } from './src/theme/fonts';
+import { nativeHeaderStyle } from './src/theme/navigation';
+import { ThemePreferenceProvider } from './src/contexts/ThemePreferenceContext';
+import { SnackbarProvider } from './src/components/gt';
 import { getSavedLanguage } from './src/utils/storage';
 import i18n from './src/i18n';
 
@@ -27,6 +32,18 @@ const { DarkTheme: NavDark, LightTheme: NavLight } = adaptNavigationTheme({
 });
 
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <ThemePreferenceProvider>
+        <AppContent />
+      </ThemePreferenceProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function AppContent() {
+  const fontsReady = useAppFonts();
+  // Follows the system, or the override from Settings → Appearance (Appearance.setColorScheme).
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const paperTheme = isDark ? darkTheme : lightTheme;
@@ -42,10 +59,14 @@ export default function App() {
     loadLanguage();
   }, []);
 
+  // The native splash stays up until IBM Plex is registered, so text never re-flows.
+  if (!fontsReady) return null;
+
   return (
     <AuthProvider>
       <PaperProvider theme={paperTheme}>
         <NavigationContainer theme={navTheme}>
+          <SnackbarProvider>
           <StatusBar style={isDark ? 'light' : 'dark'} />
           <Stack.Navigator
             screenOptions={{
@@ -54,6 +75,7 @@ export default function App() {
               // Android/web draw a Material app bar inside the screen instead.
               headerShown: Platform.OS === 'ios',
               contentStyle: { backgroundColor: paperTheme.colors.background },
+              ...nativeHeaderStyle(paperTheme),
             }}
           >
             <Stack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
@@ -83,6 +105,7 @@ export default function App() {
               options={{ presentation: 'modal' }}
             />
           </Stack.Navigator>
+          </SnackbarProvider>
         </NavigationContainer>
       </PaperProvider>
     </AuthProvider>

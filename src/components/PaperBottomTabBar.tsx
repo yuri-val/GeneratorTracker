@@ -23,7 +23,9 @@ export function PaperBottomTabBar({ navigation, state, descriptors, insets }: Bo
         styles.blurContainer,
         {
           paddingBottom: insets.bottom,
-          borderTopColor: theme.colors.outlineVariant,
+          // 3.0: a 1.5 px ink rule on the page colour, like the section rules.
+          borderTopColor: theme.gt.ruleStrong,
+          backgroundColor: theme.gt.dark ? 'rgba(0,0,0,0.85)' : 'rgba(243,241,236,0.9)',
         },
       ]}
     >
@@ -72,7 +74,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: 1.5,
     overflow: 'hidden',
   },
   bar: {

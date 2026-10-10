@@ -1,0 +1,60 @@
+{
+  "home": {
+    "title": "Generators",
+    "lastSession": "Last session {{date}}",
+    "fuelApprox": "≈ {{litres}} L",
+    "fuelLeft": "Fuel ≈ {{litres}} L · ~{{hours}} h",
+    "since": "since {{time}}",
+    "start": "Start",
+    "stop": "Stop"
+  },
+  "detail": {
+    "stopSession": "Stop",
+    "startSession": "Start session",
+    "editSessionTime": "Edit time",
+    "used": "Used",
+    "inTank": "In tank",
+    "fuelEstimateInfo": "Estimated from average consumption of {{lph}} L/h. Actual use depends on load.",
+    "maintenanceScaleHint": "Bar shows service life used until next maintenance",
+    "sessionStoppedUndo": "Logged {{hours}} h · {{name}}"
+  },
+  "live": {
+    "running": "running · {{duration}}",
+    "moreRunning": "{{count}} more running",
+    "toHome": "Go to Home ›"
+  },
+  "refill": {
+    "sheetSubtitle": "Tank {{tank}} L · now ≈ {{level}} L · free {{free}} L",
+    "runningTitle": "Generator is running",
+    "runningBody": "Turn the engine off before refuelling. The session will be ended and the refill date filled in.",
+    "stopAndRefill": "Stop and refill",
+    "presetToFull": "To full",
+    "presetAsLastTime": "Same as last time",
+    "presetTooBig": "more than fits",
+    "markedFull": "Filled to full",
+    "markedFullHint": "Tank level will be set to {{tank}} L",
+    "calibrate": "Estimate will be corrected by {{diff}} L — the calculated level was off.",
+    "overFree": "More than the free space ({{free}} L). A full tank will be recorded and the estimate corrected.",
+    "after": "After refill ≈ {{after}} L of {{tank}}",
+    "saveAmount": "Save {{litres}} L",
+    "tankFull": "Tank is full",
+    "saved": "Refill saved",
+    "startAgain": "Start again"
+  },
+  "generator": {
+    "tankLabel": "Tank capacity, L (optional)",
+    "tankHint": "Needed to estimate remaining fuel"
+  },
+  "settings": {
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "nightRed": "Night red mode",
+    "nightRedTitle": "Red screen at night",
+    "nightRedBody": "Keeps your eyes adapted to the dark when you walk to the generator. Works for the whole phone, keyboard included.",
+    "nightRedIOS1": "Settings → Accessibility → Display & Text Size → Color Filters → turn on, choose Color Tint, set intensity and hue to maximum.",
+    "nightRedIOS2": "Accessibility → Accessibility Shortcut → Color Filters. Triple-click the side button to toggle.",
+    "nightRedAndroid": "Depends on the manufacturer: look for Color correction or Color filter in accessibility settings.",
+    "openAccessibility": "Open accessibility settings"
+  }
+}

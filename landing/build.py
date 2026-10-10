@@ -262,7 +262,7 @@ def manifest(en: dict) -> str:
     return json.dumps({
         'name': 'Generator Tracker', 'short_name': 'GenTracker', 'description': plain(en['meta_description']),
         'lang': 'en', 'start_url': './', 'scope': './', 'display': 'browser',
-        'background_color': '#0b0d10', 'theme_color': '#ff6b35',
+        'background_color': '#f3f1ec', 'theme_color': '#1b1a17',
         'icons': [{'src': 'icon-192.png', 'sizes': '192x192', 'type': 'image/png'},
                   {'src': 'icon-512.png', 'sizes': '512x512', 'type': 'image/png'}],
     }, indent=2)
@@ -305,10 +305,6 @@ def main():
         s['notes_date_human'] = human_date(s['notes_date'], s['lang'])
         for kind in MARK_PATHS:
             s[f'mark_{kind}'] = MARK.format(cls=kind, path=MARK_PATHS[kind], text=s[f'cmp_{kind}_text'])
-        # The Cyrillic subset is only worth preloading on the Ukrainian page.
-        s['font_preload_extra'] = (
-            f'  <link rel="preload" href="{s["dir_root"]}fonts/inter-cyrillic.woff2" as="font" type="font/woff2" crossorigin>'
-            if s['lang'] == 'uk' else '')
         s['json_ld'] = json_ld(s)
         target = OUT / s['canonical_path'] / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)

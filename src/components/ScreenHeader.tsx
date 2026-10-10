@@ -44,7 +44,6 @@ interface ScreenHeaderProps {
   /** Android/web: tapping the title (the detail screen opens the editor). */
   onTitlePress?: () => void;
   titleTestID?: string;
-  elevated?: boolean;
   /**
    * iOS: transparent bar over the content with the system scroll-edge effect (iOS 26+).
    * Only for screens whose root is a ScrollView/FlatList with
@@ -167,11 +166,11 @@ function MaterialHeader({
   trailing,
   onTitlePress,
   titleTestID,
-  elevated = true,
 }: ScreenHeaderProps) {
   const theme = useAppTheme();
   return (
-    <Appbar.Header elevated={elevated}>
+    // 3.0: a flat bar on the page colour (no tonal elevation), so it reads as part of the page.
+    <Appbar.Header elevated={false} style={{ backgroundColor: theme.gt.bg }}>
       {leading === 'back' && onLeadingPress && <Appbar.BackAction onPress={onLeadingPress} testID={leadingTestID} />}
       {leading === 'close' && onLeadingPress && (
         <Appbar.Action icon={ICONS.close.mci} onPress={onLeadingPress} testID={leadingTestID} accessibilityLabel="Close" />

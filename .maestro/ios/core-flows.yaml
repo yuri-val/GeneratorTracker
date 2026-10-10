@@ -15,14 +15,18 @@ name: iOS core flows
 - tapOn: "Save"
 - assertVisible: ".*Maestro Gen.*"
 
-# Start and stop a work session
+# Start, stop (no confirmation since 3.0), undo from the snackbar, stop again
 - tapOn: ".*Maestro Gen.*"
 - tapOn:
     id: start-session
-- tapOn: "OK"
+- assertVisible:
+    id: stop-session
 - tapOn:
     id: stop-session
-- tapOn: "OK"
+- tapOn:
+    id: snackbar-action # "Cancel" = undo: the session runs again
+- tapOn:
+    id: stop-session
 - assertVisible: "Sessions \\(1\\)"
 
 # Add a refill through the native form
@@ -36,8 +40,9 @@ name: iOS core flows
 - tapOn:
     id: input-refill-amount
 - inputText: "4.5"
-- tapOn: "Save"
-- assertVisible: ".*4.5L.*"
+- tapOn:
+    id: save-refill # 3.0 refill sheet: "Save 4.5 L" at the bottom
+- assertVisible: "Refills \\(1\\)"
 
 # Add a maintenance task
 - tapOn:
@@ -60,6 +65,5 @@ name: iOS core flows
 - tapOn: "More"
 - tapOn: "Delete"
 - tapOn: "Delete" # the alert's destructive action
-- tapOn: "OK" # "Generator deleted" confirmation
-- assertVisible: "Generator Tracker"
+- assertVisible: "Generators" # Home title since 3.0 (no "deleted" alert any more)
 - assertNotVisible: ".*Maestro Gen.*"

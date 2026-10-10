@@ -169,7 +169,7 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     // …and the device can still edit it afterwards and win.
     await goToTab(page, 'Home');
     await openGenerator(page, 'Renamed By Old App');
-    await page.getByTestId('detail-edit-generator').click();
+    await page.getByTestId('detail-edit-action').click();
     await page.getByTestId('input-generator-name').fill('Final Local Name');
     await page.getByTestId('save-generator').click();
     await goBack(page);
@@ -191,7 +191,7 @@ test.describe('Cloud sync against the Firebase emulators', () => {
 
     await goToTab(page, 'Home');
     await openGenerator(page, 'Model Gen');
-    await page.getByTestId('detail-edit-generator').click();
+    await page.getByTestId('detail-edit-action').click();
     await page.getByTestId('input-generator-model').fill('');
     await page.getByTestId('save-generator').click();
     await goBack(page);
@@ -260,7 +260,7 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await page.getByText('Add Refill', { exact: true }).first().click();
     await page.getByTestId('input-refill-amount').fill('7');
     await page.getByTestId('save-refill').click();
-    await expect(page.getByRole('tab', { name: /Refills \(1\)/ }).first()).toBeVisible();
+    await expect(page.getByTestId('detail-tab-refills')).toContainText('1');
     await goBack(page);
 
     await signUp(page, email);
@@ -301,9 +301,8 @@ test.describe('Cloud sync against the Firebase emulators', () => {
     await syncNow(page);
 
     await goToTab(page, 'Analytics');
-    await expect(visibleText(page, 'LITERS USED')).toBeVisible();
-    await expect(visibleText(page, '0.0', true).first()).toBeVisible();
-    await expect(visibleText(page, '999.0', true)).toHaveCount(0);
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('0.0');
+    await expect(visibleText(page, /999/)).toHaveCount(0);
     const refills = await page.evaluate(() => localStorage.getItem('@refills') || '[]');
     expect(refills).not.toContain('ghost-refill');
   });

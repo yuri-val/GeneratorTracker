@@ -37,6 +37,11 @@ import {
   getAccountKind,
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
+import { NightRedSheet } from '../../components/NightRedSheet';
+import { PageHeader, StatusBarScrim } from '../../components/gt';
+import { FONT } from '../../theme/tokens';
+import { useThemePreference } from '../../contexts/ThemePreferenceContext';
+import type { ThemePreference } from '../../utils/storage';
 
 // Read once from the app config so the About section never lags behind app.json.
 const APP_VERSION = Constants.expoConfig?.version ?? '';
@@ -49,6 +54,9 @@ export default function SettingsScreen() {
   const { syncStatus, pendingCount, performInitialSync, performManualSync } = useSync();
 
   const [signingIn, setSigningIn] = useState(false);
+  const { preference: themePreference, setPreference: setThemePreference } = useThemePreference();
+  const [nightRedOpen, setNightRedOpen] = useState(false);
+  const nightRed = <NightRedSheet visible={nightRedOpen} onClose={() => setNightRedOpen(false)} />;
   const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
 
   const handleLanguageChange = async (newLang: string) => {
@@ -256,23 +264,38 @@ export default function SettingsScreen() {
         onSync={handleManualSync}
         language={i18n.language.split('-')[0]}
         onLanguageChange={handleLanguageChange}
+        themePreference={themePreference}
+        onThemeChange={setThemePreference}
+        onNightRed={() => setNightRedOpen(true)}
+        nightRed={nightRed}
       />
     );
   }
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <ScreenHeader title={t('settings.title')} largeTitle />
+  // 3.0: flat sections with a hairline border instead of elevated rounded cards.
+  // 3.0: the selected segment is ink-filled like FilterChips, not Material's tinted container.
+  const inkSegments = (current: string, buttons: { value: string; label: string; testID: string }[]) =>
+    buttons.map(b => ({
+      ...b,
+      checkedColor: theme.gt.bg,
+      uncheckedColor: theme.gt.text,
+      style: b.value === current ? { backgroundColor: theme.gt.text } : undefined,
+    }));
 
+  const sectionColors = { backgroundColor: 'transparent', borderColor: theme.gt.dark ? theme.gt.ruleStrong : theme.gt.rule };
+
+  return (
+    <View style={[styles.container, { backgroundColor: theme.gt.bg }]}>
       <ScrollView
         contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
       >
+        <PageHeader title={t('settings.title')} summary={t('settings.appName') + ' ' + APP_VERSION} />
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.account')}</List.Subheader>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.account')}</List.Subheader>
 
             {!user ? (
-              <Surface elevation={1} style={styles.sectionCard}>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant, marginBottom: 16 }}>
                   {t('settings.syncDescription')}
                 </Text>
@@ -320,7 +343,7 @@ export default function SettingsScreen() {
                 )}
               </Surface>
             ) : (
-              <Surface elevation={1} style={styles.sectionCard}>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <Card mode="contained" style={{ backgroundColor: 'transparent' }}>
                   <Card.Title
                     title={user.email || t('settings.anonymousUser')}
@@ -338,9 +361,7 @@ export default function SettingsScreen() {
                 </Card>
 
                 <Button
-                  mode="contained"
-                  buttonColor={theme.colors.error}
-                  textColor={theme.colors.onError}
+                  mode="outlined"
                   icon="logout"
                   onPress={handleSignOut}
                   style={styles.authButton}
@@ -368,8 +389,8 @@ export default function SettingsScreen() {
         {user && (
           <Animated.View entering={FadeInDown.delay(100).springify()}>
             <List.Section>
-              <List.Subheader style={styles.sectionTitle}>{t('settings.sync')}</List.Subheader>
-              <Surface elevation={1} style={styles.sectionCard}>
+              <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.sync')}</List.Subheader>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
                 <List.Item
                   title={t('settings.status')}
                   description={getSyncText()}
@@ -406,17 +427,44 @@ export default function SettingsScreen() {
           </Animated.View>
         )}
 
+        <Animated.View entering={FadeInDown.delay(125).springify()}>
+          <List.Section>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.appearance')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
+              <Text variant="labelLarge" style={{ marginBottom: 8 }}>
+                {t('settings.theme')}
+              </Text>
+              <SegmentedButtons
+                value={themePreference}
+                onValueChange={value => setThemePreference(value as ThemePreference)}
+                buttons={inkSegments(themePreference, [
+                  { value: 'system', label: t('settings.themeSystem'), testID: 'theme-system' },
+                  { value: 'light', label: t('settings.themeLight'), testID: 'theme-light' },
+                  { value: 'dark', label: t('settings.themeDark'), testID: 'theme-dark' },
+                ])}
+              />
+              <List.Item
+                title={t('settings.nightRed')}
+                onPress={() => setNightRedOpen(true)}
+                right={props => <List.Icon {...props} icon="chevron-right" />}
+                style={{ marginTop: 8, paddingHorizontal: 0 }}
+                testID="night-red"
+              />
+            </Surface>
+          </List.Section>
+        </Animated.View>
+
         <Animated.View entering={FadeInDown.delay(150).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.language')}</List.Subheader>
-            <Surface elevation={1} style={styles.sectionCard}>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.language')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
               <SegmentedButtons
                 value={i18n.language.split('-')[0]}
                 onValueChange={handleLanguageChange}
-                buttons={[
+                buttons={inkSegments(i18n.language.split('-')[0], [
                   { value: 'en', label: t('settings.english'), testID: 'lang-en' },
                   { value: 'uk', label: t('settings.ukrainian'), testID: 'lang-uk' },
-                ]}
+                ])}
               />
             </Surface>
           </List.Section>
@@ -424,10 +472,10 @@ export default function SettingsScreen() {
 
         <Animated.View entering={FadeInDown.delay(200).springify()}>
           <List.Section>
-            <List.Subheader style={styles.sectionTitle}>{t('settings.about')}</List.Subheader>
-            <Surface elevation={1} style={styles.sectionCard}>
+            <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.about')}</List.Subheader>
+            <Surface elevation={0} style={[styles.sectionCard, sectionColors]}>
               <List.Item
-                title={t('home.title')}
+                title={t('settings.appName')}
                 description={t('settings.version', { version: APP_VERSION })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
@@ -442,6 +490,8 @@ export default function SettingsScreen() {
           </List.Section>
         </Animated.View>
       </ScrollView>
+      <StatusBarScrim />
+      {nightRed}
       <DeleteAccountDialog
         visible={deleteDialogVisible}
         email={user?.email}
@@ -471,6 +521,10 @@ interface SettingsIOSProps {
   onSync: () => void;
   language: string;
   onLanguageChange: (language: string) => void;
+  themePreference: ThemePreference;
+  onThemeChange: (preference: ThemePreference) => void;
+  onNightRed: () => void;
+  nightRed: React.ReactNode;
 }
 
 /** iOS: Settings as a native grouped form (SwiftUI Form) under the large-title bar. */
@@ -601,6 +655,25 @@ function SettingsIOS(props: SettingsIOSProps) {
 
   sections.push(
     {
+      key: 'appearance',
+      title: t('settings.appearance'),
+      fields: [
+        {
+          kind: 'picker',
+          key: 'theme',
+          label: t('settings.theme'),
+          value: props.themePreference,
+          options: [
+            { value: 'system', label: t('settings.themeSystem') },
+            { value: 'light', label: t('settings.themeLight') },
+            { value: 'dark', label: t('settings.themeDark') },
+          ],
+          onChange: value => props.onThemeChange(value as ThemePreference),
+        },
+        { kind: 'button', key: 'nightRed', label: t('settings.nightRed'), onPress: props.onNightRed, testID: 'night-red' },
+      ],
+    },
+    {
       key: 'language',
       fields: [
         {
@@ -620,7 +693,7 @@ function SettingsIOS(props: SettingsIOSProps) {
       key: 'about',
       title: t('settings.about'),
       footer: isUsingFirebaseEmulator ? t('settings.emulatorDescription') : undefined,
-      fields: [{ kind: 'info', key: 'version', label: t('home.title'), value: APP_VERSION }],
+      fields: [{ kind: 'info', key: 'version', label: t('settings.appName'), value: APP_VERSION }],
     }
   );
 
@@ -628,6 +701,7 @@ function SettingsIOS(props: SettingsIOSProps) {
     <>
       <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
       <NativeForm sections={sections} />
+      {props.nightRed}
     </>
   );
 }
@@ -640,14 +714,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   content: {
-    padding: 16,
+    paddingHorizontal: 20,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 13,
+    fontFamily: FONT.sans500,
+    paddingHorizontal: 0,
   },
   sectionCard: {
-    borderRadius: 16,
+    borderRadius: 0,
+    borderWidth: 1,
     padding: 16,
   },
   divider: {

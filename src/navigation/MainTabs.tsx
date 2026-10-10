@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, View } from 'react-native';
 import { createNativeBottomTabNavigator } from '@bottom-tabs/react-navigation';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,9 @@ import AnalyticsScreen from '../screens/analytics/AnalyticsScreen';
 import SettingsScreen from '../screens/settings/SettingsScreen';
 import { ICONS } from '../constants/icons';
 import { useAppTheme } from '../theme/useAppTheme';
+import { nativeHeaderStyle } from '../theme/navigation';
+import { FONT } from '../theme/tokens';
+import { TabLiveBar } from '../components/fleet/TabLiveBar';
 
 /**
  * Native bottom tabs: UITabBar on iOS (Liquid Glass on iOS 26+), Material 3
@@ -30,6 +33,27 @@ const ANDROID_TAB_ICONS = {
  * large title on the tab root. Android keeps the Material top app bar rendered by the
  * screen itself (ScreenHeader), so the stack header is hidden there.
  */
+/**
+ * Analytics / Settings with the live bar as a footer above the tab bar, on every platform.
+ * Not the iOS 26 tab bar accessory: attaching/detaching it per tab rebuilds SwiftUI's TabView and
+ * crashes ("child view controller … should have parent view controller"), and a permanent one
+ * would show an empty glass capsule on Home.
+ */
+function withLiveBarFooter(Component: React.ComponentType) {
+  function WithLiveBar() {
+    return (
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1 }}>
+          <Component />
+        </View>
+        <TabLiveBar />
+      </View>
+    );
+  }
+  WithLiveBar.displayName = `WithLiveBar(${Component.displayName ?? Component.name})`;
+  return WithLiveBar;
+}
+
 function withTabStack(name: string, Component: React.ComponentType) {
   function TabStack() {
     const theme = useAppTheme();
@@ -38,6 +62,7 @@ function withTabStack(name: string, Component: React.ComponentType) {
         screenOptions={{
           headerShown: Platform.OS === 'ios',
           contentStyle: { backgroundColor: theme.colors.background },
+          ...nativeHeaderStyle(theme),
         }}
       >
         <Stack.Screen name={`${name}Root`} component={Component} />
@@ -49,8 +74,8 @@ function withTabStack(name: string, Component: React.ComponentType) {
 }
 
 const HomeTab = withTabStack('Home', HomeScreen);
-const AnalyticsTab = withTabStack('Analytics', AnalyticsScreen);
-const SettingsTab = withTabStack('Settings', SettingsScreen);
+const AnalyticsTab = withTabStack('Analytics', withLiveBarFooter(AnalyticsScreen));
+const SettingsTab = withTabStack('Settings', withLiveBarFooter(SettingsScreen));
 
 export default function MainTabs() {
   const { t } = useTranslation();
@@ -60,11 +85,12 @@ export default function MainTabs() {
 
   return (
     <Tab.Navigator
-      tabBarActiveTintColor={theme.colors.primary}
+      tabBarActiveTintColor={theme.colors.onBackground}
       tabBarInactiveTintColor={theme.colors.onSurfaceVariant}
       activeIndicatorColor={theme.colors.primaryContainer}
       rippleColor={theme.colors.primaryContainer}
-      tabBarStyle={Platform.OS === 'android' ? { backgroundColor: theme.colors.elevation.level2 } : undefined}
+      tabLabelStyle={Platform.OS === 'android' ? { fontFamily: FONT.sans600, fontSize: 11 } : undefined}
+      tabBarStyle={Platform.OS === 'android' ? { backgroundColor: theme.colors.background } : undefined}
       hapticFeedbackEnabled
     >
       <Tab.Screen

@@ -221,6 +221,28 @@ export const saveLanguage = async (language: string): Promise<void> => {
   }
 };
 
+// ============= Appearance =============
+
+export type ThemePreference = 'system' | 'light' | 'dark';
+const THEME_KEY = '@theme_preference';
+
+export const getThemePreference = async (): Promise<ThemePreference> => {
+  try {
+    const value = await AsyncStorage.getItem(THEME_KEY);
+    return value === 'light' || value === 'dark' ? value : 'system';
+  } catch {
+    return 'system';
+  }
+};
+
+export const saveThemePreference = async (preference: ThemePreference): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(THEME_KEY, preference);
+  } catch (error) {
+    console.error('Error saving theme preference:', error);
+  }
+};
+
 // ============= Generic entity writes =============
 
 /**

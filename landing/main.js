@@ -9,7 +9,7 @@
   const themeToggle = document.querySelector('[data-theme-toggle]');
   const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
   const currentTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
-  const themeColors = { light: '#fbfaf8', dark: '#0b0d10' };
+  const themeColors = { light: '#f3f1ec', dark: '#000000' };
 
   const syncTheme = () => {
     const theme = currentTheme();

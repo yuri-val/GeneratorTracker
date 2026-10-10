@@ -34,6 +34,7 @@ export const ICONS = {
   chartNoData: { sf: 'chart.line.flattrend.xyaxis', mci: 'chart-line-variant' },
   grid: { sf: 'square.grid.2x2', mci: 'view-grid' },
   play: { sf: 'play.fill', mci: 'play' },
+  accessibility: { sf: 'accessibility', mci: 'human' },
   stop: { sf: 'stop.fill', mci: 'stop' },
   statusDue: { sf: 'exclamationmark.circle.fill', mci: 'alert-circle' },
   statusSoon: { sf: 'clock.badge.exclamationmark', mci: 'clock-alert-outline' },
@@ -53,6 +54,7 @@ export const ICONS = {
   filter: { sf: 'line.3.horizontal.decrease.circle', mci: 'filter-variant' },
   more: { sf: 'ellipsis', mci: 'dots-vertical' },
   markServiced: { sf: 'checkmark.circle', mci: 'check' },
+  check: { sf: 'checkmark', mci: 'check' },
 } as const satisfies Record<string, { sf: SFSymbol; mci: string }>;
 
 export type IconName = keyof typeof ICONS;
