@@ -32,6 +32,29 @@
         "credentialsSource": "local",
         "autoIncrement": true
       }
+    },
+    "preview-lite": {
+      "extends": "preview",
+      "env": {
+        "APP_VARIANT": "lite"
+      },
+      "android": {
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease",
+        "credentialsSource": "local",
+        "autoIncrement": true
+      }
+    },
+    "production-lite": {
+      "extends": "production",
+      "env": {
+        "APP_VARIANT": "lite"
+      },
+      "android": {
+        "buildType": "app-bundle",
+        "credentialsSource": "local",
+        "autoIncrement": true
+      }
     }
   },
   "submit": {
@@ -43,6 +66,13 @@
       },
       "ios": {
         "ascAppId": "6819560707"
+      }
+    },
+    "production-lite": {
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed",
+        "serviceAccountKeyPath": "./credentials/android/play-service-account.json"
       }
     }
   }

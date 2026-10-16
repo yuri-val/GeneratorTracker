@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-10-17
+
+**Editions.** The paid Android app is unchanged (no ads, no limits, no purchases). New free editions:
+**Generator Tracker Lite** (Android, package `com.yurival.GeneratorTrackerLite`, built with `APP_VARIANT=lite`)
+and the iOS app, which becomes free. See `docs/MONETIZATION.md`.
+
+### Added
+- `src/monetization/`: the edition (`app.config.js` → `extra.edition`), in-app purchases through `expo-iap`
+  (`gt_remove_ads`, `gt_unlimited`, `gt_everything`; non-consumables, restored from the store account), a fake
+  store for web/Jest/dev builds, limits of the lite edition (3 generators, 2 maintenance tasks per generator —
+  creating only, existing records are never hidden), and AdMob ads (`react-native-google-mobile-ads`): consent
+  first (UMP, ATT), a banner under the header of Analytics and Settings, one interstitial when Analytics opens at
+  most every 10 minutes and never in the first 10 minutes after launch.
+- `Upgrade` screen (paywall in the 3.0 style) and Settings → Purchases (status, open, restore, ad privacy options).
+- EAS profiles `preview-lite` / `production-lite`; `npm run test:e2e:lite` (web build with
+  `EXPO_PUBLIC_EDITION=lite` and the fake store).
+- Privacy policy: "Advertising" and "In-App Purchases" sections (free editions only).
+
+### Changed
+- "Session Running" → "Session running".
+- The AdMob SDK ships in every native build (Expo autolinking) with `delayAppMeasurementInit`; the full edition
+  never initialises it.
+
 ## [3.0.0] - 2026-10-10
 
 **Redesign** (design handoff `docs/design/redesign-3.0`, plan `docs/REDESIGN_3.0.md`): the app is built around

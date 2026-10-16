@@ -15,6 +15,7 @@ import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
 import { contentColumn } from '../../theme/layout';
+import { canAddGenerator, useEntitlements } from '../../monetization';
 
 type AddGeneratorScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddGenerator'>;
@@ -26,6 +27,7 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const { t, i18n } = useTranslation();
   const { generatorId } = route.params || {};
   const isEdit = !!generatorId;
+  const { lite, entitlements } = useEntitlements();
 
   const [name, setName] = useState('');
   const [model, setModel] = useState('');
@@ -73,6 +75,12 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const handleSave = async () => {
     setSubmitted(true);
     if (!name.trim() || tankInvalid) {
+      return;
+    }
+
+    // Lite edition: the limit applies to new generators only (Home normally stops earlier).
+    if (!isEdit && !canAddGenerator(lite, entitlements, (await getGenerators()).length)) {
+      navigation.replace('Upgrade', { reason: 'generators' });
       return;
     }
 

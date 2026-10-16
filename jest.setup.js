@@ -21,3 +21,26 @@ jest.mock('./src/config/firebase', () => ({
   db: {},
   isUsingFirebaseEmulator: false,
 }));
+
+// The AdMob and billing SDKs are native-only; unit tests cover the logic around them.
+jest.mock('react-native-google-mobile-ads', () => ({
+  __esModule: true,
+  default: () => ({ initialize: jest.fn().mockResolvedValue([]) }),
+  AdsConsent: { gatherConsent: jest.fn().mockResolvedValue({ canRequestAds: true, privacyOptionsRequirementStatus: 'NOT_REQUIRED' }), showPrivacyOptionsForm: jest.fn() },
+  AdsConsentPrivacyOptionsRequirementStatus: { REQUIRED: 'REQUIRED', NOT_REQUIRED: 'NOT_REQUIRED', UNKNOWN: 'UNKNOWN' },
+  AdEventType: { LOADED: 'loaded', CLOSED: 'closed', ERROR: 'error' },
+  BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
+  BannerAd: () => null,
+  InterstitialAd: { createForAdRequest: () => ({ addAdEventListener: jest.fn(), load: jest.fn(), show: jest.fn() }) },
+  TestIds: {},
+}));
+jest.mock('expo-iap', () => ({
+  initConnection: jest.fn().mockResolvedValue(true),
+  endConnection: jest.fn().mockResolvedValue(true),
+  fetchProducts: jest.fn().mockResolvedValue([]),
+  getAvailablePurchases: jest.fn().mockResolvedValue([]),
+  finishTransaction: jest.fn().mockResolvedValue(undefined),
+  requestPurchase: jest.fn().mockResolvedValue(null),
+  purchaseUpdatedListener: jest.fn(() => ({ remove: jest.fn() })),
+  purchaseErrorListener: jest.fn(() => ({ remove: jest.fn() })),
+}));

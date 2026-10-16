@@ -16,6 +16,7 @@ import { generatorColor, space } from '../../theme/tokens';
 import { contentColumn } from '../../theme/layout';
 import { fuelByMonth, hoursByMonth, totalsByGenerator } from '../../utils/analytics';
 import { fmtNumber, fmtSummary, hourUnit, litreUnit, NBSP } from '../../utils/format';
+import { AdBanner, maybeShowInterstitial, useEntitlements } from '../../monetization';
 
 const ALL = 'all';
 
@@ -36,6 +37,7 @@ export default function AnalyticsScreen() {
   const [loaded, setLoaded] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState<string>(ALL);
+  const { lite, entitlements } = useEntitlements();
 
   const load = useCallback(async () => {
     try {
@@ -55,7 +57,10 @@ export default function AnalyticsScreen() {
   useFocusEffect(
     useCallback(() => {
       load();
-    }, [load]),
+      // Lite edition: opening Analytics is the one natural break where a full-screen ad may
+      // appear (never on Home, around Start/Stop or at launch); ads.ts keeps the cadence.
+      if (lite && !entitlements.noAds) maybeShowInterstitial();
+    }, [load, lite, entitlements.noAds]),
   );
 
   const onRefresh = async () => {
@@ -239,6 +244,7 @@ export default function AnalyticsScreen() {
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={gt.textMuted} />}
     >
       {isIOS ? <PageSummary summary={summary} testID="analytics-summary" /> : <PageHeader title={t('analytics.title')} summary={summary} summaryTestID="analytics-summary" />}
+      <AdBanner />
       {body}
     </ScrollView>
   );

@@ -24,6 +24,7 @@ import { useNow } from '../../hooks/useNow';
 import { useSessionActions } from '../../hooks/useSessionActions';
 import { sessionElapsedMs } from '../../services/sessions';
 import { statusText, usedFraction } from '../../utils/maintenanceView';
+import { canAddMaintenanceTask, useEntitlements } from '../../monetization';
 import {
   fmtClock, fmtClockTime, fmtLitresValue, fmtNumber, fmtShortDate, litreUnit, NBSP, splitAround,
 } from '../../utils/format';
@@ -101,6 +102,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
     .sort((a, b) => `${b.date}T${b.startTime}`.localeCompare(`${a.date}T${a.startTime}`));
   const refills = [...item.refills].sort((a, b) => `${b.date}T${b.time ?? ''}`.localeCompare(`${a.date}T${a.time ?? ''}`));
   const tasks = [...item.tasks].sort((a, b) => a.title.localeCompare(b.title));
+  const { lite, entitlements } = useEntitlements();
   const elapsedMs = running ? sessionElapsedMs(running, now) : 0;
   const engineHours = item.engineHours + elapsedMs / 3_600_000;
 
@@ -129,12 +131,13 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
     }
   };
 
-  const add = () =>
-    segment === 'sessions'
-      ? navigation.navigate('AddWorkSession', { generatorId })
-      : segment === 'refills'
-      ? navigation.navigate('AddRefill', { generatorId })
-      : navigation.navigate('AddMaintenance', { generatorId });
+  const add = () => {
+    if (segment === 'sessions') navigation.navigate('AddWorkSession', { generatorId });
+    else if (segment === 'refills') navigation.navigate('AddRefill', { generatorId });
+    // Lite edition: past the free limit "+" opens the paywall instead of the form.
+    else if (!canAddMaintenanceTask(lite, entitlements, tasks.length)) navigation.navigate('Upgrade', { reason: 'maintenance' });
+    else navigation.navigate('AddMaintenance', { generatorId });
+  };
 
   const records: Row[] =
     segment === 'sessions'

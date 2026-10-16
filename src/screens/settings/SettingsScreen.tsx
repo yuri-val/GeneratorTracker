@@ -14,6 +14,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { useTabBarOverlap } from '../../navigation/useTabBarOverlap';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { isIOS } from '../../theme/platform';
@@ -38,7 +39,8 @@ import {
 } from '../../services/auth';
 import { contentColumn } from '../../theme/layout';
 import { NightRedSheet } from '../../components/NightRedSheet';
-import { PageHeader, StatusBarScrim } from '../../components/gt';
+import { PageHeader, SquareButton, StatusBarScrim, useSnackbar } from '../../components/gt';
+import { AdBanner, adsSupported, initAds, showPrivacyOptions, useEntitlements, usingTestAds } from '../../monetization';
 import { FONT } from '../../theme/tokens';
 import { useThemePreference } from '../../contexts/ThemePreferenceContext';
 import type { ThemePreference } from '../../utils/storage';
@@ -58,6 +60,7 @@ export default function SettingsScreen() {
   const [nightRedOpen, setNightRedOpen] = useState(false);
   const nightRed = <NightRedSheet visible={nightRedOpen} onClose={() => setNightRedOpen(false)} />;
   const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
+  const purchases = usePurchasesSection();
 
   const handleLanguageChange = async (newLang: string) => {
     await i18n.changeLanguage(newLang);
@@ -268,6 +271,7 @@ export default function SettingsScreen() {
         onThemeChange={setThemePreference}
         onNightRed={() => setNightRedOpen(true)}
         nightRed={nightRed}
+        purchases={purchases}
       />
     );
   }
@@ -290,6 +294,7 @@ export default function SettingsScreen() {
         contentContainerStyle={[styles.content, contentColumn, { paddingBottom: tabBarOverlap + 16 }]}
       >
         <PageHeader title={t('settings.title')} summary={t('settings.appName') + ' ' + APP_VERSION} />
+        <AdBanner />
         <Animated.View entering={FadeInDown.delay(0).springify()}>
           <List.Section>
             <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.account')}</List.Subheader>
@@ -454,6 +459,32 @@ export default function SettingsScreen() {
           </List.Section>
         </Animated.View>
 
+        {purchases && (
+          <Animated.View entering={FadeInDown.delay(120).springify()}>
+            <List.Section>
+              <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.purchases')}</List.Subheader>
+              <Surface elevation={0} style={[styles.sectionCard, sectionColors, { gap: 12 }]} testID="purchases-section">
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }} testID="purchases-status">
+                  {purchases.status ?? t('settings.purchasesHint')}
+                </Text>
+                {!purchases.ownedAll && (
+                  <SquareButton kind="primary" label={t('settings.purchasesOpen')} onPress={purchases.open} height={48} testID="open-upgrade" />
+                )}
+                <SquareButton kind="outline" label={t('settings.restorePurchases')} onPress={purchases.restore} disabled={purchases.busy} height={44} testID="restore-purchases-settings" />
+                {purchases.privacyOptions && (
+                  <List.Item
+                    title={t('settings.privacyOptions')}
+                    onPress={showPrivacyOptions}
+                    right={props => <List.Icon {...props} icon="chevron-right" />}
+                    style={{ paddingHorizontal: 0 }}
+                    testID="ad-privacy-options"
+                  />
+                )}
+              </Surface>
+            </List.Section>
+          </Animated.View>
+        )}
+
         <Animated.View entering={FadeInDown.delay(150).springify()}>
           <List.Section>
             <List.Subheader style={[styles.sectionTitle, { color: theme.gt.textMuted }]}>{t('settings.language')}</List.Subheader>
@@ -479,6 +510,13 @@ export default function SettingsScreen() {
                 description={t('settings.version', { version: APP_VERSION })}
                 left={(props) => <List.Icon {...props} icon="information" />}
               />
+              {purchases && usingTestAds && (
+                <List.Item
+                  title={t('settings.testAdsTitle')}
+                  description={t('settings.testAdsDescription')}
+                  left={(props) => <List.Icon {...props} icon="test-tube" color={appColors.warning} />}
+                />
+              )}
               {isUsingFirebaseEmulator && (
                 <List.Item
                   title={t('settings.emulatorTitle')}
@@ -525,6 +563,55 @@ interface SettingsIOSProps {
   onThemeChange: (preference: ThemePreference) => void;
   onNightRed: () => void;
   nightRed: React.ReactNode;
+  purchases: PurchasesSection | null;
+}
+
+interface PurchasesSection {
+  /** Owned-state line, or null while nothing is owned (the hint is shown instead). */
+  status: string | null;
+  ownedAll: boolean;
+  busy: boolean;
+  privacyOptions: boolean;
+  open: () => void;
+  restore: () => void;
+}
+
+/** The lite edition's Purchases section state; null in the full edition (no section at all). */
+function usePurchasesSection(): PurchasesSection | null {
+  const { t } = useTranslation();
+  const navigation = useNavigation<any>();
+  const snackbar = useSnackbar();
+  const { lite, entitlements, busy, restore } = useEntitlements();
+  const [privacyOptions, setPrivacyOptions] = useState(false);
+  useEffect(() => {
+    if (!lite || !adsSupported || entitlements.noAds) return;
+    initAds().then(s => setPrivacyOptions(s.privacyOptionsRequired));
+  }, [lite, entitlements.noAds]);
+  if (!lite) return null;
+  const ownedAll = entitlements.noAds && entitlements.unlimited;
+  const status = ownedAll
+    ? t('settings.purchasesOwnedAll')
+    : entitlements.noAds
+      ? t('settings.purchasesOwnedAds')
+      : entitlements.unlimited
+        ? t('settings.purchasesOwnedLimits')
+        : null;
+  return {
+    status,
+    ownedAll,
+    busy,
+    privacyOptions,
+    open: () => navigation.navigate('Upgrade'),
+    restore: async () => {
+      try {
+        const count = await restore();
+        snackbar.show({ message: count > 0 ? t('upgrade.restored') : t('upgrade.nothingToRestore'), testID: 'snackbar-restored' });
+      } catch (error) {
+        console.warn('Restore failed:', error);
+        Alert.alert(t('common.error'), t('upgrade.purchaseError'));
+      }
+    },
+  };
 }
 
 /** iOS: Settings as a native grouped form (SwiftUI Form) under the large-title bar. */
@@ -653,6 +740,20 @@ function SettingsIOS(props: SettingsIOSProps) {
         },
       ];
 
+  if (props.purchases) {
+    const p = props.purchases;
+    sections.push({
+      key: 'purchases',
+      title: t('settings.purchases'),
+      footer: p.status ?? t('settings.purchasesHint'),
+      fields: [
+        ...(p.ownedAll ? [] : [{ kind: 'button' as const, key: 'open', label: t('settings.purchasesOpen'), onPress: p.open, testID: 'open-upgrade' }]),
+        { kind: 'button', key: 'restore', label: t('settings.restorePurchases'), disabled: p.busy, onPress: p.restore, testID: 'restore-purchases-settings' },
+        ...(p.privacyOptions ? [{ kind: 'button' as const, key: 'privacy', label: t('settings.privacyOptions'), onPress: () => showPrivacyOptions() }] : []),
+      ],
+    });
+  }
+
   sections.push(
     {
       key: 'appearance',
@@ -692,7 +793,7 @@ function SettingsIOS(props: SettingsIOSProps) {
     {
       key: 'about',
       title: t('settings.about'),
-      footer: isUsingFirebaseEmulator ? t('settings.emulatorDescription') : undefined,
+      footer: isUsingFirebaseEmulator ? t('settings.emulatorDescription') : props.purchases && usingTestAds ? t('settings.testAdsDescription') : undefined,
       fields: [{ kind: 'info', key: 'version', label: t('settings.appName'), value: APP_VERSION }],
     }
   );
@@ -700,6 +801,7 @@ function SettingsIOS(props: SettingsIOSProps) {
   return (
     <>
       <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
+      <AdBanner />
       <NativeForm sections={sections} />
       {props.nightRed}
     </>
