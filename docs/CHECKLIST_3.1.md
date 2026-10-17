@@ -79,6 +79,17 @@
       `/get/` з вибором видання — Я.
 - [ ] **G3. Політика конфіденційності** вже оновлена в PR #11 (розділи «Реклама», «Покупки») — викотиться з мерджем.
 
+## H. Після релізу 3.1 — Expo SDK 58 (версія 3.2)
+
+- [ ] **H1. Оновлення на SDK 58** (RN 0.86 → 0.88, iOS 27 SDK, Xcode 27) окремою гілкою після виходу 3.1 — Я:
+      `npx expo install expo@^58.0.0 --fix`, `npx expo-doctor@latest`, перегенерувати `android/` та `ios/`,
+      нові dev-клієнти. Очікувано лагодить локальну iOS-збірку на Swift 6.4.
+- [ ] **H2. Що перевірити**: R8 у релізних Android-збірках (keep-правила для Play Billing / AdMob, якщо щось
+      зріже), сумісність react-native-bottom-tabs / react-native-paper / react-native-google-mobile-ads / expo-iap
+      з RN 0.88, нова логіка `NODE_ENV` і `.env` (режим емулятора Firebase), `@expo/ui` (`Host` вирівнює вгору),
+      iOS scene life cycle (у нас уже `enableSceneSupport`) — Я.
+- [ ] **H3. Повний прогін**: unit, e2e (full + lite), Maestro на емуляторі/симуляторі, тестові збірки в обидва стори — Я.
+
 ## Поточний крок (оновлено)
 
 **B3** — опублікувати GDPR-повідомлення, створити IDFA explainer і повідомлення для штатів США. Далі **B5** (app-ads.txt)
