@@ -16,11 +16,11 @@
 - [x] **B1. Додати застосунки** Generator Tracker Lite (Android) і Generator Tracker: Run Hours (iOS) як
       неопубліковані — Разом.
 - [x] **B2. Рекламні блоки**: Banner + Interstitial у кожному — Разом.
-- [ ] **B3. Privacy & messaging**: GDPR-повідомлення (UMP) — чернетка «Generator Tracker - GDPR» збережена (2 застосунки,
-      політика конфіденційності, мови en/uk/pl/de/cs, кнопка «Не погоджуюся»), чекає публікації; + IDFA explainer
-      для iOS, + правила штатів США — Разом.
-- [x] **B4. ID у збірку**: EAS env `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID`,
-      записані в `app.config.js` / `src/monetization/ads.ts` (реальні — лише в релізних збірках) — Я.
+- [ ] **B3. Privacy & messaging** — Разом:
+      - [x] GDPR (ЄЕЗ/Британія/Швейцарія) «Generator Tracker - GDPR» — **опубліковано** 2026-10-17 (Lite + Run Hours,
+        en/uk/pl/de/cs, кнопка «Не погоджуюся»). Відкликання згоди — Налаштування → «Налаштування приватності реклами».
+      - [ ] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — чернетка (en + uk), чекає публікації.
+      - [ ] Штати США «Generator Tracker - US states» — чернетка (Lite + Run Hours, en), чекає публікації.
 - [ ] **B5. app-ads.txt** на лендінгу (`landing/app-ads.txt`) і сайт розробника в обох сторах — Я.
 
 ## C. Код (поки йдуть A/B)
