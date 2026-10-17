@@ -22,8 +22,8 @@
       - [x] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — опубліковано (en + uk).
       - [x] Штати США «Generator Tracker - US states» — опубліковано (Lite + Run Hours, en).
 - [ ] **B5. app-ads.txt** — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
-      - [ ] DNS: `generatortracker.yuri-val.dev  CNAME  yuri-val.github.io.` — Ти.
-      - [ ] Pages → custom domain + Enforce HTTPS (після DNS) — Я.
+      - [x] DNS: `generatortracker.yuri-val.dev  CNAME  yuri-val.github.io.` — Ти.
+      - [x] Pages → custom domain + Enforce HTTPS; старі github.io-адреси → 301 на новий домен.
       - [x] `app-ads.txt` генерує `landing/build.py`; `cname:` у деплой-воркфлоу; усі URL сайту оновлено (PR #11).
       - [ ] «Сайт розробника» = `https://generatortracker.yuri-val.dev` у Play (обидва застосунки) і App Store (Support/Marketing URL) — Разом.
       - [ ] QR `landing/assets/qr-get.svg` веде на старий `/get/` (працює через переадресацію GitHub) — перегенерувати — Я.
@@ -37,7 +37,7 @@
 
 ## D. Google Play — Generator Tracker Lite (застосунок створено ✅)
 
-- [ ] **D1. Перша збірка** `production-lite` → трек internal — Я (submit — Ти або з дозволу).
+- [x] **D1. Перша збірка** `production-lite` → трек internal — 3.1.0 (versionCode 3) відправлено 2026-10-17.
 - [ ] **D2. In-app products** `gt_remove_ads` $0.99, `gt_unlimited` $0.99, `gt_everything` $1.49 (після D1) — Разом.
 - [ ] **D3. Сторінка в магазині**: назва, короткий/повний опис (`description/lite/`), іконка 512
       (`store/icon/play-store-512.png`), feature graphic 1024×500, скріншоти (`store/play/phone-*-1200x2400`) — Разом.
