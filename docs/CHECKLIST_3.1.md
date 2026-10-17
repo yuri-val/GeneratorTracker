@@ -38,7 +38,8 @@
 ## D. Google Play — Generator Tracker Lite (застосунок створено ✅)
 
 - [x] **D1. Перша збірка** `production-lite` → трек internal — 3.1.0 (versionCode 3) відправлено 2026-10-17.
-- [ ] **D2. In-app products** `gt_remove_ads` $0.99, `gt_unlimited` $0.99, `gt_everything` $1.49 (після D1) — Разом.
+- [x] **D2. In-app products** `gt_remove_ads` $0.99, `gt_unlimited` $0.99, `gt_everything` $1.49 — активні з 2026-10-17
+      (варіант покупки `buy`, 174 регіони, базова ціна в USD → 54,99 / 54,99 / 79,99 ₴; назви й описи uk + en-US).
 - [ ] **D3. Сторінка в магазині**: назва, короткий/повний опис (`description/lite/`), іконка 512
       (`store/icon/play-store-512.png`), feature graphic 1024×500, скріншоти (`store/play/phone-*-1200x2400`) — Разом.
 - [ ] **D4. Розділ «Контент додатка»**: політика конфіденційності (URL), реклама — «так», доступ до застосунку,
@@ -92,5 +93,5 @@
 
 ## Поточний крок (оновлено)
 
-**B3** — опублікувати GDPR-повідомлення, створити IDFA explainer і повідомлення для штатів США. Далі **B5** (app-ads.txt)
-і **D1** (перша збірка Lite в internal testing).
+**D3/D4** — сторінка Lite у Play і розділ «Контент додатка». Паралельно: сайт розробника
+`https://generatortracker.yuri-val.dev` у Play (обидва застосунки) і App Store (залишок B5).
