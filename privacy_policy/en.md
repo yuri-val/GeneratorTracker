@@ -1,6 +1,6 @@
 # Privacy Policy for Generator Tracker
 
-**Last Updated:** October 6, 2026
+**Last Updated:** October 17, 2026
 
 ## Introduction
 
@@ -11,6 +11,7 @@ Generator Tracker ("we", "our", or "the app") is committed to protecting your pr
 - 🎯 **Optional Cloud Sync**: You choose whether to sync
 - 🚫 **No Tracking**: We don't track, profile, or sell your data
 - ✅ **Open Source**: Our code is transparent and auditable
+- 📣 **Ads only in the free editions**: Generator Tracker Lite (Android) and the iOS app show ads until you remove them with a one-time purchase; the paid Android app has none (see "Advertising")
 
 ## Information We Collect
 
@@ -117,12 +118,25 @@ Generator Tracker does **not sell, rent, or share** your personal data with thir
 - **Data Shared**: Email, name, profile photo (as provided by Google)
 - **Privacy Policy**: https://policies.google.com/privacy
 
-### No Analytics or Tracking
+### Advertising (free editions only)
+
+**Generator Tracker Lite** (Android) and the **iOS app** are free and show ads from **Google AdMob** until you buy "Remove ads" or "Everything". The paid Android app **Generator Tracker** contains no ads and never initialises the advertising SDK.
+
+- **Where ads appear**: a banner on the Analytics and Settings screens, and at most one full-screen ad when Analytics is opened, no more than once every 10 minutes. There are no ads on the home screen, around Start/Stop, on the generator screen or at launch.
+- **Data used by AdMob**: the advertising identifier of your device (if you allow it), IP address, device type and operating system, coarse location derived from the IP address, and ad interaction data. Google uses this to serve, measure and limit ads. AdMob's handling of this data is described at https://policies.google.com/technologies/ads and https://support.google.com/admob/answer/6128543.
+- **Your choices**: in the European Economic Area, the UK and Switzerland the app asks for your consent before showing ads (Google's consent form) and you can change it any time in Settings → "Ad privacy options". On iOS the system "Allow tracking" prompt controls whether ads may use the advertising identifier; declining it keeps ads non-personalised. Buying "Remove ads" removes ads and stops all advertising requests.
+- **The app itself** sends nothing about you to the advertising network: your generators, sessions and refills never leave the app for advertising purposes.
+
+### In-App Purchases (free editions only)
+
+Purchases ("Remove ads", "Unlimited", "Everything") are processed by **Apple (App Store)** or **Google (Google Play)**. The app receives only a confirmation that a product is owned; it never sees your payment details. Purchase records are tied to your store account and are restored from it ("Restore purchases"). Apple's and Google's privacy policies apply to the payment: https://www.apple.com/legal/privacy/ and https://policies.google.com/privacy.
+
+### No Analytics or Tracking by the App
 - ❌ No Google Analytics
 - ❌ No Facebook Pixel
-- ❌ No advertising SDKs
 - ❌ No usage tracking
 - ❌ No crash reporting with personal data
+- ❌ No advertising SDK in the paid Android app; in the free editions it is used only to show ads (see above)
 
 ## Your Rights and Choices
 
