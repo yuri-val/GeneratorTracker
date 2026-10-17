@@ -57,7 +57,10 @@ export function initAds(): Promise<AdsStatus> {
         if (info.canRequestAds) await mobileAds().initialize();
         status = { ready: info.canRequestAds, privacyOptionsRequired };
       } catch (error) {
+        // Typically no network for the consent request: stay without ads and let the next
+        // screen that needs one try again, instead of pinning this launch to "no ads".
         console.warn('Ads not initialised:', error);
+        initPromise = null;
       }
       return status;
     })();

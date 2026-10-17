@@ -56,5 +56,8 @@
       "react-native-bottom-tabs",
       "expo-iap"
     ]
+  },
+  "react-native-google-mobile-ads": {
+    "android_sdk": "classic"
   }
 }

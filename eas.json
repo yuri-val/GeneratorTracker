@@ -55,6 +55,13 @@
         "credentialsSource": "local",
         "autoIncrement": true
       }
+    },
+    "development-sim": {
+      "extends": "development",
+      "ios": {
+        "simulator": true,
+        "resourceClass": "m-medium"
+      }
     }
   },
   "submit": {
