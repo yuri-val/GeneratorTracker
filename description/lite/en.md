@@ -1,51 +1,64 @@
-# Generator Tracker Lite - Google Play Store Description
+# Generator Tracker Lite — Google Play (en)
 
-Listing for the free Android edition (`com.yurival.GeneratorTrackerLite`). Same screenshots and icon as the paid app.
+Listing of the free Android edition (`com.yurival.GeneratorTrackerLite`), as published in Play Console
+(uploaded through the Play Developer API). Screenshots and icon are the paid app's (`store/play/phone-en-1200x2400`,
+`store/icon/play-store-512.png`); the feature graphic adds a "LITE" tag (`store/play/lite/feature.mjs`).
 
-## Short Description (80 characters max)
-Generator run hours, fuel and maintenance. Free with ads; remove them once.
+## App name (22/30 characters)
 
-## Full Description
+```text
+Generator Tracker Lite
+```
 
-**Generator Tracker Lite** is the free edition of Generator Tracker: start a generator in one tap, see how much fuel is left and never miss an oil change — for a backup unit at home, a job site or a rental fleet. It works offline and keeps your data on your device.
+## Short description (75/80 characters)
 
-### 🎯 Key Features
+```text
+Start in one tap, see fuel left and get oil-change reminders. Lite edition.
+```
 
-**Start and Stop in One Tap**
-- Start or stop a generator right from the home screen; running ones move to the top with a live timer
-- Several generators can run at once; a bar keeps the running ones a tap away on every screen
-- Stopped by mistake? Undo within 5 seconds
+## Full description (2567/4000 characters)
 
-**Fuel Left, Estimated**
-- Enter the tank size and see roughly how much fuel and how many hours are left
-- Refills in a few taps: to full, same as last time, or a stepper; "filled to full" calibrates the estimate
-- Litres per hour are worked out for you
+```text
+Generator Tracker Lite is the free edition of Generator Tracker, built around what you do during a power cut: start the generator in one tap, keep an eye on it and never miss maintenance — for a backup unit at home, a job site or a small fleet.
 
-**Maintenance on Time**
-- Oil, filters, spark plugs — intervals by engine hours, by days, or both
-- Each task shows how much of the interval is used; overdue work is flagged on the home screen
-- Mark a task as serviced with one tap
+Start and stop from Home
+• Running generators move to the top with a live timer and a big Stop button; idle ones sit below with Start
+• Several generators can run at once; a bar at the bottom keeps the running ones a tap away
+• Stopped by mistake? Undo brings the session back with its original start time
+• Forgot to tap? Fix the start time or add a session later
 
-**Clear Analytics**
-- Run hours and fuel by month, split by generator colour
-- All-time totals and litres per hour for every generator
+Fuel left, estimated
+• Add your tank size and see roughly how much fuel and how many hours are left
+• Refills in a few taps: to full, same as last time or a stepper
+• Refuelling a running engine is blocked — "Stop and refill" ends the session and fills in the refill time for you
+• A full tank calibrates the estimate; litres per hour are worked out for you
 
-**Readable Day and Night**
-- Warm light theme and a true-black dark theme for OLED screens and night outages
-- English and Ukrainian
+Maintenance on time
+• Oil, filters, spark plugs — intervals by engine hours, by days, or both
+• Each task shows how much of the interval is used; overdue work is flagged on the home screen with ▲
+• Mark a task as serviced with one tap
 
-### 💳 Free, With One-Time Purchases
+Clear analytics
+• Run hours and fuel by month as bars split by generator colour — petrol and diesel are never summed together
+• All-time totals and litres per hour for every generator
 
-The Lite edition shows ads (a banner on the Analytics and Settings screens and an occasional full-screen ad when opening Analytics — never around Start/Stop or at launch) and allows up to 3 generators with 2 maintenance tasks each. Remove them once, no subscriptions:
-- **Remove ads**
-- **Unlimited** generators and maintenance tasks
-- **Everything** — both together, cheaper than separately
+Readable day and night
+• Large, high-contrast controls that are easy to hit in the dark or with gloves
+• Warm light theme and a true-black dark theme that saves battery during outages
+• Material 3 design on Android phones, tablets and foldables
 
-Prefer no ads at all? The paid **Generator Tracker** app has no ads, no limits and no purchases.
+What the Lite edition includes
+• Up to 3 generators with 2 maintenance tasks each — everything else works without limits
+• A banner on the Analytics and Settings screens and an occasional full-screen ad when opening Analytics; never on the home screen, around Start/Stop or at launch
+• One-time purchases, no subscriptions: Remove ads, Unlimited (generators and maintenance tasks) or Everything — both together for less
+• Prefer no ads at all from day one? The paid Generator Tracker app has no ads, no limits and no purchases
 
-### 🔒 Privacy
+Private by design
+• Everything is stored on your device first and works fully offline
+• An account is optional and only syncs your own records between your devices
+• Delete your account and cloud data any time in Settings
+• The app itself has no analytics; ads ask for your consent where the law requires it
+• Open source (MIT) — anyone can check what the app does
 
-- Everything is stored on your device first and works fully offline
-- An account is optional and only syncs your own records between your devices; delete it any time in Settings
-- The app itself has no analytics and no tracking; ads ask for your consent where the law requires it
-- Open source (MIT) — anyone can check what the app does
+Available in English and Ukrainian.
+```
