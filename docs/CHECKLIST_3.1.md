@@ -5,7 +5,7 @@
 
 ## A. Облікові записи й договори
 
-- [ ] **A1. AdMob: реєстрація** — Ти. Той самий Google-акаунт, що й Play Console; Україна, USD, Individual.
+- [x] **A1. AdMob: реєстрація** — Ти. Той самий Google-акаунт, що й Play Console; Україна, USD, Individual.
 - [ ] **A2. App Store Connect: договір Paid Apps → Active** — Ти. ⛔ без нього покупки на iOS не працюють
       (Business → Agreements: банк, податкова форма W-8BEN, контакти).
 - [ ] **A3. Google Play: платіжний профіль продавця** — перевірити, що активний (платний застосунок уже
@@ -13,12 +13,14 @@
 
 ## B. AdMob (після A1)
 
-- [ ] **B1. Додати застосунки** Generator Tracker Lite (Android) і Generator Tracker: Run Hours (iOS) як
+- [x] **B1. Додати застосунки** Generator Tracker Lite (Android) і Generator Tracker: Run Hours (iOS) як
       неопубліковані — Разом.
-- [ ] **B2. Рекламні блоки**: Banner + Interstitial у кожному — Разом.
-- [ ] **B3. Privacy & messaging**: GDPR-повідомлення (UMP) + IDFA explainer для iOS — Разом.
-- [ ] **B4. ID у збірку**: EAS env `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID`,
-      `EXPO_PUBLIC_ADMOB_{BANNER,INTERSTITIAL}_UNIT_{ANDROID,IOS}` — Я.
+- [x] **B2. Рекламні блоки**: Banner + Interstitial у кожному — Разом.
+- [ ] **B3. Privacy & messaging**: GDPR-повідомлення (UMP) — чернетка «Generator Tracker - GDPR» збережена (2 застосунки,
+      політика конфіденційності, мови en/uk/pl/de/cs, кнопка «Не погоджуюся»), чекає публікації; + IDFA explainer
+      для iOS, + правила штатів США — Разом.
+- [x] **B4. ID у збірку**: EAS env `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID`,
+      записані в `app.config.js` / `src/monetization/ads.ts` (реальні — лише в релізних збірках) — Я.
 - [ ] **B5. app-ads.txt** на лендінгу (`landing/app-ads.txt`) і сайт розробника в обох сторах — Я.
 
 ## C. Код (поки йдуть A/B)
@@ -72,7 +74,7 @@
       `/get/` з вибором видання — Я.
 - [ ] **G3. Політика конфіденційності** вже оновлена в PR #11 (розділи «Реклама», «Покупки») — викотиться з мерджем.
 
-## Поточний крок
+## Поточний крок (оновлено)
 
-**A1** — реєстрація в AdMob (вікно відкрите у вбудованому браузері). Паралельно можна **A2** (Paid Apps у ASC),
-а я тим часом роблю **C0**.
+**B3** — опублікувати GDPR-повідомлення, створити IDFA explainer і повідомлення для штатів США. Далі **B5** (app-ads.txt)
+і **D1** (перша збірка Lite в internal testing).

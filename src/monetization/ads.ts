@@ -3,9 +3,8 @@ import { isLite } from './edition';
 import { getAdsSdk, type AdsSdk } from './adsSdk';
 
 /**
- * AdMob ad units of the lite edition. Google's test units are used until the real ones are
- * configured (EXPO_PUBLIC_ADMOB_*_ANDROID / *_IOS in the EAS environment), so a dev build never serves
- * live ads. Placement (docs/MONETIZATION.md): a banner under the header of Analytics and
+ * AdMob ad units of the lite edition: the app's live units in release builds, Google's test units in
+ * development builds (so a dev build never serves live ads). Placement (docs/MONETIZATION.md): a banner under the header of Analytics and
  * Settings, one interstitial when Analytics opens — never on Home, around Start/Stop or on
  * the generator screen, and never at launch.
  */
@@ -13,18 +12,22 @@ const TEST_UNITS = {
   banner: { android: 'ca-app-pub-3940256099942544/9214589741', ios: 'ca-app-pub-3940256099942544/2435281174' },
   interstitial: { android: 'ca-app-pub-3940256099942544/1033173712', ios: 'ca-app-pub-3940256099942544/4411468910' },
 };
-// AdMob issues separate units per platform app. EXPO_PUBLIC_* values are inlined at build time, so each
-// variable must be spelled out literally (no dynamic process.env lookups).
-const CONFIGURED = Platform.select({
-  ios: { banner: process.env.EXPO_PUBLIC_ADMOB_BANNER_UNIT_IOS, interstitial: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_IOS },
-  default: { banner: process.env.EXPO_PUBLIC_ADMOB_BANNER_UNIT_ANDROID, interstitial: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_ANDROID },
-});
-const platformKey = Platform.OS === 'ios' ? 'ios' : 'android';
-export const AD_UNITS = {
-  banner: CONFIGURED.banner || TEST_UNITS.banner[platformKey],
-  interstitial: CONFIGURED.interstitial || TEST_UNITS.interstitial[platformKey],
+// The app's own AdMob units (publisher pub-6097353818165340). They are not secret — every ad unit ID
+// ships inside the app binary. AdMob issues separate units per platform app.
+const LIVE_UNITS = {
+  banner: { android: 'ca-app-pub-6097353818165340/2550287420', ios: 'ca-app-pub-6097353818165340/7415601293' },
+  interstitial: { android: 'ca-app-pub-6097353818165340/4860011134', ios: 'ca-app-pub-6097353818165340/8018236522' },
 };
-export const usingTestAds = AD_UNITS.banner === TEST_UNITS.banner[platformKey];
+const platformKey = Platform.OS === 'ios' ? 'ios' : 'android';
+// Live units only in release builds: requesting (or tapping) live ads from development builds counts as
+// invalid traffic. EXPO_PUBLIC_ADMOB_TEST_ADS=true forces test units in a release build (e.g. internal QA).
+const useLive = !__DEV__ && process.env.EXPO_PUBLIC_ADMOB_TEST_ADS !== 'true';
+const UNITS = useLive ? LIVE_UNITS : TEST_UNITS;
+export const AD_UNITS = {
+  banner: UNITS.banner[platformKey],
+  interstitial: UNITS.interstitial[platformKey],
+};
+export const usingTestAds = !useLive;
 
 /** No interstitial in the first 10 minutes after launch, and at most one per 10 minutes after that. */
 export const INTERSTITIAL_MIN_INTERVAL_MS = 10 * 60 * 1000;

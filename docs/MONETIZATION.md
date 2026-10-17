@@ -49,20 +49,20 @@ Apple не дозволяє дві копії одного застосунку 
 ## Що треба зробити в консолях (одноразово)
 
 ### AdMob
-1. Створити обліковий запис AdMob, у ньому два застосунки: Android (`com.yurival.GeneratorTrackerLite`)
-   та iOS (`com.yuri-val.generatortracker`).
-2. У кожному створити два рекламні блоки: **Anchored adaptive banner** і **Interstitial**.
-3. Увімкнути GDPR-повідомлення в AdMob → Privacy & messaging (форма UMP) — без нього в ЄЕЗ реклама
-   не показується.
-4. Передати ID у збірку через EAS secrets / env:
-   - `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` — App ID (`ca-app-pub-…~…`), потрапляють у нативний
-     конфіг через `app.config.js`;
-   - `EXPO_PUBLIC_ADMOB_BANNER_UNIT_ANDROID|_IOS`, `EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_ANDROID|_IOS` — ID
-     блоків (`ca-app-pub-…/…`), окремі для кожної платформи. Поки їх немає, код використовує тестові ID Google, а в «Налаштування → Про
-     застосунок» видно рядок «Тестова реклама».
-5. Після релізу: Play Console → Data safety і App Store Connect → App Privacy доповнити даними, які
-   збирає AdMob (Device ID, Coarse location, Advertising data, App interactions). Політика
-   конфіденційності вже описує це (`privacy_policy/`).
+✅ 2026-10-17: обліковий запис (publisher `pub-6097353818165340`), застосунки й блоки створено:
+
+| | App ID | Banner — Analytics/Settings | Interstitial — Analytics |
+|---|---|---|---|
+| Generator Tracker Lite (Android) | `ca-app-pub-6097353818165340~3630689949` | `…/2550287420` | `…/4860011134` |
+| Generator Tracker: Run Hours (iOS) | `ca-app-pub-6097353818165340~4270563203` | `…/7415601293` | `…/8018236522` |
+
+ID записані в `app.config.js` (App ID) і `src/monetization/ads.ts` (блоки); вони не секретні. Реальні блоки —
+лише в релізних збірках, dev-збірки завжди беруть тестові блоки Google (`EXPO_PUBLIC_ADMOB_TEST_ADS=true`
+вмикає тестові й у релізній). «Test 1C» — службовий застосунок із реєстрації, прихований.
+
+Лишилось: Privacy & messaging (GDPR-повідомлення + IDFA explainer), `app-ads.txt` на сайті, а після публікації —
+зв'язати застосунки з Google Play / App Store (до того реклама обмежена). Data safety (Play) і App Privacy (ASC):
+Device ID, Coarse location, Advertising data, App interactions.
 
 ### App Store Connect (iOS)
 1. Pricing and Availability → ціна **Free** (платна версія не вмикалась, нікому нічого не

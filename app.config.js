@@ -10,9 +10,9 @@
 // edition in a web/dev build (used by the lite e2e tests with the fake store).
 const variant = process.env.APP_VARIANT === 'lite' ? 'lite' : 'full';
 
-// AdMob app IDs are native config; Google's sample IDs are used until real ones are set
-// (EAS secrets ADMOB_ANDROID_APP_ID / ADMOB_IOS_APP_ID). Ad unit IDs live in src/monetization/ads.ts.
-const ADMOB_TEST_APP_IDS = { android: 'ca-app-pub-3940256099942544~3347511713', ios: 'ca-app-pub-3940256099942544~1458002511' };
+// AdMob app IDs (native config; public — they ship in the binary). Ad unit IDs live in
+// src/monetization/ads.ts. ADMOB_*_APP_ID env vars override them (e.g. Google's sample IDs).
+const ADMOB_APP_IDS = { android: 'ca-app-pub-6097353818165340~3630689949', ios: 'ca-app-pub-6097353818165340~4270563203' };
 
 module.exports = ({ config }) => {
   const lite = variant === 'lite';
@@ -35,8 +35,9 @@ module.exports = ({ config }) => {
       [
         'react-native-google-mobile-ads',
         {
-          androidAppId: process.env.ADMOB_ANDROID_APP_ID || ADMOB_TEST_APP_IDS.android,
-          iosAppId: process.env.ADMOB_IOS_APP_ID || ADMOB_TEST_APP_IDS.ios,
+          // The paid Android app has no AdMob SDK (react-native.config.js), so no app ID either.
+          androidAppId: lite ? process.env.ADMOB_ANDROID_APP_ID || ADMOB_APP_IDS.android : undefined,
+          iosAppId: process.env.ADMOB_IOS_APP_ID || ADMOB_APP_IDS.ios,
           // The SDK must not start measuring at launch: the full edition never initialises
           // it, and the lite edition initialises it only after the consent flow.
           delayAppMeasurementInit: true,
