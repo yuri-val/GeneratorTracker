@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 OUT = ROOT / '_site'
-SITE_URL = 'https://yuri-val.github.io/GeneratorTracker/'
+SITE_URL = 'https://generatortracker.yuri-val.dev/'
 GITHUB_URL = 'https://github.com/yuri-val/GeneratorTracker'
 PLAY_URL = 'https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl={hl}'
 # Country-less form: the App Store opens the visitor's own storefront.
@@ -322,6 +322,8 @@ def main():
     (OUT / '404.html').write_text(not_found_page(en, uk))
     (OUT / 'llms.txt').write_text(llms_txt(en, uk))
     (OUT / 'site.webmanifest').write_text(manifest(en))
+    # AdMob verifies the seller of the ad inventory at <developer website host>/app-ads.txt (IAB app-ads.txt).
+    (OUT / 'app-ads.txt').write_text('google.com, pub-6097353818165340, DIRECT, f08c47fec0942fa0\n')
     (OUT / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /get/\nSitemap: {SITE_URL}sitemap.xml\n')
     (OUT / 'sitemap.xml').write_text(sitemap(today))
     (OUT / '.nojekyll').write_text('')

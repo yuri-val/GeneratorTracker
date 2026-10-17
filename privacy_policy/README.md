@@ -5,8 +5,8 @@ Play and App Store Connect):
 
 | Language | Source | Published |
 |---|---|---|
-| English | `en.md` | <https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html> |
-| Ukrainian | `uk.md` | <https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy-uk.html> |
+| English | `en.md` | <https://generatortracker.yuri-val.dev/privacy_policy/privacy-policy.html> |
+| Ukrainian | `uk.md` | <https://generatortracker.yuri-val.dev/privacy_policy/privacy-policy-uk.html> |
 
 `template.html` is the pandoc template; the pages share the landing page's styles
 (`../landing/styles.css`).
