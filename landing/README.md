@@ -1,6 +1,6 @@
 # Landing page
 
-Static product site published to GitHub Pages: <https://yuri-val.github.io/GeneratorTracker/>
+Static product site published to GitHub Pages: <https://generatortracker.yuri-val.dev/>
 (English at `/`, Ukrainian at `/uk/`, privacy policy at `/privacy_policy/`, smart download link at `/get/`).
 
 ## Structure

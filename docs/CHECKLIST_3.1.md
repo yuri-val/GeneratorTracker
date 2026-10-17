@@ -16,12 +16,17 @@
 - [x] **B1. Додати застосунки** Generator Tracker Lite (Android) і Generator Tracker: Run Hours (iOS) як
       неопубліковані — Разом.
 - [x] **B2. Рекламні блоки**: Banner + Interstitial у кожному — Разом.
-- [ ] **B3. Privacy & messaging** — Разом:
+- [x] **B3. Privacy & messaging** — Разом:
       - [x] GDPR (ЄЕЗ/Британія/Швейцарія) «Generator Tracker - GDPR» — **опубліковано** 2026-10-17 (Lite + Run Hours,
         en/uk/pl/de/cs, кнопка «Не погоджуюся»). Відкликання згоди — Налаштування → «Налаштування приватності реклами».
-      - [ ] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — чернетка (en + uk), чекає публікації.
-      - [ ] Штати США «Generator Tracker - US states» — чернетка (Lite + Run Hours, en), чекає публікації.
-- [ ] **B5. app-ads.txt** на лендінгу (`landing/app-ads.txt`) і сайт розробника в обох сторах — Я.
+      - [x] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — опубліковано (en + uk).
+      - [x] Штати США «Generator Tracker - US states» — опубліковано (Lite + Run Hours, en).
+- [ ] **B5. app-ads.txt** — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
+      - [ ] DNS: `generatortracker.yuri-val.dev  CNAME  yuri-val.github.io.` — Ти.
+      - [ ] Pages → custom domain + Enforce HTTPS (після DNS) — Я.
+      - [x] `app-ads.txt` генерує `landing/build.py`; `cname:` у деплой-воркфлоу; усі URL сайту оновлено (PR #11).
+      - [ ] «Сайт розробника» = `https://generatortracker.yuri-val.dev` у Play (обидва застосунки) і App Store (Support/Marketing URL) — Разом.
+      - [ ] QR `landing/assets/qr-get.svg` веде на старий `/get/` (працює через переадресацію GitHub) — перегенерувати — Я.
 
 ## C. Код (поки йдуть A/B)
 

@@ -12,7 +12,7 @@ import { contentColumn } from '../../theme/layout';
 import { space } from '../../theme/tokens';
 import { LIMITS, PRODUCT_IDS, useEntitlements, type ProductId } from '../../monetization';
 
-const PRIVACY_URL = 'https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html';
+const PRIVACY_URL = 'https://generatortracker.yuri-val.dev/privacy_policy/privacy-policy.html';
 
 /**
  * The paywall of the lite edition (3.0 style): three non-consumables as square cards with the

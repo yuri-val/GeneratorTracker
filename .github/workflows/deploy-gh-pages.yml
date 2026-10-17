@@ -58,7 +58,7 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta http-equiv="refresh" content="0; url=privacy-policy.html">
-            <link rel="canonical" href="https://yuri-val.github.io/GeneratorTracker/privacy_policy/privacy-policy.html">
+            <link rel="canonical" href="https://generatortracker.yuri-val.dev/privacy_policy/privacy-policy.html">
             <title>Privacy Policy — Generator Tracker</title>
           </head>
           <body><p><a href="privacy-policy.html">Privacy Policy</a></p></body>
@@ -72,6 +72,8 @@ jobs:
           publish_dir: ./landing/_site
           publish_branch: gh-pages
           force_orphan: true
+          # Custom domain (DNS: generatortracker CNAME yuri-val.github.io); force_orphan would drop a manual CNAME.
+          cname: generatortracker.yuri-val.dev
           commit_message: |
             Deploy to GitHub Pages
 
