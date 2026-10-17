@@ -76,8 +76,9 @@ Apple не дозволяє дві копії одного застосунку 
    Purchase History (не linked).
 
 ### Google Play (Lite)
-1. Створити новий застосунок «Generator Tracker Lite» (безкоштовний), пакет
-   `com.yurival.GeneratorTrackerLite`. Опис: `description/lite/{en,uk}.md`, скріншоти ті самі, що
+1. ✅ 2026-10-17: застосунок «Generator Tracker Lite» створено (безкоштовний, мова uk, пакет
+   `com.yurival.GeneratorTrackerLite` зарезервовано). Особистий акаунт: перед робочою версією потрібне
+   закрите тестування — щонайменше 12 тестувальників протягом 14 днів. Опис: `description/lite/{en,uk}.md`, скріншоти ті самі, що
    для платної (`store/play/`), іконка `store/icon/play-store-512.png`.
 2. Monetize → In-app products: ті самі три Product ID з цінами.
 3. Перша збірка: `eas build -p android --profile production-lite`, потім `eas submit … --profile
