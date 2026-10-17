@@ -4,20 +4,27 @@ import { getAdsSdk, type AdsSdk } from './adsSdk';
 
 /**
  * AdMob ad units of the lite edition. Google's test units are used until the real ones are
- * configured (EXPO_PUBLIC_ADMOB_* in the EAS environment), so a dev build never serves
+ * configured (EXPO_PUBLIC_ADMOB_*_ANDROID / *_IOS in the EAS environment), so a dev build never serves
  * live ads. Placement (docs/MONETIZATION.md): a banner under the header of Analytics and
  * Settings, one interstitial when Analytics opens — never on Home, around Start/Stop or on
  * the generator screen, and never at launch.
  */
 const TEST_UNITS = {
-  banner: 'ca-app-pub-3940256099942544/9214589741',
-  interstitial: 'ca-app-pub-3940256099942544/1033173712',
+  banner: { android: 'ca-app-pub-3940256099942544/9214589741', ios: 'ca-app-pub-3940256099942544/2435281174' },
+  interstitial: { android: 'ca-app-pub-3940256099942544/1033173712', ios: 'ca-app-pub-3940256099942544/4411468910' },
 };
+// AdMob issues separate units per platform app. EXPO_PUBLIC_* values are inlined at build time, so each
+// variable must be spelled out literally (no dynamic process.env lookups).
+const CONFIGURED = Platform.select({
+  ios: { banner: process.env.EXPO_PUBLIC_ADMOB_BANNER_UNIT_IOS, interstitial: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_IOS },
+  default: { banner: process.env.EXPO_PUBLIC_ADMOB_BANNER_UNIT_ANDROID, interstitial: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_ANDROID },
+});
+const platformKey = Platform.OS === 'ios' ? 'ios' : 'android';
 export const AD_UNITS = {
-  banner: process.env.EXPO_PUBLIC_ADMOB_BANNER_UNIT || TEST_UNITS.banner,
-  interstitial: process.env.EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT || TEST_UNITS.interstitial,
+  banner: CONFIGURED.banner || TEST_UNITS.banner[platformKey],
+  interstitial: CONFIGURED.interstitial || TEST_UNITS.interstitial[platformKey],
 };
-export const usingTestAds = AD_UNITS.banner === TEST_UNITS.banner;
+export const usingTestAds = AD_UNITS.banner === TEST_UNITS.banner[platformKey];
 
 /** No interstitial in the first 10 minutes after launch, and at most one per 10 minutes after that. */
 export const INTERSTITIAL_MIN_INTERVAL_MS = 10 * 60 * 1000;

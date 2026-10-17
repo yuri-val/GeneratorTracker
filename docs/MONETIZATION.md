@@ -57,8 +57,8 @@ Apple не дозволяє дві копії одного застосунку 
 4. Передати ID у збірку через EAS secrets / env:
    - `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` — App ID (`ca-app-pub-…~…`), потрапляють у нативний
      конфіг через `app.config.js`;
-   - `EXPO_PUBLIC_ADMOB_BANNER_UNIT`, `EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT` — ID блоків
-     (`ca-app-pub-…/…`). Поки їх немає, код використовує тестові ID Google, а в «Налаштування → Про
+   - `EXPO_PUBLIC_ADMOB_BANNER_UNIT_ANDROID|_IOS`, `EXPO_PUBLIC_ADMOB_INTERSTITIAL_UNIT_ANDROID|_IOS` — ID
+     блоків (`ca-app-pub-…/…`), окремі для кожної платформи. Поки їх немає, код використовує тестові ID Google, а в «Налаштування → Про
      застосунок» видно рядок «Тестова реклама».
 5. Після релізу: Play Console → Data safety і App Store Connect → App Privacy доповнити даними, які
    збирає AdMob (Device ID, Coarse location, Advertising data, App interactions). Політика
