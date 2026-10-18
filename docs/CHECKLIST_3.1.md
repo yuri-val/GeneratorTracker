@@ -20,14 +20,14 @@
         en/uk/pl/de/cs, кнопка «Не погоджуюся»). Відкликання згоди — Налаштування → «Налаштування приватності реклами».
       - [x] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — опубліковано (en + uk).
       - [x] Штати США «Generator Tracker - US states» — опубліковано (Lite + Run Hours, en).
-- [ ] **B5. app-ads.txt** — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
+- [x] **B5. app-ads.txt** — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
       - [x] DNS: `generatortracker.yuri-val.dev  CNAME  yuri-val.github.io.` — Ти.
       - [x] Pages → custom domain + Enforce HTTPS; старі github.io-адреси → 301 на новий домен.
       - [x] `app-ads.txt` генерує `landing/build.py`; `cname:` у деплой-воркфлоу; усі URL сайту оновлено (PR #11).
       - [x] «Сайт розробника» = `https://generatortracker.yuri-val.dev` у Play — обидва застосунки (2026-10-17, через Play API).
-      - [ ] App Store: Support/Marketing URL на новий домен — разом із метаданими версії 3.1 (F) — Я.
-      - [ ] **PR #12** (сайт: політика, `cname:`, `app-ads.txt` у `main`) — мердж — Ти. Зараз `/app-ads.txt` на сайті = 404,
-        AdMob не підтвердить застосунки, доки PR не задеплоїться; після мерджу — «Перевірити наявність оновлень» в AdMob — Я.
+      - [x] App Store: Support/Marketing URL на новий домен — у версії 3.1.0 (через API).
+      - [x] **PR #12** змерджено 2026-10-17: `/app-ads.txt` = 200, політика з розділами про рекламу й покупки.
+        AdMob підтвердить app-ads.txt, коли Lite стане публічним (краулер іде через сторінку в магазині).
       - [x] QR `landing/assets/qr-get.svg` → `https://generatortracker.yuri-val.dev/get/` (перевірено декодуванням).
 
 ## C. Код (поки йдуть A/B)
@@ -61,7 +61,8 @@
 
 ## E. Google Play — платний Generator Tracker
 
-- [ ] **E1. 3.0.0 (1015) в alpha** — чекає перевірки Google; після неї — промоут у робочу версію — Ти.
+- [ ] **E1. 3.0.0 (1015)** — в alpha і beta, у production досі 2.5.0. Рекомендація: не промоутити 3.0, а випустити
+      одразу 3.1.0 full (у ній повертається вхід через Google на Android) — Ти вирішуєш.
 - [ ] **E2. Оновити сторінку**: нова іконка, скріншоти 3.0 (`store/play/`), опис (`description/en|uk.md`),
       новий feature graphic — Разом.
 - [ ] **E3. 3.1.0 (full)**: для платного змін майже немає (рядок «Session running»); випускати разом із Lite
@@ -93,7 +94,7 @@
       видання й покупки — Ти.
 - [ ] **G2. Лендінг**: посилання на Lite у Google Play, коли сторінка стане публічною (кнопка «Безкоштовна версія»),
       `/get/` з вибором видання — Я.
-- [ ] **G3. Політика конфіденційності** вже оновлена в PR #11 (розділи «Реклама», «Покупки») — викотиться з мерджем.
+- [x] **G3. Політика конфіденційності** — уже на сайті (PR #12, 2026-10-17).
 
 ## H. Після релізу 3.1 — Expo SDK 58 (версія 3.2)
 
