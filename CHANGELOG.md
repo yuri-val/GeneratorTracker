@@ -27,6 +27,8 @@ and the iOS app, which becomes free. See `docs/MONETIZATION.md`.
 - "Session Running" → "Session running".
 - The AdMob SDK is linked only where ads can show (iOS and Generator Tracker Lite; `react-native.config.js`), with
   `delayAppMeasurementInit`; the paid Android app contains no ads code.
+- The paid Android app drops expo-iap's `com.android.vending.BILLING` permission (`blockedPermissions` in
+  `app.config.js`): it never connects to Google Play Billing, and Play would label it "Contains in-app purchases".
 - Google sign-in on Android is native (`@react-native-google-signin/google-signin`): the account picker of Google
   Play services returns an ID token for the web client, which Firebase accepts. Web keeps the expo-auth-session
   browser flow; iOS still does not offer Google sign-in (guideline 4.8) and does not link the SDK.

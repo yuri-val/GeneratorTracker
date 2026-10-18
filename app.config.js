@@ -24,6 +24,11 @@ module.exports = ({ config }) => {
     android: {
       ...config.android,
       package: lite ? `${config.android.package}Lite` : config.android.package,
+      // The paid app never talks to Google Play Billing (src/monetization only connects in the lite edition),
+      // so expo-iap's BILLING permission is removed: Play would otherwise label it "Contains in-app purchases".
+      blockedPermissions: lite
+        ? config.android.blockedPermissions
+        : [...(config.android.blockedPermissions ?? []), 'com.android.vending.BILLING'],
     },
     extra: {
       ...config.extra,
