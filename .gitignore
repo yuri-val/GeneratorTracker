@@ -81,7 +81,7 @@ AuthKey_*.p8
 landing/_site/
 
 # Store screenshots (large PNGs, regenerate with scripts/demo-data)
-store/
+/store/
 
 # Raw design exports (the handoff itself lives in docs/design/)
 _new-design/

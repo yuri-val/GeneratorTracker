@@ -121,6 +121,9 @@ jobs:
       - name: 🌐 Run e2e suite inside the emulators
         run: npm run test:e2e:emu
 
+      - name: 💳 Lite edition e2e (limits, paywall, fake store)
+        run: npm run test:e2e:lite
+
       - name: 📤 Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4

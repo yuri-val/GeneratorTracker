@@ -181,6 +181,21 @@ handoff in `docs/design/redesign-3.0/` (README = spec, `Generator Tracker 3.0.dc
 5. Use circuit pattern texture for empty states
 6. Maintain card design principles (12-16px radius, proper shadows)
 
+## Editions and monetization (since 3.1.0)
+
+Two editions from one code base, chosen at build time in `app.config.js` (`extra.edition`, read by
+`src/monetization/edition.ts`): `full` = the paid Android app (no ads, limits or purchases); `lite` = iOS (the only
+iOS app, free with purchases) and "Generator Tracker Lite" on Android (`APP_VARIANT=lite`, package
+`com.yurival.GeneratorTrackerLite`, EAS profiles `*-lite`). Everything lives in `src/monetization/` — see
+`docs/MONETIZATION.md` for the rules and the console checklist. Keep these invariants:
+- Limits (3 generators, 2 maintenance tasks per generator) block **creating** only; never hide or delete records.
+- Ads: banner under the header of Analytics/Settings and one interstitial on opening Analytics (≥10 min apart, none in
+  the first 10 min). Never on Home, around Start/Stop, on the generator screen, in forms or at launch.
+- Consent before SDK init (`initAds`), test ad units until the real ones are configured, the full edition never calls
+  the ads SDK. Purchases through `expo-iap` only (non-consumables); web/Jest/dev use the fake store.
+- `useEntitlements()` is the only way screens learn about the edition; gate with `canAddGenerator` /
+  `canAddMaintenanceTask` and send the user to the `Upgrade` screen.
+
 ## Critical Conventions
 
 ### Theming

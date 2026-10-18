@@ -20,6 +20,7 @@ import { buildFleet, useFleet, type FleetItem } from '../../hooks/useFleet';
 import { useNow } from '../../hooks/useNow';
 import { useSessionActions } from '../../hooks/useSessionActions';
 import { fmtSummary } from '../../utils/format';
+import { canAddGenerator, useEntitlements } from '../../monetization';
 
 /**
  * Home (3.0, design 5a / 5d): running generators on top as inverted cards with a Stop button,
@@ -36,6 +37,7 @@ export default function HomeScreen() {
   const anyRunning = !!raw?.s.some(s => s.isActive);
   const now = useNow(60_000, anyRunning);
   const { start, stop } = useSessionActions(reload);
+  const { lite, entitlements } = useEntitlements();
   useSnackbarBottomOffset(TAB_BAR_OFFSET);
 
   const fleet = useMemo(() => (raw ? buildFleet(raw.g, raw.s, raw.r, raw.t, now) : []), [raw, now]);
@@ -49,6 +51,11 @@ export default function HomeScreen() {
 
   const addGenerator = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Lite edition: past the free limit the "+" opens the paywall instead of the form.
+    if (!canAddGenerator(lite, entitlements, raw?.g.length ?? 0)) {
+      navigation.navigate('Upgrade', { reason: 'generators' });
+      return;
+    }
     navigation.navigate('AddGenerator', {});
   };
 

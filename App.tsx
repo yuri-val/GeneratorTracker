@@ -13,6 +13,8 @@ import AddGeneratorScreen from './src/screens/generator/AddGeneratorScreen';
 import AddWorkSessionScreen from './src/screens/generator/AddWorkSessionScreen';
 import AddRefillScreen from './src/screens/generator/AddRefillScreen';
 import AddMaintenanceScreen from './src/screens/generator/AddMaintenanceScreen';
+import UpgradeScreen from './src/screens/upgrade/UpgradeScreen';
+import { EntitlementsProvider } from './src/monetization';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { darkTheme, lightTheme } from './src/theme';
 import { useAppFonts } from './src/theme/fonts';
@@ -64,6 +66,7 @@ function AppContent() {
 
   return (
     <AuthProvider>
+      <EntitlementsProvider>
       <PaperProvider theme={paperTheme}>
         <NavigationContainer theme={navTheme}>
           <SnackbarProvider>
@@ -104,10 +107,12 @@ function AppContent() {
               component={AddMaintenanceScreen}
               options={{ presentation: 'modal' }}
             />
+            <Stack.Screen name="Upgrade" component={UpgradeScreen} options={{ presentation: 'modal' }} />
           </Stack.Navigator>
           </SnackbarProvider>
         </NavigationContainer>
       </PaperProvider>
+      </EntitlementsProvider>
     </AuthProvider>
   );
 }

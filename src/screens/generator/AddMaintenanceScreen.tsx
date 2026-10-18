@@ -21,6 +21,7 @@ import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm, type FormSection } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
 import { contentColumn } from '../../theme/layout';
+import { canAddMaintenanceTask, useEntitlements } from '../../monetization';
 
 type AddMaintenanceScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddMaintenance'>;
@@ -32,6 +33,7 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
   const { t, i18n } = useTranslation();
   const { generatorId, taskId } = route.params;
   const isEditing = !!taskId;
+  const { lite, entitlements } = useEntitlements();
 
   const [title, setTitle] = useState('');
   const [intervalHours, setIntervalHours] = useState('');
@@ -120,6 +122,12 @@ export default function AddMaintenanceScreen({ navigation, route }: AddMaintenan
     }
 
     const serviceHoursNum = parseFloat(lastServiceHours);
+
+    // Lite edition: the limit applies to new tasks only (the generator screen normally stops earlier).
+    if (!isEditing && !canAddMaintenanceTask(lite, entitlements, (await getMaintenanceTasks(generatorId)).length)) {
+      navigation.replace('Upgrade', { reason: 'maintenance' });
+      return;
+    }
 
     try {
       const now = new Date().toISOString();

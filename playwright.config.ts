@@ -13,6 +13,8 @@ const useEmulator = process.env.FIREBASE_EMULATOR === '1';
 
 export default defineConfig({
   testDir: './e2e',
+  // The lite edition has its own server and config (playwright.lite.config.ts).
+  testIgnore: /lite\.spec\.ts/,
   timeout: 120_000,
   expect: { timeout: 20_000 },
   fullyParallel: false,
@@ -30,7 +32,8 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: 'CI=1 BROWSER=none npx expo start --web --port 8081',
+    // --clear: the app config (edition) is baked into the web bundle and Metro's cache does not key on it.
+    command: 'CI=1 BROWSER=none npx expo start --web --port 8081 --clear',
     url: 'http://localhost:8081',
     reuseExistingServer: !useEmulator,
     timeout: 180_000,

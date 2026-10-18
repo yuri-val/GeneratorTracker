@@ -2,7 +2,7 @@
   "expo": {
     "name": "GeneratorTracker",
     "slug": "GeneratorTracker",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -53,7 +53,11 @@
           }
         }
       ],
-      "react-native-bottom-tabs"
+      "react-native-bottom-tabs",
+      "expo-iap"
     ]
+  },
+  "react-native-google-mobile-ads": {
+    "android_sdk": "classic"
   }
 }
