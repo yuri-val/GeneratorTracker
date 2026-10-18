@@ -184,6 +184,14 @@ event-emitter замість `setInterval`.
 **Рішення потрібне від власника:** (а) увімкнути Google на Android — потрібен Android OAuth client
 із SHA-1 підписного ключа у Google Cloud/Firebase console і тест на реальному білді; (б) чи
 навмисно прихований анонімний вхід (він Google-конфігу не потребує).
+**2026-10-18, 3.1 — (а) зроблено:** на Android кнопка Google була схована, бо браузерний флоу
+expo-auth-session шле redirect `com.yurival.GeneratorTracker:/oauthredirect`, а Google для Android-клієнтів
+відповідає «Error 400: invalid_request — Custom URI scheme is not enabled» (перевірено запитом; клієнти
+не використовувались із січня, Google попереджає про їх видалення). Рішення власника — нативний вхід (кнопка знову видима на Android):
+`@react-native-google-signin/google-signin` на Android (ID-токен для web client id → Firebase), web лишився
+на expo-auth-session, iOS вхід через Google не пропонує (4.8); SDK не лінкується на iOS. Android OAuth-клієнти
+з SHA-1 upload- і Play-ключа для обох пакетів — у Google Cloud. Ризик: «Original» API бібліотеки спирається на
+legacy Google Sign-In for Android (Google: deprecated, but remains functional); Credential Manager — платна версія.
 
 ### S-15. Сирі повідомлення помилок Firebase
 **Де:** `SettingsScreen` показує `error.message` («Firebase: Error (auth/invalid-credential).»).

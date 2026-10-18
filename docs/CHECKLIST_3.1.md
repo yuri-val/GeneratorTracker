@@ -54,8 +54,10 @@
       на пристрої й у Google Play. Зміни чекають в «Огляді публікації» — підуть на перевірку разом із закритим тестом.
 - [ ] **D5. Закрите тестування** ⛔: ≥12 тестувальників ≥14 днів (вимога для особистих акаунтів), потім заявка
       на робочу версію — Ти збираєш тестувальників, Я готую трек і листа-запрошення.
-- [ ] **D6. OAuth для Google Sign-In у Lite**: Android client ID (пакет Lite + SHA-1 ключа підпису Play)
-      у Google Cloud, SHA-1 у Firebase, `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` для профілів `*-lite` — Разом.
+- [ ] **D6. Google Sign-In на Android** (була схована з 2.x: браузерний флоу Google відхиляє на Android — custom URI scheme):
+      - [x] Нативний вхід `@react-native-google-signin` на Android (обидва застосунки), web без змін, iOS не лінкує SDK — Я.
+      - [x] OAuth-клієнти Android у Google Cloud (2026-10-18): Lite — upload + Play-ключ, платний — Play-ключ (upload уже був).
+      - [ ] Перевірка на пристрої зі збірки з internal-треку (Lite) — Разом.
 
 ## E. Google Play — платний Generator Tracker
 

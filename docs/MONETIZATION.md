@@ -84,9 +84,10 @@ Device ID, Coarse location, Advertising data, App interactions.
 3. Перша збірка: `eas build -p android --profile production-lite`, потім `eas submit … --profile
    production-lite` (трек internal). In-app products стають активними лише після того, як
    застосунок із Billing-дозволом опублікований хоча б у внутрішньому тестуванні.
-4. Google Sign-In для Lite потребує окремого OAuth Android client ID (пакет + SHA-1 підпису Lite):
-   створити в Google Cloud Console і додати SHA-1 у Firebase; у Lite-збірці задати
-   `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID` на нього (EAS env для профілів `*-lite`).
+4. Google Sign-In на Android нативний (`@react-native-google-signin`, з 3.1): у застосунок іде лише web
+   client id, тож Lite окремої змінної не потребує. Але в Google Cloud (проєкт Firebase) має бути
+   OAuth-клієнт типу Android на кожну пару «пакет + SHA-1»: `com.yurival.GeneratorTrackerLite` з SHA-1
+   upload-ключа і ключа підпису Play (Play Console → Цілісність додатка), інакше `DEVELOPER_ERROR` (10).
 5. Data safety: Advertising ID, Location (approximate), App interactions — «collected, shared with
    AdMob».
 

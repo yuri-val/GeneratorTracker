@@ -310,7 +310,9 @@ export default function SettingsScreen() {
                   onSignUp={handleEmailSignUp}
                 />
 
-                {Platform.OS !== 'android' && (
+                {/* Google: native on Android, browser on web, not on iOS (guideline 4.8). Anonymous sign-in
+                    stays hidden on Android (docs/STABILIZATION_PLAN.md S-14). */}
+                {(googleAvailable || Platform.OS !== 'android') && (
                   <>
                     <View style={styles.divider}>
                       <Divider style={styles.dividerLine} />
@@ -334,16 +336,18 @@ export default function SettingsScreen() {
                       </Button>
                     )}
 
-                    <Button
-                      mode="outlined"
-                      icon="incognito"
-                      onPress={handleAnonymousSignIn}
-                      disabled={signingIn}
-                      style={styles.authButton}
-                      contentStyle={styles.authButtonContent}
-                    >
-                      {t('settings.signInAnonymously')}
-                    </Button>
+                    {Platform.OS !== 'android' && (
+                      <Button
+                        mode="outlined"
+                        icon="incognito"
+                        onPress={handleAnonymousSignIn}
+                        disabled={signingIn}
+                        style={styles.authButton}
+                        contentStyle={styles.authButtonContent}
+                      >
+                        {t('settings.signInAnonymously')}
+                      </Button>
+                    )}
                   </>
                 )}
               </Surface>

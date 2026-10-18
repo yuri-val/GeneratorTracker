@@ -13,9 +13,12 @@ import {
 } from 'firebase/auth';
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
+import type { AuthSessionResult } from 'expo-auth-session';
+import { useCallback, useState } from 'react';
 import { Platform } from 'react-native';
 import { auth } from '../config/firebase';
 import { User } from '../models/types';
+import { hasNativeGoogleSignIn, nativeGoogleSignIn, nativeGoogleSignOut } from './googleSignInNative';
 
 // Enable web browser for auth session
 WebBrowser.maybeCompleteAuthSession();
@@ -77,39 +80,64 @@ export const signInAnonymouslyUser = async (): Promise<User> => {
 };
 
 /**
- * Google OAuth client ids, one per platform (see .env.example). `expoClientId` no
- * longer exists in expo-auth-session v7; the web client id covers web builds.
+ * The web OAuth client id (see .env.example). Both platforms that offer Google sign-in use it:
+ * web as the client of the browser flow, Android as the audience of the ID token returned by
+ * the native SDK (the Android OAuth clients only verify the package name and signing key).
  */
-const GOOGLE_CLIENT_IDS = {
-  ios: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-  android: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  web: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
-};
+const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
 
 /**
- * expo-auth-session throws *during render* when the current platform has no client
- * id, which used to take the whole Settings screen down. Google sign-in is only
- * offered when this build has an id for the platform it runs on.
+ * Google sign-in is only offered when this build can complete it: expo-auth-session throws
+ * *during render* without a client id, which used to take the whole Settings screen down.
  */
 // Not offered on iOS: App Store guideline 4.8 requires "Sign in with Apple" next to any
 // third-party sign-in, so iOS offers email/password and anonymous sign-in only.
 export const isGoogleAuthConfigured = !!Platform.select({
   ios: false,
-  android: GOOGLE_CLIENT_IDS.android,
-  default: GOOGLE_CLIENT_IDS.web,
+  android: hasNativeGoogleSignIn && GOOGLE_WEB_CLIENT_ID,
+  default: GOOGLE_WEB_CLIENT_ID,
 });
 
-const useConfiguredGoogleAuth = () => {
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    iosClientId: GOOGLE_CLIENT_IDS.ios,
-    androidClientId: GOOGLE_CLIENT_IDS.android,
-    webClientId: GOOGLE_CLIENT_IDS.web,
-    responseType: 'id_token', // Request ID token for Firebase Auth
-  });
-  return { request, response, promptAsync, available: true as const };
+type GoogleAuth = {
+  /** Non-null once a sign-in can be started. */
+  request: object | null;
+  /** The result of the last attempt, shaped like expo-auth-session's (Settings reads `params.id_token`). */
+  response: AuthSessionResult | null;
+  promptAsync: () => Promise<AuthSessionResult>;
+  available: boolean;
 };
 
-type GoogleAuth = Omit<ReturnType<typeof useConfiguredGoogleAuth>, 'available'> & { available: boolean };
+/** Web: expo-auth-session's browser flow, asking Google for the ID token directly. */
+const useBrowserGoogleAuth = (): GoogleAuth => {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    webClientId: GOOGLE_WEB_CLIENT_ID,
+    responseType: 'id_token', // Request ID token for Firebase Auth
+  });
+  return { request, response, promptAsync: () => promptAsync(), available: true };
+};
+
+const NATIVE_REQUEST = {};
+
+/** Android: the native account picker (googleSignInNative.android.ts). */
+const useNativeGoogleAuth = (): GoogleAuth => {
+  const [response, setResponse] = useState<AuthSessionResult | null>(null);
+  const promptAsync = useCallback(async (): Promise<AuthSessionResult> => {
+    let result: AuthSessionResult;
+    try {
+      const signIn = await nativeGoogleSignIn(GOOGLE_WEB_CLIENT_ID ?? '');
+      result =
+        signIn.type === 'success'
+          ? { type: 'success', errorCode: null, error: null, params: { id_token: signIn.idToken }, authentication: null, url: '' }
+          : { type: 'dismiss' };
+    } catch (error: any) {
+      console.error('Native Google sign in error:', error);
+      result = { type: 'error', errorCode: String(error?.code ?? 'unknown'), error, params: {}, authentication: null, url: '' };
+    }
+    setResponse(result);
+    return result;
+  }, []);
+  return { request: NATIVE_REQUEST, response, promptAsync, available: true };
+};
 
 const useUnavailableGoogleAuth = (): GoogleAuth => ({
   request: null,
@@ -119,12 +147,14 @@ const useUnavailableGoogleAuth = (): GoogleAuth => ({
 });
 
 /**
- * Sign in with Google using expo-auth-session. The implementation is chosen once per
- * build (the client ids are inlined at build time), so the hook order never changes.
+ * Sign in with Google. The implementation is chosen once per build (platform and client id
+ * are fixed at build time), so the hook order never changes.
  */
-export const useGoogleAuth: () => GoogleAuth = isGoogleAuthConfigured
-  ? useConfiguredGoogleAuth
-  : useUnavailableGoogleAuth;
+export const useGoogleAuth: () => GoogleAuth = !isGoogleAuthConfigured
+  ? useUnavailableGoogleAuth
+  : Platform.OS === 'android'
+    ? useNativeGoogleAuth
+    : useBrowserGoogleAuth;
 
 /**
  * Complete Google sign in with the response from OAuth
@@ -145,6 +175,7 @@ export const signInWithGoogleCredential = async (idToken: string): Promise<User>
  */
 export const signOut = async (): Promise<void> => {
   try {
+    await nativeGoogleSignOut();
     await firebaseSignOut(auth);
   } catch (error: any) {
     console.error('Sign out error:', error);
@@ -183,6 +214,7 @@ export const reauthenticateWithPassword = async (password: string): Promise<void
 /** Delete the Firebase account itself (the caller deletes the cloud data first). */
 export const deleteCurrentUser = async (): Promise<void> => {
   if (auth.currentUser) await deleteUser(auth.currentUser);
+  await nativeGoogleSignOut();
 };
 
 /**

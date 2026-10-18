@@ -15,3 +15,6 @@ Generator Tracker now comes in two editions. The paid Android app stays exactly 
 
 ## 🔧 Changed
 - "Session Running" on the generator screen is now "Session running", like the other labels.
+
+## 🐛 Fixed
+- **Sign in with Google on Android**: the button is back in Settings → Account and opens the familiar Google account picker.

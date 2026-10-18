@@ -25,8 +25,18 @@ and the iOS app, which becomes free. See `docs/MONETIZATION.md`.
 
 ### Changed
 - "Session Running" → "Session running".
-- The AdMob SDK ships in every native build (Expo autolinking) with `delayAppMeasurementInit`; the full edition
-  never initialises it.
+- The AdMob SDK is linked only where ads can show (iOS and Generator Tracker Lite; `react-native.config.js`), with
+  `delayAppMeasurementInit`; the paid Android app contains no ads code.
+- Google sign-in on Android is native (`@react-native-google-signin/google-signin`): the account picker of Google
+  Play services returns an ID token for the web client, which Firebase accepts. Web keeps the expo-auth-session
+  browser flow; iOS still does not offer Google sign-in (guideline 4.8) and does not link the SDK.
+
+### Fixed
+- Sign in with Google is available on Android (it was hidden there since 2.x, S-14): the expo-auth-session
+  browser flow cannot work on Android — it redirects to `com.yurival.GeneratorTracker:/oauthredirect` and Google
+  rejects custom URI schemes for Android OAuth clients ("Error 400: invalid_request"). Android OAuth clients now
+  exist for both packages and both signing keys (upload and Play app signing); `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`
+  is no longer used. Anonymous sign-in stays hidden on Android.
 
 ## [3.0.0] - 2026-10-10
 
