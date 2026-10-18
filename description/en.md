@@ -1,126 +1,72 @@
-# Generator Tracker - Google Play Store Description
+# Generator Tracker — Google Play (en)
 
-## Short Description (80 characters max)
-Track generator hours, fuel refills, and analyze performance efficiently.
+Listing of the paid Android app (`com.yurival.GeneratorTracker`) as published in Play Console with 3.1.0
+(uploaded through the Play Developer API). Screenshots: `store/play/phone-en-1200x2400`, icon `store/icon/play-store-512.png`,
+feature graphic `store/play/feature-graphic-1024x500.png`.
 
-## Full Description
+## App name (28/30 characters)
 
-**Generator Tracker** is a powerful mobile app for tracking generator operating hours, fuel consumption, and maintenance. Perfect for businesses, contractors, and homeowners who need reliable generator monitoring.
+```text
+Generator Tracker: Run Hours
+```
 
-### 🎯 Key Features
+## Short description (73/80 characters)
 
-**Start and Stop in One Tap**
-- Start or stop any generator right from the home screen
-- Running generators move to the top with a live timer
-- Several generators can run at once
-- Stopped by mistake? Undo within 5 seconds
+```text
+Start a generator in one tap, see fuel left and never miss an oil change.
+```
 
-**Fuel Left, Estimated**
-- Enter the tank size and see roughly how much fuel is left and for how many hours
-- Quick refill sheet with presets: to full, same as last time
-- "Filled to full" calibrates the estimate
-- Refills are blocked while the engine runs — "Stop and refill" in one tap
+## Full description (2122/4000 characters)
 
-**Comprehensive Tracking**
-- Log operating hours with precise timestamps
-- Record fuel refills with date, time and amount
-- Add notes to sessions and refills
-- Track multiple generators effortlessly
+```text
+Generator Tracker is built around what you do during a power cut: start the generator in one tap, keep an eye on it and never miss maintenance — for one backup unit at home, a job site or a rental fleet.
 
-**Maintenance & Service Tracking**
-- Define recurring service tasks per generator (oil changes, filters, seasonal checks)
-- Set intervals by engine hours, by calendar days, or both
-- A bar shows how much of each service interval is used
-- "Mark serviced" to reset a task in one tap
-- The most urgent task is shown on the home screen, marked with ▲
+Start and stop from Home
+• Running generators move to the top with a live timer and a big Stop button; idle ones sit below with Start
+• Several generators can run at once; a bar at the bottom keeps the running ones a tap away
+• Stopped by mistake? Undo brings the session back with its original start time
+• Forgot to tap? Fix the start time or add a session later
 
-**Smart Analytics**
-- View total operating hours per generator
-- Monitor fuel consumption patterns
-- Calculate average fuel per hour
-- Filter analytics by individual generator or view all combined
-- Get insights across all generators
+Fuel left, estimated
+• Add your tank size and see roughly how much fuel and how many hours are left
+• Refills in a few taps: to full, same as last time or a stepper
+• Refuelling a running engine is blocked — "Stop and refill" ends the session and fills in the refill time for you
+• A full tank calibrates the estimate; litres per hour are worked out for you
 
-**Cloud Sync & Security**
-- Firebase-powered cloud synchronization
-- Sign in with email and password, or anonymously
-- Offline-first architecture - works without internet
-- Your data syncs when connection is available
-- Delete your account and cloud data any time in Settings
+Maintenance on time
+• Oil, filters, spark plugs — intervals by engine hours, by days, or both
+• Each task shows how much of the interval is used; overdue work is flagged on the home screen with ▲
+• Mark a task as serviced with one tap
 
-**Clear, Calm Design**
-- Large, high-contrast controls that are easy to hit in the dark or with gloves
-- Warm light theme and a true-black dark theme that saves battery during outages
-- Native navigation: Material 3 on Android, the native iOS tab bar on iPhone and iPad
-- Night red mode instructions to keep your night vision
+Clear analytics
+• Run hours and fuel by month as bars split by generator colour — petrol and diesel are never summed together
+• All-time totals and litres per hour for every generator
 
-**Professional Features**
-- Edit any session or refill record
-- Delete generators with all associated data
-- Pull-to-refresh for instant updates
-- Export-ready data structure
+Readable day and night
+• Large, high-contrast controls that are easy to hit in the dark or with gloves
+• Warm light theme and a true-black dark theme that saves battery during outages
+• Theme follows the device or can be set in Settings, plus a guide to the system red filter for night vision
+• Material 3 design and native navigation on Android phones, tablets and foldables
 
-### 📊 Perfect For
+Private by design
+• Everything is stored on your device first and works fully offline
+• An account is optional (email or Google) and only syncs your own records between your devices
+• Delete your account and cloud data any time in Settings
+• No ads, no analytics, no tracking
+• Open source (MIT) — anyone can check what the app does
 
-- **Construction Companies**: Track equipment runtime
-- **Event Services**: Monitor generator usage at events
-- **Homeowners**: Maintain backup generators
-- **Property Managers**: Manage multiple units
-- **Contractors**: Bill accurate operating hours
-- **Maintenance Teams**: Schedule service intervals
+Available in English and Ukrainian. Also on iPhone and iPad.
+```
 
-### 🔒 Privacy & Data
+## What's new in 3.1.0 (387/500 characters)
 
-- Your data is stored locally on your device
-- Optional cloud sync for backup and multi-device access
-- No ads, no tracking
-- Full control over your information
-
-### 💡 Why Generator Tracker?
-
-**Save Money**: Optimize fuel usage and maintenance schedules
-**Stay Organized**: All generator data in one place
-**Work Offline**: Track hours even without internet
-**Professional Reports**: Clean data for billing and audits
-
-### 🆕 What's New in Version 3.0.0
-
-- **Redesign**: start and stop generators right from the home screen; running ones move to the top with a live timer.
-- **Undo**: stop without confirmations — undo within 5 seconds.
-- **Fuel left**: add the tank size to see the estimated fuel and hours left; refills calibrate the estimate.
-- **New refill sheet**: presets, "filled to full", and "Stop and refill" while the engine runs.
-- **Maintenance bars** and a live clock on the generator screen; a bar shows other running generators.
-- **Appearance settings**: light, dark or system theme, plus night red mode instructions.
-
-### 📱 Technical Excellence
-
-- Built with React Native & Expo
-- TypeScript for reliability
-- AsyncStorage for local persistence
-- Firebase for cloud features
-- Native navigation on each platform
-- Responsive design for phones, tablets and foldables
-
-### 🌐 Multilingual Support
-
-Currently supports:
-- English
-- Ukrainian
-
-More languages coming soon!
-
-### 📞 Support
-
-Need help? Found a bug? Have a feature request?
-Visit: https://github.com/anthropics/generator-tracker/issues
-
-### 📄 Open Source
-
-Generator Tracker is open source and licensed under MIT.
-Contributions welcome!
-
----
-
-**Download Generator Tracker today and take control of your generator monitoring!**
-
-Track. Analyze. Optimize.
+```text
+A new Generator Tracker:
+• Start and stop from the home screen with live timers; several generators can run at once
+• Undo a mistaken Stop within 5 seconds
+• Fuel left in the tank and hours remaining
+• Maintenance bars show how much of each interval is used
+• Monthly hours and fuel as bars per generator
+• Warm light and true-black dark themes, new icon
+• Sign in with Google on Android
+```
