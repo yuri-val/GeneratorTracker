@@ -312,7 +312,9 @@ address { font-style: normal; }
 .showcase-copy h2 { padding-bottom: 18px; border-bottom: 1.5px solid var(--line-strong); }
 
 /* Compare */
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-top: 1.5px solid var(--line-strong); border-bottom: 1px solid var(--line); }
+/* contain: paint keeps the wide table inside its scroller: without it the page itself scrolled sideways
+   on phones with reduced motion (no reveal transform to clip it). */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; contain: paint; border-top: 1.5px solid var(--line-strong); border-bottom: 1px solid var(--line); }
 .compare { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 15.5px; }
 .compare th, .compare td { padding: 16px 20px; text-align: center; border-top: 1px solid var(--line); }
 .compare thead th { border-top: 0; font-size: 14px; font-weight: 500; color: var(--text-2); padding-top: 20px; padding-bottom: 20px; }
