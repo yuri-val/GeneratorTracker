@@ -35,7 +35,7 @@ export default function UpgradeScreen() {
         ? t('upgrade.reasonMaintenance', { count: LIMITS.maintenanceTasksPerGenerator })
         : params?.reason === 'ads'
           ? t('upgrade.reasonAds')
-          : t('upgrade.intro');
+          : t('upgrade.intro', { generators: LIMITS.generators, tasks: LIMITS.maintenanceTasksPerGenerator });
 
   const buy = async (id: ProductId) => {
     setPending(id);

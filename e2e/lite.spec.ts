@@ -56,6 +56,9 @@ test.describe('Lite edition', () => {
   test('"Everything" marks all products as owned and hides the Settings upsell', async ({ page }) => {
     await goToTab(page, 'Settings');
     await page.getByTestId('open-upgrade').click();
+    // Opened without a limit: the general intro, with the limits filled in.
+    await expect(page.getByTestId('upgrade-reason')).toContainText('up to 3 generators with 2 maintenance tasks');
+    await expect(page.getByTestId('upgrade-reason')).not.toContainText('{{');
     await page.getByTestId('buy-gt_everything').click();
     await expect(page.getByTestId('snackbar-purchased')).toBeVisible();
     await expect(page.getByTestId('purchases-status')).toContainText('Ads and limits removed');
