@@ -20,7 +20,8 @@
         en/uk/pl/de/cs, кнопка «Не погоджуюся»). Відкликання згоди — Налаштування → «Налаштування приватності реклами».
       - [x] IDFA explainer (iOS) «Generator Tracker - IDFA explainer» — опубліковано (en + uk).
       - [x] Штати США «Generator Tracker - US states» — опубліковано (Lite + Run Hours, en).
-- [x] **B5. app-ads.txt** — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
+- [x] **B5. app-ads.txt** (iOS-застосунок прив'язано до App Store в AdMob 2026-10-19; підтвердження app-ads.txt пройде,
+      коли в App Store буде 3.1.0 з новим сайтом розробника — тоді «Перевірити оновлення») — сайт переїжджає на `https://generatortracker.yuri-val.dev/` (GitHub Pages, custom domain):
       - [x] DNS: `generatortracker.yuri-val.dev  CNAME  yuri-val.github.io.` — Ти.
       - [x] Pages → custom domain + Enforce HTTPS; старі github.io-адреси → 301 на новий домен.
       - [x] `app-ads.txt` генерує `landing/build.py`; `cname:` у деплой-воркфлоу; усі URL сайту оновлено (PR #11).
@@ -57,6 +58,8 @@
       потім заявка на робочу версію (анкета про тестування) — Я готую, Ти подаєш.
 - [ ] **D6. Google Sign-In на Android** (була схована з 2.x: браузерний флоу Google відхиляє на Android — custom URI scheme):
       - [x] Нативний вхід `@react-native-google-signin` на Android (обидва застосунки), web без змін, iOS не лінкує SDK — Я.
+      - [x] DEVELOPER_ERROR у Lite з internal (2026-10-19): у клієнті «Lite (Play signing key)» стояв SHA-1 не того ключа
+        (DD:04…); виправлено на поточний ключ підпису Play `27:84:FC:…:53:19`. Набирає сили від хвилин до годин.
       - [x] OAuth-клієнти Android у Google Cloud (2026-10-18): Lite — upload + Play-ключ, платний — Play-ключ (upload уже був).
       - [ ] Перевірка на пристрої зі збірки з internal-треку (Lite) — Разом.
 
@@ -77,7 +80,9 @@
       має ручний випуск (MANUAL) — після схвалення: ціна → Free, тоді «Release» — Разом.
 - [x] **F3. Три покупки** — створено через ASC API 2026-10-18: Non-Consumable, en-US + uk, $0.99/$0.99/$1.49 (база USD,
       175 регіонів), нотатка й скріншот для рецензії (екран покупок 1290×2796). Перша покупка подається разом із версією.
-- [x] **F4. Збірка 3.1.0 (1)** — EAS → altool 2026-10-18 (без Google Sign-In SDK, AdMob iOS app ID, ATT-рядок).
+- [x] **F4. Збірка 3.1.0 (2)** — 2026-10-19, у версії замість (1): у TestFlight-прогоні (1) не з'явився запит ATT —
+      UMP падав (DNS домашньої мережі блокує домени реклами Google), а ATT ми лишали UMP. Тепер `ensureTrackingPrompt`
+      питає сам (PR #16, перевірено на симуляторі). iOS `autoIncrement` у production (обидві попередні збірки мали build 1).
 - [ ] **F5. Версія 3.1.0 в ASC** — створена через API (MANUAL release): тексти, «Що нового», назва/підзаголовок/URL,
       нотатки для рецензента, скріншоти 3.0 (6 × iPhone 6.9" + 6 × iPad 13", en + uk) — ✅. Лишилось: прив'язати збірку
       (F4) — ✅ 3.1.0 (1), у TestFlight для «Team (Expo)»; вікова анкета 3.1: advertising = так (рейтинг 4+). Покупки
