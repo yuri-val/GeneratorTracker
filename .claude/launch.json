@@ -30,6 +30,15 @@
         "source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && BROWSER=none EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true EXPO_PUBLIC_EDITION=lite npx expo start --web --port 8084 --clear"
       ],
       "port": 8084
+    },
+    {
+      "name": "metro-native",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-lc",
+        "source ~/.nvm/nvm.sh && nvm use 22 >/dev/null && CI=1 EXPO_PUBLIC_USE_FIREBASE_EMULATOR=true npx expo start --dev-client --port 8081 --clear"
+      ],
+      "port": 8081
     }
   ]
 }
