@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 import { isLite } from './edition';
 import { getAdsSdk, type AdsSdk } from './adsSdk';
+import { ensureTrackingPrompt } from './tracking';
 
 /**
  * AdMob ad units of the lite edition: the app's live units in release builds, Google's test units in
@@ -53,22 +54,33 @@ let initPromise: Promise<AdsStatus> | null = null;
 
 /**
  * Consent first, SDK second, as the AdMob policies require: the UMP form is shown where
- * the law needs one (GDPR), iOS adds the App Tracking Transparency prompt, and only then
- * is the SDK initialised. Safe to call more than once.
+ * the law needs one (GDPR), then iOS asks App Tracking Transparency (UMP shows it after its
+ * IDFA explainer; `ensureTrackingPrompt` asks itself when UMP did not), and only then is the
+ * SDK initialised. Safe to call more than once.
  */
 export function initAds(): Promise<AdsStatus> {
   if (!adsSupported) return Promise.resolve(status);
   if (!initPromise) {
     initPromise = (async () => {
+      const { AdsConsent, AdsConsentPrivacyOptionsRequirementStatus, default: mobileAds } = sdk();
+      let info: Awaited<ReturnType<typeof AdsConsent.gatherConsent>> | null = null;
       try {
-        const { AdsConsent, AdsConsentPrivacyOptionsRequirementStatus, default: mobileAds } = sdk();
-        const info = await AdsConsent.gatherConsent();
+        info = await AdsConsent.gatherConsent();
+      } catch (error) {
+        // Typically no network for the consent request: stay without ads and let the next
+        // screen that needs one try again, instead of pinning this launch to "no ads".
+        console.warn('Consent not gathered:', error);
+      }
+      await ensureTrackingPrompt();
+      if (!info) {
+        initPromise = null;
+        return status;
+      }
+      try {
         const privacyOptionsRequired = info.privacyOptionsRequirementStatus === AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
         if (info.canRequestAds) await mobileAds().initialize();
         status = { ready: info.canRequestAds, privacyOptionsRequired };
       } catch (error) {
-        // Typically no network for the consent request: stay without ads and let the next
-        // screen that needs one try again, instead of pinning this launch to "no ads".
         console.warn('Ads not initialised:', error);
         initPromise = null;
       }
