@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Collect views/reactions/comments for every publication in marketing/publications.local.md.
 
-Usage:  python3 marketing/stats.py [--no-write]
+Usage:  python3 marketing/stats.py [--no-write] [--set "Site:views=N,reads=N,reactions=N,comments=N" ...]
 
 Reads the links from the table in publications.local.md, fetches the public counters of each site,
 prints a table, appends a snapshot to marketing/stats.local.csv and rewrites the "Статистика" section at
@@ -12,7 +12,12 @@ Sources:
 - drukarnia    — the article page's Nuxt payload (viewNum, readNum, fullReadNum, likeNum, commentNum)
 - dev.to       — public API (reactions, comments); views need a DEV API key: DEVTO_API_KEY (env or the local pub.env) or
                  credentials/devto-api-key (dev.to → Settings → Extensions → DEV Community API Keys)
+- medium       — author-only stats, Cloudflare blocks scripts: read medium.com/me/stats in a signed-in browser
+                 and pass the numbers with --set "Medium:views=…,reads=…"
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
+
+--set stores numbers read by hand (or from a signed-in browser) in the local marketing/manual.local.json, keyed by
+the site name from the table; sites without a public counter show the last stored values with their date.
 
 Opening an article in a browser counts as a view on some sites; this script's requests may too.
 """
@@ -29,6 +34,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PUBS = ROOT / 'marketing' / 'publications.local.md'
 CSV = ROOT / 'marketing' / 'stats.local.csv'
+MANUAL = ROOT / 'marketing' / 'manual.local.json'
+FIELDS = ('views', 'reads', 'full_reads', 'reactions', 'comments')
 STATS_HEADING = '## Статистика'
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) GeneratorTrackerStats/1.0'
 
@@ -109,7 +116,27 @@ def publications():
     return rows
 
 
+def load_manual():
+    return json.loads(MANUAL.read_text()) if MANUAL.exists() else {}
+
+
+def store_manual(args, now):
+    """--set "Site:views=1,reads=0" → manual.local.json."""
+    manual = load_manual()
+    for arg in args:
+        site, _, pairs = arg.partition(':')
+        values = {}
+        for pair in filter(None, pairs.split(',')):
+            key, _, value = pair.partition('=')
+            if key.strip() not in FIELDS:
+                sys.exit(f'--set: unknown field {key!r}, expected one of {FIELDS}')
+            values[key.strip()] = int(value)
+        manual[site.strip()] = {**values, 'at': now.isoformat(timespec='minutes')}
+    MANUAL.write_text(json.dumps(manual, ensure_ascii=False, indent=2) + '\n')
+
+
 def collect():
+    manual = load_manual()
     results = []
     for pub in publications():
         host = urllib.parse.urlparse(pub['url']).netloc.removeprefix('www.')
@@ -118,6 +145,9 @@ def collect():
             data = fetch(pub['url']) if fetch else {'note': 'manual'}
         except Exception as e:  # one failing site must not stop the rest
             data = {'error': f'{type(e).__name__}: {e}'}
+        stored = manual.get(pub['site'])
+        if stored and not any(data.get(k) is not None for k in FIELDS):
+            data = {**{k: stored.get(k) for k in FIELDS}, 'note': f"вручну/з браузера, {stored['at']}"}
         results.append({**pub, **data})
     return results
 
@@ -151,6 +181,9 @@ def previous_views():
 
 def main():
     now = dt.datetime.now()
+    sets = [sys.argv[i + 1] for i, a in enumerate(sys.argv[:-1]) if a == '--set']
+    if sets:
+        store_manual(sets, now)
     before = previous_views()
     results = collect()
     md = table(results, now)
@@ -164,10 +197,10 @@ def main():
     with CSV.open('a', newline='') as f:
         w = csv.writer(f)
         if new:
-            w.writerow(['timestamp', 'site', 'lang', 'url', 'views', 'reads', 'full_reads', 'reactions', 'comments'])
+            w.writerow(['timestamp', 'site', 'lang', 'url', *FIELDS])
         for r in results:
             w.writerow([now.isoformat(timespec='minutes'), r['site'], r['lang'], r['url']] +
-                       ['' if r.get(k) is None else r[k] for k in ('views', 'reads', 'full_reads', 'reactions', 'comments')])
+                       ['' if r.get(k) is None else r[k] for k in FIELDS])
     text = PUBS.read_text()
     head = text.split(STATS_HEADING)[0].rstrip() + '\n\n'
     PUBS.write_text(head + md)
