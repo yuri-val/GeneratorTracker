@@ -88,7 +88,12 @@ def devto(url):
     return out
 
 
-FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto}
+def medium(url):
+    # Views are author-only, and Cloudflare answers scripted requests (page, ?format=json, GraphQL) with 403.
+    return {'note': 'manual: medium.com/me/stats'}
+
+
+FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium}
 
 
 def publications():
