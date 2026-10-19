@@ -621,9 +621,16 @@ function usePurchasesSection(): PurchasesSection | null {
 /** iOS: Settings as a native grouped form (SwiftUI Form) under the large-title bar. */
 function SettingsIOS(props: SettingsIOSProps) {
   const { t } = useTranslation();
+  const { gt } = useAppTheme();
   const { user } = props;
   const emailAuth = useEmailAuth({ onSignIn: props.onEmailSignIn, onSignUp: props.onEmailSignUp });
   const busy = emailAuth.loading || props.signingIn;
+  // The lite edition's banner sits between the bar and the form. A transparent bar would put it under
+  // the large title (the native bar tracks only a scroll view that comes first), so with a possible
+  // banner the bar is opaque and the content starts below it. Decided up front, not when an ad loads,
+  // so the bar does not change style under the user.
+  const { lite, entitlements } = useEntitlements();
+  const mayShowBanner = lite && !entitlements.noAds && adsSupported;
 
   const sections: FormSection[] = user
     ? [
@@ -804,8 +811,8 @@ function SettingsIOS(props: SettingsIOSProps) {
 
   return (
     <>
-      <ScreenHeader title={t('settings.title')} largeTitle scrollEdge />
-      <AdBanner />
+      <ScreenHeader title={t('settings.title')} largeTitle scrollEdge={!mayShowBanner} barBackground={gt.bg} />
+      {mayShowBanner && <AdBanner />}
       <NativeForm sections={sections} />
       {props.nightRed}
     </>
