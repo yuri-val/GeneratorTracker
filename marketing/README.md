@@ -6,6 +6,19 @@
   → opt-in https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite, paid Android
   https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker.
 
+## Tags
+
+Order = priority; take the first N where a site limits them (dev.to: 4, lowercase, no spaces; Medium / Hashnode: 5).
+
+**Українська:** генератор, блекаут, відключення світла, енергонезалежність, мобільний застосунок, Android, iOS, ТО генератора,
+пальне, pet-проєкт, open source, Україна
+Хештеги: #генератор #блекаут #відключенняСвітла #енергонезалежність #застосунок #Android #iOS #GeneratorTracker
+
+**English:** generator, power outage, backup power, off-grid, mobile app, android, ios, maintenance, fuel tracking,
+side project, open source, react native
+Hashtags: #generator #poweroutage #backuppower #offgrid #androidapp #iosapp #sideproject #GeneratorTracker
+dev.to (4): `reactnative`, `showdev`, `opensource`, `android`
+
 ## Channels (researched 2026-10-19, check each sidebar/rules before posting)
 
 [T] = good for the 12+ Lite testers (Google: 12 testers opted in continuously for 14 days).
