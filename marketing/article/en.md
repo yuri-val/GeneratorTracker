@@ -47,6 +47,8 @@ Everything is stored on your phone and works fully offline. An account is option
 **iPhone and iPad — public TestFlight beta.** The free version 3.1: ads only on the Analytics and Settings screens, up to 3 generators. Ads and limits can be removed with a one-time purchase, and in TestFlight purchases are free.
 👉 [testflight.apple.com/join/wZcGdJar](https://testflight.apple.com/join/wZcGdJar)
 
+Or straight from the App Store: [apps.apple.com/app/id6819560707](https://apps.apple.com/app/id6819560707). It's the paid version 2.6 for now and becomes free as soon as Apple approves 3.1.
+
 **Android — free Generator Tracker Lite, closed testing.** Google will publish it on Play once at least 12 people have tested it for 14 days, so every tester really helps:
 1. Join the group [groups.google.com/g/generator-tracker-lite](https://groups.google.com/g/generator-tracker-lite) (with the same Google account you use on Play).
 2. Opt in: [play.google.com/apps/testing/com.yurival.GeneratorTrackerLite](https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite).
