@@ -10,7 +10,7 @@ the end of publications.local.md (both files are local, excluded via .git/info/e
 Sources:
 - telegra.ph   — api.telegra.ph/getViews (views)
 - drukarnia    — the article page's Nuxt payload (viewNum, readNum, fullReadNum, likeNum, commentNum)
-- dev.to       — public API (reactions, comments); views need a DEV API key in DEVTO_API_KEY or
+- dev.to       — public API (reactions, comments); views need a DEV API key: DEVTO_API_KEY (env or the local pub.env) or
                  credentials/devto-api-key (dev.to → Settings → Extensions → DEV Community API Keys)
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
@@ -61,7 +61,14 @@ def drukarnia(url):
 
 
 def devto_key():
+    """DEVTO_API_KEY from the environment, the local pub.env (KEY=value lines) or credentials/devto-api-key."""
     key = os.environ.get('DEVTO_API_KEY')
+    env = ROOT / 'pub.env'
+    if not key and env.exists():
+        for line in env.read_text().splitlines():
+            name, _, value = line.partition('=')
+            if name.strip().removeprefix('export ') == 'DEVTO_API_KEY':
+                key = value.strip().strip('"\'')
     f = ROOT / 'credentials' / 'devto-api-key'
     return key or (f.read_text().strip() if f.exists() else None)
 
