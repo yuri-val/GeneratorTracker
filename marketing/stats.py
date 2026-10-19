@@ -14,6 +14,7 @@ Sources:
                  credentials/devto-api-key (dev.to → Settings → Extensions → DEV Community API Keys)
 - medium       — author-only stats, Cloudflare blocks scripts: read medium.com/me/stats in a signed-in browser
                  and pass the numbers with --set "Medium:views=…,reads=…"
+- vmist.net    — api.vmist.net/profiles/<user>/posts/<n> (views, upvotes, comments); use the short /<user>/posts/<n> link
 - x.com        — the public embed endpoint (likes + retweets, replies incl. the thread's own); views via --set
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
@@ -109,8 +110,16 @@ def x_post(url):
             'comments': data.get('conversation_count'), 'note': 'views: x.com analytics → --set'}
 
 
+def vmist(url):
+    # Public API used by the site itself: /profiles/<user>/posts/<seq_id> (the short /<user>/posts/<n> link).
+    parts = urllib.parse.urlparse(url).path.strip('/').split('/')
+    data = json.loads(get(f'https://api.vmist.net/profiles/{parts[0]}/posts/{parts[2]}'))
+    return {'views': data.get('views_count'), 'reactions': (data.get('vote') or {}).get('vote_upvote'),
+            'comments': data.get('comments_count')}
+
+
 FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
-            'x.com': x_post, 'twitter.com': x_post}
+            'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist}
 
 
 def publications():
