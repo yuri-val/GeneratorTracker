@@ -22,6 +22,11 @@
 
 Avoid r/androidapps: Rule 2 bans self-promotion and tester requests.
 
+**Reddit's spam filter (2026-10-19):** the first posts from a new, low-karma account with several Google links, posted to two
+subreddits within an hour, were removed by Reddit's site-wide filter (r/TestersCommunity, r/Ukraine_UA) — not by the mods.
+Fix: ask the mods to approve via modmail; build karma with a few genuine comments first; one link in the post, the rest in a
+comment; never the same text in several subs on the same day; no TestFlight link until Apple's beta review passes.
+
 ## Short posts
 
 ### Tester request (r/AndroidClosedTesting / r/TestersCommunity)
