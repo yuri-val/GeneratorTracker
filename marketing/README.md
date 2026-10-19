@@ -6,6 +6,11 @@
   → opt-in https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite, paid Android
   https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker.
 
+## Stats
+
+`python3 marketing/stats.py` — views/reactions/comments of every link in the local `marketing/publications.local.md`
+(history in the local `marketing/stats.local.csv`; dev.to views need `DEVTO_API_KEY` or `credentials/devto-api-key`).
+
 ## Tags
 
 Order = priority; take the first N where a site limits them (dev.to: 4, lowercase, no spaces; Medium / Hashnode: 5).
