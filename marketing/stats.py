@@ -14,6 +14,7 @@ Sources:
                  credentials/devto-api-key (dev.to → Settings → Extensions → DEV Community API Keys)
 - medium       — author-only stats, Cloudflare blocks scripts: read medium.com/me/stats in a signed-in browser
                  and pass the numbers with --set "Medium:views=…,reads=…"
+- x.com        — the public embed endpoint (likes + retweets, replies incl. the thread's own); views via --set
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
 --set stores numbers read by hand (or from a signed-in browser) in the local marketing/manual.local.json, keyed by
@@ -100,7 +101,16 @@ def medium(url):
     return {'note': 'manual: medium.com/me/stats'}
 
 
-FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium}
+def x_post(url):
+    # The embed (syndication) endpoint is public: likes, retweets and the reply count; views are not in it.
+    post_id = urllib.parse.urlparse(url).path.rstrip('/').split('/')[-1]
+    data = json.loads(get(f'https://cdn.syndication.twimg.com/tweet-result?id={post_id}&token=4'))
+    return {'reactions': (data.get('favorite_count') or 0) + (data.get('retweet_count') or 0),
+            'comments': data.get('conversation_count'), 'note': 'views: x.com analytics → --set'}
+
+
+FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
+            'x.com': x_post, 'twitter.com': x_post}
 
 
 def publications():
