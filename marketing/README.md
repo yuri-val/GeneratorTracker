@@ -9,7 +9,7 @@
 ## Stats
 
 `python3 marketing/stats.py` — views/reactions/comments of every link in the local `marketing/publications.local.md`
-(history in the local `marketing/stats.local.csv`; dev.to views need `DEVTO_API_KEY` in the env, the local git-excluded `pub.env` or `credentials/devto-api-key`).
+(history in the local `marketing/stats.local.csv`; `--set "Medium:views=N,reads=N"` stores numbers read in a signed-in browser for sites without a public counter; dev.to views need `DEVTO_API_KEY` in the env, the local git-excluded `pub.env` or `credentials/devto-api-key`).
 
 ## Tags
 
