@@ -50,6 +50,8 @@ interface ScreenHeaderProps {
    * contentInsetAdjustmentBehavior="automatic"; other screens keep an opaque bar.
    */
   scrollEdge?: boolean;
+  /** iOS: background of an opaque bar (without `scrollEdge`), e.g. the page colour; the system default otherwise. */
+  barBackground?: string;
 }
 
 /**
@@ -72,7 +74,7 @@ function NativeHeader(props: ScreenHeaderProps) {
   const latest = useRef(props);
   latest.current = props;
 
-  const { title, largeTitle, leading, actions = [], menu, trailing, scrollEdge } = props;
+  const { title, largeTitle, leading, actions = [], menu, trailing, scrollEdge, barBackground } = props;
   const signature = JSON.stringify({
     title,
     largeTitle,
@@ -81,6 +83,7 @@ function NativeHeader(props: ScreenHeaderProps) {
     menu: menu && [menu.label, menu.icon, menu.actions.map(a => [a.key, a.label, a.icon, a.selected, a.destructive])],
     trailing: !!trailing,
     scrollEdge,
+    barBackground,
     tint: theme.colors.primary,
     label: theme.colors.onBackground,
     error: theme.colors.error,
@@ -95,6 +98,8 @@ function NativeHeader(props: ScreenHeaderProps) {
       headerLargeTitleEnabled: !!current.largeTitle,
       headerTransparent: !!current.scrollEdge,
       headerShadowVisible: !current.scrollEdge ? false : undefined,
+      headerStyle: !current.scrollEdge && current.barBackground ? { backgroundColor: current.barBackground } : undefined,
+      headerLargeStyle: !current.scrollEdge && current.barBackground ? { backgroundColor: current.barBackground } : undefined,
       // `automatic` resolves to the hard style (tinted band + divider) for these bars.
       scrollEdgeEffects: current.scrollEdge ? { top: 'soft' } : undefined,
       // Brand tint for bar buttons only; titles keep the system label colour (HIG).
