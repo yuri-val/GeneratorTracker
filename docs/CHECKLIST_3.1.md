@@ -84,17 +84,22 @@
       великим заголовком — тепер панель непрозора, банер під нею (PR #17). Збірка (2) замінила (1): у TestFlight-прогоні (1) не з'явився запит ATT —
       UMP падав (DNS домашньої мережі блокує домени реклами Google), а ATT ми лишали UMP. Тепер `ensureTrackingPrompt`
       питає сам (PR #16, перевірено на симуляторі). iOS `autoIncrement` у production (обидві попередні збірки мали build 1).
-- [ ] **F5. Версія 3.1.0 в ASC** — створена через API (MANUAL release): тексти, «Що нового», назва/підзаголовок/URL,
+- [x] **F5. Версія 3.1.0 в ASC** — створена через API (MANUAL release): тексти, «Що нового», назва/підзаголовок/URL,
       нотатки для рецензента, скріншоти 3.0 (6 × iPhone 6.9" + 6 × iPad 13", en + uk) — ✅. Лишилось: прив'язати збірку
       (F4) — ✅ 3.1.0 (3), у TestFlight для «Team (Expo)»; вікова анкета 3.1: advertising = так (рейтинг 4+). Покупки
       додаються до тієї ж заявки кнопкою «Add for Review» на сторінці кожної покупки (усі три READY_TO_SUBMIT) — Ти, при F8.
-- [ ] **F6. App Privacy**: Advertising Data, Device ID, Coarse Location, Product Interaction, Diagnostics (AdMob) + email,
+- [x] **F6. App Privacy** — опубліковано 2026-10-19 перед подачею: Advertising Data, Device ID, Coarse Location, Product Interaction, Diagnostics (AdMob) + email,
       name, user ID, user content (акаунт); Tracking — так (ATT). ⚠️ «Publish» одразу міняє сторінку живої 2.6.0 —
       публікувати безпосередньо перед Submit 3.1 — Разом. Чернетки немає: останній крок форми одразу «Publish»,
       тож заповнюю разом із тобою в день подачі (відповіді: AdMob-типи — Third-Party Advertising + Analytics, не прив'язані,
       трекінг так; діагностика — Analytics, не прив'язана, без трекінгу).
-- [ ] **F7. Відео з фізичного iPhone** (3.1 з TestFlight) для рецензента, як просили в 2.1 — Ти.
-- [ ] **F8. Submit for Review** — Ти.
+- [x] **F7. Відео з фізичного iPhone** (3.1 (3) з TestFlight) — 2026-10-19: ATT-запит, банери, покупка «Прибрати рекламу»,
+      акаунт; прикріплене до App Review Information (H.264, без звуку), нотатки посилаються на нього.
+- [x] **F8. Submit for Review** — 2026-10-19 12:11: версія 3.1.0 (3) + 3 покупки, WAITING_FOR_REVIEW. Першу
+      non-consumable API не додає до заявки (FIRST_NON_CONSUMABLE_MUST_BE_SUBMITTED_ON_VERSION) — заявку створено через API,
+      покупки додано кнопкою «Add for Review» → чернетка, подано через API.
+- [ ] **F9. Після схвалення** — ціна застосунку $0.99 → Free, тоді «Release» (ручний випуск); `git revert b0a8af8` (G1b);
+      AdMob → «Перевірити оновлення» для app-ads.txt — Разом.
 
 ## G. GitHub і сайт
 
