@@ -4,6 +4,9 @@ Images: `gallery-*.png` (1270×760, cover first) and `thumbnail-240.png`, render
 In the submission form use "Add an image from a URL" with
 `https://raw.githubusercontent.com/yuri-val/GeneratorTracker/main/marketing/producthunt/<file>` (the built-in browser can't upload files).
 
+**Draft (saved 2026-10-20, not scheduled):** https://www.producthunt.com/products/generator-tracker?launch=generator-tracker-2
+("Schedule" / "Edit Launch" on that page). Product page: https://www.producthunt.com/products/generator-tracker
+
 The submission form keeps everything in the page until "Create draft" / "Schedule": don't navigate that tab away.
 
 ## Main info
