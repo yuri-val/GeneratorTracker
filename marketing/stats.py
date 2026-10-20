@@ -167,8 +167,9 @@ def collect():
         except Exception as e:  # one failing site must not stop the rest
             data = {'error': f'{type(e).__name__}: {e}'}
         stored = manual.get(pub['site'])
-        if stored and not any(data.get(k) is not None for k in FIELDS):
-            data = {**{k: stored.get(k) for k in FIELDS}, 'note': f"вручну/з браузера, {stored['at']}"}
+        filled = [k for k in FIELDS if data.get(k) is None and stored and stored.get(k) is not None]
+        if filled:  # hand-entered numbers only fill what the site does not report itself
+            data = {**data, **{k: stored[k] for k in filled}, 'note': f"{', '.join(filled)} вручну, {stored['at']}"}
         results.append({**pub, **data})
     return results
 
