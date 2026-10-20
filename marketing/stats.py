@@ -119,7 +119,9 @@ def vmist(url):
 
 
 FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
-            'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist}
+            'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist,
+            'threads.com': lambda url: {'note': 'manual: Threads Insights → --set'},
+            'threads.net': lambda url: {'note': 'manual: Threads Insights → --set'}}
 
 
 def publications():
