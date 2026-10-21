@@ -15,6 +15,7 @@ Sources:
 - medium       — author-only stats, Cloudflare blocks scripts: read medium.com/me/stats in a signed-in browser
                  and pass the numbers with --set "Medium:views=…,reads=…"
 - vmist.net    — api.vmist.net/profiles/<user>/posts/<n> (views, upvotes, comments); use the short /<user>/posts/<n> link
+- daily.dev    — api.daily.dev/graphql post(id: <slug>) (upvotes, comments); views via --set
 - x.com        — the public embed endpoint (likes + retweets, replies incl. the thread's own); views via --set
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
@@ -118,10 +119,22 @@ def vmist(url):
             'comments': data.get('comments_count')}
 
 
+def dailydev(url):
+    # Public GraphQL accepts the post slug as id; views are author-only (post analytics → --set).
+    slug = urllib.parse.urlparse(url).path.rstrip('/').split('/')[-1]
+    body = json.dumps({'query': 'query($id:ID!){post(id:$id){numUpvotes numComments}}', 'variables': {'id': slug}}).encode()
+    req = urllib.request.Request('https://api.daily.dev/graphql', data=body,
+                                 headers={'User-Agent': UA, 'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=30) as r:
+        post = json.loads(r.read().decode())['data']['post']
+    return {'reactions': post['numUpvotes'], 'comments': post['numComments'], 'note': 'views: post analytics → --set'}
+
+
 FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
             'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist,
             'threads.com': lambda url: {'note': 'manual: Threads Insights → --set'},
-            'threads.net': lambda url: {'note': 'manual: Threads Insights → --set'}}
+            'threads.net': lambda url: {'note': 'manual: Threads Insights → --set'},
+            'daily.dev': dailydev, 'app.daily.dev': dailydev}
 
 
 def publications():
