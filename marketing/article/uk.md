@@ -44,10 +44,10 @@
 
 ![Generator Tracker на Android](images/android-uk-home.jpg)
 
-**iPhone та iPad — публічне тестування в TestFlight.** Безкоштовна версія 3.1: реклама лише на екранах Аналітики й Налаштувань, до 3 генераторів. Рекламу й обмеження можна прибрати разовою покупкою, а в TestFlight покупки безкоштовні.
-👉 [testflight.apple.com/join/wZcGdJar](https://testflight.apple.com/join/wZcGdJar)
+**iPhone та iPad — безкоштовно в App Store.** Реклама лише на екранах Аналітики й Налаштувань, до 3 генераторів; рекламу й обмеження можна прибрати разовою покупкою, без підписок.
+👉 [apps.apple.com/app/id6819560707](https://apps.apple.com/app/id6819560707)
 
-Або одразу з App Store: [apps.apple.com/app/id6819560707](https://apps.apple.com/app/id6819560707). Поки там платна версія 2.6, а щойно Apple схвалить 3.1, застосунок стане безкоштовним.
+Хочете пробувати нові версії раніше за всіх — є публічна бета в TestFlight: [testflight.apple.com/join/wZcGdJar](https://testflight.apple.com/join/wZcGdJar).
 
 **Android — безкоштовна Generator Tracker Lite, закрите тестування.** Google випустить її в Play, коли щонайменше 12 людей протестують її 14 днів, тож кожен тестувальник дуже допомагає:
 1. Вступіть у групу [groups.google.com/g/generator-tracker-lite](https://groups.google.com/g/generator-tracker-lite) (тим самим Google-акаунтом, що й у Play).

@@ -1,7 +1,7 @@
 # Marketing: article, channels, short posts
 
 - `article/uk.md`, `article/en.md` — the main article (images in `article/images/`, from the landing and store creatives).
-- Links: TestFlight public beta https://testflight.apple.com/join/wZcGdJar (group "Public beta", up to 1000 testers; works
+- Links: App Store (free since 3.1, 2026-10-21) https://apps.apple.com/app/id6819560707 · TestFlight public beta https://testflight.apple.com/join/wZcGdJar (group "Public beta", up to 1000 testers; works
   once Apple's beta review approves build 3.1.0 (3)), Lite closed test: group https://groups.google.com/g/generator-tracker-lite
   → opt-in https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite, paid Android
   https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker.

@@ -23,7 +23,7 @@ publishing so the replies go out together). Images: `article/images/`.
 
 > Як спробувати:
 >
-> 🍎 iPhone — бета в TestFlight: https://testflight.apple.com/join/wZcGdJar
+> 🍎 iPhone — безкоштовно в App Store: https://apps.apple.com/app/id6819560707
 >
 > 🤖 Android, безкоштовна Lite — закрите тестування. Вступіть у групу https://groups.google.com/g/generator-tracker-lite і підтвердьте участь: https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite
 >
