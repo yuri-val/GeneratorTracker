@@ -16,6 +16,7 @@ Sources:
                  and pass the numbers with --set "Medium:views=…,reads=…"
 - vmist.net    — api.vmist.net/profiles/<user>/posts/<n> (views, upvotes, comments); use the short /<user>/posts/<n> link
 - daily.dev    — api.daily.dev/graphql post(id: <slug>) (upvotes, comments); views via --set
+- *.hashnode.dev — the article page payload (views, reactions, responses); the GraphQL API needs a Pro plan
 - x.com        — the public embed endpoint (likes + retweets, replies incl. the thread's own); views via --set
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
@@ -130,6 +131,15 @@ def dailydev(url):
     return {'reactions': post['numUpvotes'], 'comments': post['numComments'], 'note': 'views: post analytics → --set'}
 
 
+def hashnode(url):
+    # The API needs a Pro plan; the article page's Next.js payload carries views/reactions/responses.
+    page = get(url)
+    m = re.search(r'readTimeInMinutes\\?":\d+,\\?"views\\?":(\d+),\\?"reactionCount\\?":(\d+),\\?"responseCount\\?":(\d+)', page)
+    if not m:
+        return {'error': 'counters not found in page'}
+    return {'views': int(m.group(1)), 'reactions': int(m.group(2)), 'comments': int(m.group(3))}
+
+
 FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
             'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist,
             'threads.com': lambda url: {'note': 'manual: Threads Insights → --set'},
@@ -174,7 +184,7 @@ def collect():
     results = []
     for pub in publications():
         host = urllib.parse.urlparse(pub['url']).netloc.removeprefix('www.')
-        fetch = FETCHERS.get(host)
+        fetch = FETCHERS.get(host) or (hashnode if host.endswith('.hashnode.dev') else None)
         try:
             data = fetch(pub['url']) if fetch else {'note': 'manual'}
         except Exception as e:  # one failing site must not stop the rest
