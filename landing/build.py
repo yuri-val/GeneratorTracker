@@ -162,7 +162,7 @@ def llms_txt(en: dict, uk: dict) -> str:
 
 Mobile app for Android (7.0+) and iPhone/iPad (iOS 16.4+) that tracks generator run hours, fuel refills
 and maintenance intervals. Offline-first: data lives on the device, an account is optional and used only
-for syncing between the owner's devices. No analytics SDKs; both apps are a one-time purchase without ads. Free editions with ads removable by a one-time purchase are coming (Generator Tracker Lite on Android, the iPhone app from version 3.1). Open source under the MIT license.
+for syncing between the owner's devices. No analytics SDKs; the paid Android app has no ads, the free editions (the iOS app; Generator Tracker Lite on Android, in testing) show ads removable with a one-time purchase. Open source under the MIT license.
 Current version: {en['app_version']} (released {en['notes_date']}). Languages: English, Ukrainian.
 Author: Yuri Valigursky.
 
