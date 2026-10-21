@@ -26,7 +26,7 @@ Generator Tracker is a logbook for power generators. Scheduled blackouts in Ukra
 
 Under the hood: offline-first sync with pending state instead of a queue, tombstones for deletes and a pure last-write-wins merge, covered by unit and emulator tests. Native SwiftUI forms on iOS, Material 3 on Android. Open source (MIT).
 
-iPhone: free (ads on two screens, removable with a one-time purchase) + public TestFlight beta. Android: full paid app without ads, and a free Lite version in closed testing — testers welcome: https://groups.google.com/g/generator-tracker-lite
+iPhone: free on the App Store (ads on two screens, removable with a one-time purchase), plus a public TestFlight beta. Android: full paid app without ads, and a free Lite version in closed testing — testers welcome: https://groups.google.com/g/generator-tracker-lite
 
 ## First comment (maker)
 

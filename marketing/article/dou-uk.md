@@ -79,7 +79,7 @@ Realtime-слухачі `onSnapshot` застосовують додавання
 
 Якщо у вас генератор (особливо кілька — ОСББ, магазин, об'єкт), буду радий відгукам:
 
-- **iPhone** — безкоштовна бета в TestFlight: https://testflight.apple.com/join/wZcGdJar
+- **iPhone** — безкоштовно в App Store: https://apps.apple.com/app/id6819560707 (а нові версії раніше — у бета-версії TestFlight: https://testflight.apple.com/join/wZcGdJar)
 - **Android** — безкоштовна Lite у закритому тестуванні: група https://groups.google.com/g/generator-tracker-lite, участь — https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite (Google вимагає 12 тестувальників протягом 14 днів, кожен дуже допомагає)
 - **Код і issues** — https://github.com/yuri-val/GeneratorTracker
 

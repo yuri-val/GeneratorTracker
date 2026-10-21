@@ -30,7 +30,7 @@ Counted with X's weighting: links = 23, emoji = 2, Latin/Cyrillic = 1.
 **4/5** · images: `android-en-home.jpg`
 
 > Try it:
-> 🍎 iPhone/iPad — TestFlight: https://testflight.apple.com/join/wZcGdJar
+> 🍎 iPhone/iPad — free on the App Store: https://apps.apple.com/app/id6819560707
 > 🤖 Android Lite (closed test, needs 12 testers) — join https://groups.google.com/g/generator-tracker-lite then opt in on Google Play
 > 💳 Full Android version, no ads: https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker
 

@@ -23,6 +23,6 @@ What I learned building the sync:
 Gotchas: Hermes has no Intl.PluralRules (hand-written Ukrainian plurals), and on iOS 26 attaching the tab bar accessory conditionally rebuilds SwiftUI's TabView and crashes.
 
 Code (MIT): https://github.com/yuri-val/GeneratorTracker
-Free iPhone beta: https://testflight.apple.com/join/wZcGdJar
+Free on the App Store: https://apps.apple.com/app/id6819560707
 
 How do you handle offline sync — CRDTs, your own queue, WatermelonDB, PowerSync?
