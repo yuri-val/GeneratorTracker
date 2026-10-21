@@ -2,7 +2,9 @@
 
 *Audience: Everyone + GitHub Nexus (own squad). Developer audience → technical angle (a condensed English version of the DOU article).*
 
-**Title:** Offline-first sync in React Native that never loses data
+**Title:** Offline-first sync in React Native + Firestore: pending state, tombstones and a pure merge
+
+*(Renamed on 2026-10-21 from "…that never loses data": daily.dev flagged the absolute claim as clickbait.)*
 
 **Body:**
 
