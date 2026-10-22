@@ -17,6 +17,7 @@ Sources:
 - vmist.net    — api.vmist.net/profiles/<user>/posts/<n> (views, upvotes, comments); use the short /<user>/posts/<n> link
 - daily.dev    — api.daily.dev/graphql post(id: <slug>) (upvotes, comments); views via --set
 - *.hashnode.dev — the article page payload (views, reactions, responses); the GraphQL API needs a Pro plan
+- dou.ua       — the topic page (view counter and comments)
 - x.com        — the public embed endpoint (likes + retweets, replies incl. the thread's own); views via --set
 - anything else (Reddit blocks scripted requests, …) is listed as "manual".
 
@@ -140,11 +141,21 @@ def hashnode(url):
     return {'views': int(m.group(1)), 'reactions': int(m.group(2)), 'comments': int(m.group(3))}
 
 
+def dou(url):
+    # The topic page shows the view counter (.pageviews) and the comments block publicly.
+    page = get(url)
+    views = re.search(r'class="pageviews"[^>]*>\s*(\d+)', page)
+    start = page.find('id="commentsList"')  # the list is followed by the page script; the sidebar comes later
+    block = page[start:page.find('<script', start)] if start >= 0 else ''
+    count = len(re.findall(r'class="comment"', block)) if start >= 0 else None
+    return {'views': int(views.group(1)) if views else None, 'comments': count}
+
+
 FETCHERS = {'telegra.ph': telegraph, 'drukarnia.com.ua': drukarnia, 'dev.to': devto, 'medium.com': medium,
             'x.com': x_post, 'twitter.com': x_post, 'vmist.net': vmist,
             'threads.com': lambda url: {'note': 'manual: Threads Insights → --set'},
             'threads.net': lambda url: {'note': 'manual: Threads Insights → --set'},
-            'daily.dev': dailydev, 'app.daily.dev': dailydev}
+            'daily.dev': dailydev, 'app.daily.dev': dailydev, 'dou.ua': dou}
 
 
 def publications():
