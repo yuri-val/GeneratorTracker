@@ -19,7 +19,7 @@ Subreddit list and rules: see the research table in `marketing/publications.loca
 
 > Most portable generators don't have an hour meter, but oil changes, filters and plugs all go by engine hours. During scheduled outages ours ran 6–10 h a day and I kept losing count, so I built a small free logbook app for it (disclosure: I'm the developer).
 >
-> What it does: tap Start/Stop and it counts engine hours; enter the tank size and it estimates fuel and runtime left, with litres/gallons per hour from your refills; maintenance by hours or days with an overdue warning; monthly charts. Works fully offline, no account needed, open source.
+> What it does: tap Start/Stop and it counts engine hours; enter the tank size and it estimates fuel and runtime left, with litres per hour from your refills (gallons not yet); maintenance by hours or days with an overdue warning; monthly charts. Works fully offline, no account needed, open source.
 >
 > Not trying to spam — genuinely curious how you all do it: notebook, sticker on the generator, an aftermarket hour meter, spreadsheet? And what would you want such an app to track that I'm missing?
 
@@ -94,7 +94,7 @@ Subreddit list and rules: see the research table in `marketing/publications.loca
 >
 > So I made a small logbook app (disclosure: I'm the developer, it's free and open source):
 > - tap Start/Stop and engine hours count themselves; several generators at once
-> - enter the tank size → fuel and runtime left; gallons/litres per hour from your refills
+> - enter the tank size → fuel and runtime left; litres per hour from your refills (litres only for now)
 > - oil / air filter / spark plug intervals by hours, days or both, with overdue warnings
 > - monthly charts of hours and fuel
 > - works fully offline, no account needed
