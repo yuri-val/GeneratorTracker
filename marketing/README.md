@@ -11,6 +11,11 @@
 `python3 marketing/stats.py` — views/reactions/comments of every link in the local `marketing/publications.local.md`
 (history in the local `marketing/stats.local.csv`; `--set "Medium:views=N,reads=N"` stores numbers read in a signed-in browser for sites without a public counter; dev.to views need `DEVTO_API_KEY` in the env, the local git-excluded `pub.env` or `credentials/devto-api-key`).
 
+`python3 marketing/appstore_sales.py [--days 14]` — App Store downloads, redownloads, updates and in-app purchases per day
+from Apple's daily Sales reports (cached in the local `marketing/appstore_sales.local.csv`). Needs an App Store Connect API
+key with the Sales role (`credentials/ios/AuthKey_<KEY_ID>.p8` + `credentials/ios/asc-sales-key.env` with
+`ASC_SALES_KEY_ID` and `ASC_VENDOR_NUMBER`); the EAS key is App Manager and can't read reports.
+
 ## Tags
 
 Order = priority; take the first N where a site limits them (dev.to: 4, lowercase, no spaces; Medium / Hashnode: 5).
