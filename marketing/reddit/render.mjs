@@ -44,7 +44,7 @@ const EN_FOOT = 'Free · offline · open source (MIT)';
 const cards = {
   // r/Generator, r/smallengines
   generator: { kicker: 'For portable generators', title: 'No hour meter? <em>Count engine hours</em> with one tap', shots: ['active', 'charts'],
-    items: ['Start / Stop — hours count themselves', 'Break-in and 100-hour oil change reminders', 'Fuel left and litres per hour from refills', 'Several generators at once'], foot: EN_FOOT },
+    items: ['Start / Stop — hours count themselves', 'Oil change reminders by hours or days', 'Fuel left and litres per hour from refills', 'Several generators, works offline'], foot: EN_FOOT },
   // r/OffGrid, r/OffGridLiving, r/SolarDIY
   offgrid: { kicker: 'Off-grid backup', title: 'Your backup generator, <em>logged</em>', shots: ['charts', 'home'],
     items: ['Monthly run hours and fuel — see what solar didn’t cover', 'Oil, filter and plug intervals by hours or days', 'Works with no internet, no account', 'Overdue service on the home screen'], foot: EN_FOOT },
