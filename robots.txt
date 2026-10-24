@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /get/
+Sitemap: https://generatortracker.yuri-val.dev/sitemap.xml
