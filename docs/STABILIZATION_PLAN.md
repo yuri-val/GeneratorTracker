@@ -271,6 +271,12 @@ FAILED_PRECONDITION. У 2.4.0 це ламає «Sync now» (pull падає на
 **Рішення:** `expo-build-properties` → `android.enableMinifyInReleaseBuilds: true` (+ `enableShrinkResourcesInReleaseBuilds`).
 R8 може вирізати класи, до яких звертаються через reflection, тож потрібна окрема PATCH-версія з обов'язковим
 прогоном release-збірки на пристрої (запуск, вхід, синк, графіки, date-picker) перед відправкою.
+> ✅ **Увімкнено 2026-10-24** (`app.json` → `expo-build-properties.android`): R8 перейменовує 94% класів (23 134 у
+> mapping, dex 16 МБ у трьох файлах). Додаткових keep-правил не знадобилось — бібліотеки з reflection (reanimated,
+> worklets, svg, Play services, AdMob, Billing) несуть свої consumer-правила. Release-APK обох видань перевірено на
+> емуляторі API 36 (запуск, генератор, старт/стоп, редагування сесії з date-picker, аналітика, налаштування, виклик
+> Google-входу; Lite — банер AdMob і пейвол). Іде в наступну PATCH-версію. `mapping.txt` AGP кладе в AAB (BUNDLE-METADATA), тож Play Console
+> розшифровує стеки збоїв сам — окремо завантажувати не треба.
 
 ### S-33. Google Play: edge-to-edge — застарілі API та «може працювати не для всіх» (знайдено в Play Console)
 **Що є:** рекомендації стосуються релізу 2.0.3. Збірка 2.4.2 уже має `targetSdk 36` і `edgeToEdgeEnabled`;
