@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2026-10-24
+
+Android maintenance release for both Google Play apps (the paid Generator Tracker and Generator Tracker Lite).
+
+### Changed
+- Android release builds are now optimized with R8: code shrinking, obfuscation and resource shrinking
+  (`expo-build-properties` → `enableMinifyInReleaseBuilds`, `enableShrinkResourcesInReleaseBuilds`). Google Play
+  flagged 3.1.0 for DEX obfuscation of 2% (25% required by February 2027); R8 now renames 94% of the classes.
+  No behaviour changes; verified on release builds of both editions (sessions, date pickers, analytics, Google
+  sign-in, AdMob banner and consent, purchases screen).
+
 ## [3.1.0] - 2026-10-17
 
 **Editions.** The paid Android app is unchanged (no ads, no limits, no purchases). New free editions:
