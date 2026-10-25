@@ -66,6 +66,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
   // The clock ticks every second only while this generator runs; the live bar needs a minute tick.
   const now = useNow(ownRunning ? 1000 : 60_000, anyRunning);
   const { start, stop } = useSessionActions(reload);
+  const { lite, entitlements } = useEntitlements();
 
   const fleet = useMemo(() => (raw ? buildFleet(raw.g, raw.s, raw.r, raw.t, now) : []), [raw, now]);
   const item = fleet.find(i => i.generator.id === generatorId);
@@ -104,7 +105,6 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
     .sort((a, b) => `${b.date}T${b.startTime}`.localeCompare(`${a.date}T${a.startTime}`));
   const refills = [...item.refills].sort((a, b) => `${b.date}T${b.time ?? ''}`.localeCompare(`${a.date}T${a.time ?? ''}`));
   const tasks = [...item.tasks].sort((a, b) => a.title.localeCompare(b.title));
-  const { lite, entitlements } = useEntitlements();
   const elapsedMs = running ? sessionElapsedMs(running, now) : 0;
   const engineHours = item.engineHours + elapsedMs / 3_600_000;
 

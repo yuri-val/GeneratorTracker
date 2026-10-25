@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   is saved back with its exact litres, so opening and saving a form never drifts.
 - Web e2e runs with the `en-GB` locale so the existing specs keep litres; a new spec covers gallons.
 
+### Fixed
+- Generator screen: `useEntitlements()` was called after an early return, so React warned about a change in the
+  order of hooks when the screen first loaded (dev builds; a context read, no crash in release).
+
 ## [3.1.1] - 2026-10-24
 
 Android maintenance release for both Google Play apps (the paid Generator Tracker and Generator Tracker Lite).
