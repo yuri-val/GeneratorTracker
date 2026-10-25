@@ -87,3 +87,21 @@ Recommended: **1** — a real question first, honest disclosure, invites comment
 - If it's removed by AutoModerator: don't repost — modmail with the link.
 - Send me the stats (views, upvotes, comments) — I'll log them.
 - Gallons came up → it's the first feature for the next version.
+
+## Modmail after removal (sent 2026-10-24)
+
+> **Subject:** Removed post — how can I make it fit the rules?
+>
+> Hi mods, my post "How do you know when your oil change is due if your generator has no hour meter?" was removed:
+> https://www.reddit.com/r/Generator/comments/1xe7wzo/how_do_you_know_when_your_oil_change_is_due_if/
+>
+> I'm a developer from Ukraine; with daily blackouts our portable runs for hours every day, so I built a free,
+> open-source, offline app for logging engine hours, fuel and service intervals. I disclosed that it's mine and kept
+> the links in one comment, but I understand if that still counts as self-promotion here.
+>
+> Would any of these be OK?
+> 1. Restore the post without the links comment (I'd only share a link if someone asks), or
+> 2. a plain discussion post about tracking engine hours without mentioning the app at all, or
+> 3. posting it in a weekly/self-promo thread, if you have one.
+>
+> If none of that fits r/Generator, no problem — I won't repost. Thanks for keeping the sub clean.

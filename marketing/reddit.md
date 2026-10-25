@@ -134,3 +134,19 @@ Don't reuse one image in several subs on the same day.
 | `cover-es.png` | r/PuertoRico (say the app is in English/Ukrainian for now) |
 | `cover-sideproject.png` | r/SideProject, r/ShowYourApp, r/iOSApps (App Shelf) |
 | `cover-testers.png` | r/TestFlight, r/AndroidClosedTesting |
+
+## r/OffGrid (2026-10-25) — different angle from r/OffGridLiving
+
+**Title:** How many hours does your generator actually cover in winter? Trying to figure out the real fuel math for a solar + generator setup
+
+> For those of you with solar + a backup generator: how many generator hours do you end up running in a bad winter month, and how many litres (or gallons) does that burn?
+>
+> I'm in Ukraine, where scheduled blackouts made the generator a daily thing. Spec-sheet fuel consumption assumes a fixed load, which real use never matches, so the only honest number is what your refills show over a few weeks.
+>
+> To stop guessing I built a small free logbook app (disclosure: I'm the developer, it's open source): Start/Stop counts engine hours, litres per hour come from your actual refills, oil/filter/plug reminders by hours or days, and monthly charts of generator hours and fuel. Works fully offline. Litres only for now.
+>
+> But mostly I'm curious about your numbers: how many generator hours per month in winter vs summer, and what do you do to cut them — bigger battery bank, more panels, running the gen only to bulk-charge?
+
+**First comment:** iPhone (free): https://apps.apple.com/app/id6819560707 · Android: https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker (free Lite in testing: https://groups.google.com/g/generator-tracker-lite) · source: https://github.com/yuri-val/GeneratorTracker
+
+**Image:** `marketing/reddit/cover-preppers.png` ("Know your fuel runway") — not the off-grid cover already used on r/OffGridLiving and DIY Solar Forum.
