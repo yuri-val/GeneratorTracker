@@ -155,6 +155,36 @@ test.describe('Core flows (web e2e)', () => {
     await expect(page.getByTestId('chart-fuel')).toBeVisible();
   });
 
+  test('US gallons: input and display convert, storage stays in litres', async ({ page }) => {
+    await page.goto('/');
+    await waitForEmptyHome(page);
+
+    await goToTab(page, 'Settings');
+    await page.getByTestId('fuel-unit-gallons').click();
+    await goToTab(page, 'Home');
+
+    await createGenerator(page, 'Gallon Gen', undefined, 5);
+    await openGenerator(page, 'Gallon Gen');
+    await openDetailTab(page, 'Refills');
+    await page.getByText('Add Refill', { exact: true }).first().click();
+    await page.getByTestId('input-refill-amount').fill('2.5');
+    await page.getByTestId('save-refill').click();
+    await expect(visibleText(page, /^2\.5/).first()).toBeVisible();
+
+    await goBack(page);
+    await goToTab(page, 'Analytics');
+    await expect(visibleText(page, 'Fuel, gal').first()).toBeVisible();
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('2.5');
+
+    // 2.5 gal was stored as 9.46 L.
+    await goToTab(page, 'Settings');
+    await page.getByTestId('fuel-unit-litres').click();
+    await goToTab(page, 'Analytics');
+    await expect(page.getByTestId('analytics-total-fuel')).toHaveText('9.5');
+    const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('@refills') || '[]'));
+    expect(stored[0].amount).toBe(9.46);
+  });
+
   test('switching the language persists across reloads', async ({ page }) => {
     await page.goto('/');
     await waitForEmptyHome(page);

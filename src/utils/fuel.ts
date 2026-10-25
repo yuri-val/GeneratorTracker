@@ -137,14 +137,14 @@ export interface RefillPreset {
   enabled: boolean;
 }
 
-/** Presets: to full, same as last time, 1 L (tanks ≤ 10 L) or 20 L (bigger tanks). */
-export function refillPresets(est: FuelEstimate, tank: number, lastRefill?: number): RefillPreset[] {
+/** Presets: to full, same as last time, and a fixed amount — 1 L (tanks ≤ 10 L) or 20 L by default; the
+ * refill sheet passes ½ / 5 US gallons (in litres) when the user works in gallons. */
+export function refillPresets(est: FuelEstimate, tank: number, lastRefill?: number, fixed = fixedPresetLitres(tank)): RefillPreset[] {
   const fits = (v: number) => !est.known || v <= est.free + EPSILON;
   const list: RefillPreset[] = [
     { key: 'toFull', litres: est.known ? roundLitres(est.free) : undefined, enabled: !est.known || est.free >= EPSILON },
   ];
   if (lastRefill) list.push({ key: 'asLastTime', litres: lastRefill, enabled: fits(lastRefill) });
-  const fixed = fixedPresetLitres(tank);
   list.push({ key: 'fixed', litres: fixed, enabled: fits(fixed) });
   return list;
 }

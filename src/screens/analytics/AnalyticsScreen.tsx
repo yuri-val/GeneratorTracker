@@ -15,7 +15,9 @@ import { useAppTheme } from '../../theme/useAppTheme';
 import { generatorColor, space } from '../../theme/tokens';
 import { contentColumn } from '../../theme/layout';
 import { fuelByMonth, hoursByMonth, totalsByGenerator } from '../../utils/analytics';
-import { fmtNumber, fmtSummary, hourUnit, litreUnit, NBSP } from '../../utils/format';
+import { fmtNumber, fmtSummary, hourUnit, NBSP } from '../../utils/format';
+import { useFuelFormat } from '../../contexts/FuelUnitContext';
+import { toDisplay } from '../../utils/units';
 import { AdBanner, maybeShowInterstitial, useEntitlements } from '../../monetization';
 
 const ALL = 'all';
@@ -30,6 +32,7 @@ export default function AnalyticsScreen() {
   const tabBarOverlap = useTabBarOverlap();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const ff = useFuelFormat();
 
   const [generators, setGenerators] = useState<Generator[]>([]);
   const [sessions, setSessions] = useState<WorkSession[]>([]);
@@ -83,7 +86,16 @@ export default function AnalyticsScreen() {
   const litres = totals.reduce((s, x) => s + x.litres, 0);
   const lph = hours > 0 ? litres / hours : 0;
   const hoursMonths = useMemo(() => hoursByMonth(sessions, order, lang), [sessions, order.join(), lang]);
-  const fuelMonths = useMemo(() => fuelByMonth(refills, order, lang), [refills, order.join(), lang]);
+  // Stored in litres; the chart shows the user's unit.
+  const fuelMonths = useMemo(
+    () =>
+      fuelByMonth(refills, order, lang).map(m => ({
+        ...m,
+        total: toDisplay(m.total, ff.unit),
+        segments: m.segments.map(sg => ({ ...sg, value: toDisplay(sg.value, ff.unit) })),
+      })),
+    [refills, order.join(), lang, ff.unit],
+  );
   const hasMonthly = hoursMonths.some(m => m.total > 0) || fuelMonths.some(m => m.total > 0);
   const maxHours = Math.max(0, ...totals.map(x => x.hours));
 
@@ -107,8 +119,8 @@ export default function AnalyticsScreen() {
       </GtText>
       <View style={[styles.stats, { borderColor: gt.rule }]}>
         <Stat label={t('detail.motorHours')} value={fmtNumber(hours, lang, hours >= 1000 ? 0 : 1)} testID="analytics-total-hours" />
-        <Stat label={t('analytics.fuelTotal')} value={fmtNumber(litres, lang, litres >= 1000 ? 0 : 1)} testID="analytics-total-fuel" />
-        <Stat label={t('detail.lph')} value={lph > 0 ? fmtNumber(lph, lang, 2) : '—'} testID="analytics-lph" />
+        <Stat label={t('analytics.fuelTotal', { unit: ff.unitLabel })} value={ff.value(litres, toDisplay(litres, ff.unit) >= 1000 ? 0 : 1)} testID="analytics-total-fuel" />
+        <Stat label={t('detail.lph', { rate: ff.rateLabel })} value={lph > 0 ? ff.rate(lph) : '—'} testID="analytics-lph" />
       </View>
     </View>
   );
@@ -191,8 +203,10 @@ export default function AnalyticsScreen() {
                   </View>
                   <GtText variant="caption" color={gt.textMuted} style={styles.indent}>
                     {t('analytics.rowDetail', {
-                      litres: fmtNumber(row.litres, lang),
-                      lph: row.lph > 0 ? fmtNumber(row.lph, lang, 2) : '—',
+                      litres: ff.value(row.litres),
+                      unit: ff.unitLabel,
+                      lph: row.lph > 0 ? ff.rate(row.lph) : '—',
+                      rate: ff.rateLabel,
                       sessions: row.sessions,
                     })}
                   </GtText>
@@ -227,7 +241,7 @@ export default function AnalyticsScreen() {
       {hasMonthly ? (
         <>
           {chart(t('analytics.hoursByMonth'), hourUnit(lang), hoursMonths, 'chart-hours')}
-          {chart(t('analytics.fuelByMonth'), litreUnit(lang), fuelMonths, 'chart-fuel')}
+          {chart(t('analytics.fuelByMonth'), ff.unitLabel, fuelMonths, 'chart-fuel')}
         </>
       ) : (
         empty('chartNoData', t('analytics.notEnoughData'), t('analytics.logMoreHint'))

@@ -43,6 +43,8 @@ import { PageHeader, SquareButton, StatusBarScrim, useSnackbar } from '../../com
 import { AdBanner, adsSupported, initAds, showPrivacyOptions, useEntitlements, usingTestAds } from '../../monetization';
 import { FONT } from '../../theme/tokens';
 import { useThemePreference } from '../../contexts/ThemePreferenceContext';
+import { useFuelUnitPreference } from '../../contexts/FuelUnitContext';
+import type { FuelUnit } from '../../utils/units';
 import type { ThemePreference } from '../../utils/storage';
 
 // Read once from the app config so the About section never lags behind app.json.
@@ -57,6 +59,7 @@ export default function SettingsScreen() {
 
   const [signingIn, setSigningIn] = useState(false);
   const { preference: themePreference, setPreference: setThemePreference } = useThemePreference();
+  const { unit: fuelUnit, setUnit: setFuelUnit } = useFuelUnitPreference();
   const [nightRedOpen, setNightRedOpen] = useState(false);
   const nightRed = <NightRedSheet visible={nightRedOpen} onClose={() => setNightRedOpen(false)} />;
   const { request, response, promptAsync, available: googleAvailable } = useGoogleAuth();
@@ -269,6 +272,8 @@ export default function SettingsScreen() {
         onLanguageChange={handleLanguageChange}
         themePreference={themePreference}
         onThemeChange={setThemePreference}
+        fuelUnit={fuelUnit}
+        onFuelUnitChange={setFuelUnit}
         onNightRed={() => setNightRedOpen(true)}
         nightRed={nightRed}
         purchases={purchases}
@@ -452,6 +457,17 @@ export default function SettingsScreen() {
                   { value: 'dark', label: t('settings.themeDark'), testID: 'theme-dark' },
                 ])}
               />
+              <Text variant="labelLarge" style={{ marginTop: 16, marginBottom: 8 }}>
+                {t('settings.fuelUnits')}
+              </Text>
+              <SegmentedButtons
+                value={fuelUnit}
+                onValueChange={value => setFuelUnit(value as FuelUnit)}
+                buttons={inkSegments(fuelUnit, [
+                  { value: 'L', label: t('settings.fuelUnitLitres'), testID: 'fuel-unit-litres' },
+                  { value: 'gal', label: t('settings.fuelUnitGallons'), testID: 'fuel-unit-gallons' },
+                ])}
+              />
               <List.Item
                 title={t('settings.nightRed')}
                 onPress={() => setNightRedOpen(true)}
@@ -565,6 +581,8 @@ interface SettingsIOSProps {
   onLanguageChange: (language: string) => void;
   themePreference: ThemePreference;
   onThemeChange: (preference: ThemePreference) => void;
+  fuelUnit: FuelUnit;
+  onFuelUnitChange: (unit: FuelUnit) => void;
   onNightRed: () => void;
   nightRed: React.ReactNode;
   purchases: PurchasesSection | null;
@@ -781,6 +799,17 @@ function SettingsIOS(props: SettingsIOSProps) {
             { value: 'dark', label: t('settings.themeDark') },
           ],
           onChange: value => props.onThemeChange(value as ThemePreference),
+        },
+        {
+          kind: 'picker',
+          key: 'fuelUnit',
+          label: t('settings.fuelUnits'),
+          value: props.fuelUnit,
+          options: [
+            { value: 'L', label: t('settings.fuelUnitLitres') },
+            { value: 'gal', label: t('settings.fuelUnitGallons') },
+          ],
+          onChange: value => props.onFuelUnitChange(value as FuelUnit),
         },
         { kind: 'button', key: 'nightRed', label: t('settings.nightRed'), onPress: props.onNightRed, testID: 'night-red' },
       ],

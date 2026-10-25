@@ -26,8 +26,9 @@ import { sessionElapsedMs } from '../../services/sessions';
 import { statusText, usedFraction } from '../../utils/maintenanceView';
 import { canAddMaintenanceTask, useEntitlements } from '../../monetization';
 import {
-  fmtClock, fmtClockTime, fmtLitresValue, fmtNumber, fmtShortDate, litreUnit, NBSP, splitAround,
+  fmtClock, fmtClockTime, fmtNumber, fmtShortDate, NBSP, splitAround,
 } from '../../utils/format';
+import { useFuelFormat } from '../../contexts/FuelUnitContext';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'GeneratorDetail'>;
@@ -51,6 +52,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
   const { gt } = theme;
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const ff = useFuelFormat();
   const insets = useSafeAreaInsets();
   const { generatorId } = route.params;
   const { raw, reload } = useFleet();
@@ -64,6 +66,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
   // The clock ticks every second only while this generator runs; the live bar needs a minute tick.
   const now = useNow(ownRunning ? 1000 : 60_000, anyRunning);
   const { start, stop } = useSessionActions(reload);
+  const { lite, entitlements } = useEntitlements();
 
   const fleet = useMemo(() => (raw ? buildFleet(raw.g, raw.s, raw.r, raw.t, now) : []), [raw, now]);
   const item = fleet.find(i => i.generator.id === generatorId);
@@ -102,7 +105,6 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
     .sort((a, b) => `${b.date}T${b.startTime}`.localeCompare(`${a.date}T${a.startTime}`));
   const refills = [...item.refills].sort((a, b) => `${b.date}T${b.time ?? ''}`.localeCompare(`${a.date}T${a.time ?? ''}`));
   const tasks = [...item.tasks].sort((a, b) => a.title.localeCompare(b.title));
-  const { lite, entitlements } = useEntitlements();
   const elapsedMs = running ? sessionElapsedMs(running, now) : 0;
   const engineHours = item.engineHours + elapsedMs / 3_600_000;
 
@@ -174,8 +176,8 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
               {t('detail.used')}
             </GtText>
             <GtText variant="cardTitle" color={gt.runText}>
-              ≈{NBSP}<Num>{fmtLitresValue((elapsedMs / 3_600_000) * fuel.lph, lang)}</Num>
-              <GtText variant="meta" color={gt.runMuted}>{NBSP}{litreUnit(lang)}</GtText>
+              ≈{NBSP}<Num>{ff.value((elapsedMs / 3_600_000) * fuel.lph)}</Num>
+              <GtText variant="meta" color={gt.runMuted}>{NBSP}{ff.unitLabel}</GtText>
             </GtText>
           </View>
           <View style={styles.flex}>
@@ -200,9 +202,9 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
             <GtText variant="cardTitle" color={gt.runText}>
               {fuel.known ? (
                 <>
-                  ≈{NBSP}<Num>{fmtLitresValue(fuel.level, lang)}</Num>
+                  ≈{NBSP}<Num>{ff.value(fuel.level)}</Num>
                   <GtText variant="meta" color={gt.runMuted}>
-                    {NBSP}{litreUnit(lang)}  ~{fmtNumber(fuel.hoursLeft, lang)}{NBSP}{t('common.hoursAbbr')}
+                    {NBSP}{ff.unitLabel}  ~{fmtNumber(fuel.hoursLeft, lang)}{NBSP}{t('common.hoursAbbr')}
                   </GtText>
                 </>
               ) : (
@@ -215,7 +217,7 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
       {fuel && infoOpen && (
         <View style={[styles.infoBox, { backgroundColor: gt.runInfo }]}>
           <GtText variant="caption" color={gt.runInfoText}>
-            {fuel.known ? t('detail.fuelEstimateInfo', { lph: fmtNumber(fuel.lph, lang, 2) }) : t('detail.fuelUnknown')}
+            {fuel.known ? t('detail.fuelEstimateInfo', { lph: ff.rate(fuel.lph), rate: ff.rateLabel }) : t('detail.fuelUnknown')}
           </GtText>
         </View>
       )}
@@ -238,8 +240,8 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
           {fuel.known ? (
             <>
               {t('home.fuelLabel')} ≈{NBSP}
-              <Num color={gt.text}>{fmtLitresValue(fuel.level, lang)}</Num>
-              {NBSP}{litreUnit(lang)} / <Num>{fmtLitresValue(generator.tankCapacity!, lang)}</Num> · ~{fmtNumber(fuel.hoursLeft, lang)}
+              <Num color={gt.text}>{ff.value(fuel.level)}</Num>
+              {NBSP}{ff.unitLabel} / <Num>{ff.value(generator.tankCapacity!)}</Num> · ~{fmtNumber(fuel.hoursLeft, lang)}
               {NBSP}{t('common.hoursAbbr')}
             </>
           ) : (
@@ -260,8 +262,8 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
   const stats = (
     <View style={[styles.stats, { borderColor: gt.rule }]}>
       <Stat label={t('detail.motorHours')} value={fmtNumber(engineHours, lang)} testID="stat-engine-hours" />
-      <Stat label={t('detail.lph')} value={item.lph > 0 && completed.length ? fmtNumber(item.lph, lang, 2) : '—'} />
-      <Stat label={t('detail.tankLitres')} value={generator.tankCapacity ? fmtNumber(generator.tankCapacity, lang) : '—'} />
+      <Stat label={t('detail.lph', { rate: ff.rateLabel })} value={item.lph > 0 && completed.length ? ff.rate(item.lph) : '—'} />
+      <Stat label={t('detail.tankLitres', { unit: ff.unitLabel })} value={generator.tankCapacity ? ff.value(generator.tankCapacity) : '—'} />
     </View>
   );
 
@@ -390,8 +392,8 @@ export default function GeneratorDetailScreen({ navigation, route }: Props) {
               )}
             </View>
             <GtText variant="rowTitle" mono>
-              {fmtLitresValue(r.amount, lang)}
-              <GtText variant="caption" color={gt.textMuted}>{NBSP}{litreUnit(lang)}</GtText>
+              {ff.value(r.amount)}
+              <GtText variant="caption" color={gt.textMuted}>{NBSP}{ff.unitLabel}</GtText>
             </GtText>
           </Pressable>
         );

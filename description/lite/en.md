@@ -16,7 +16,7 @@ Generator Tracker Lite
 Start in one tap, see fuel left and get oil-change reminders. Lite edition.
 ```
 
-## Full description (2567/4000 characters)
+## Full description (2644/4000 characters)
 
 ```text
 Generator Tracker Lite is the free edition of Generator Tracker, built around what you do during a power cut: start the generator in one tap, keep an eye on it and never miss maintenance — for a backup unit at home, a job site or a small fleet.
@@ -31,7 +31,8 @@ Fuel left, estimated
 • Add your tank size and see roughly how much fuel and how many hours are left
 • Refills in a few taps: to full, same as last time or a stepper
 • Refuelling a running engine is blocked — "Stop and refill" ends the session and fills in the refill time for you
-• A full tank calibrates the estimate; litres per hour are worked out for you
+• A full tank calibrates the estimate; consumption per hour is worked out for you
+• Litres or US gallons — set by your region, switchable in Settings
 
 Maintenance on time
 • Oil, filters, spark plugs — intervals by engine hours, by days, or both
@@ -40,7 +41,7 @@ Maintenance on time
 
 Clear analytics
 • Run hours and fuel by month as bars split by generator colour — petrol and diesel are never summed together
-• All-time totals and litres per hour for every generator
+• All-time totals and consumption per hour for every generator
 
 Readable day and night
 • Large, high-contrast controls that are easy to hit in the dark or with gloves

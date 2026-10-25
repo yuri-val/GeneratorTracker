@@ -17,10 +17,10 @@ import { GtText, SquareButton, fontFor, useSnackbar } from '../../components/gt'
 import { contentColumn } from '../../theme/layout';
 import { space } from '../../theme/tokens';
 import { recordRefill, sessionElapsedMs, startSession, stopForRefill } from '../../services/sessions';
-import {
-  defaultRefill, estimateFuel, previewRefill, refillPresets, roundLitres, stepperStep, type RefillPreset,
-} from '../../utils/fuel';
-import { fmtClockTime, fmtLitresValue, fmtNumber, fmtShortDate, litreUnit, NBSP } from '../../utils/format';
+import { defaultRefill, estimateFuel, previewRefill, refillPresets, type RefillPreset } from '../../utils/fuel';
+import { fmtClockTime, fmtNumber, fmtShortDate, NBSP } from '../../utils/format';
+import { useFuelFormat } from '../../contexts/FuelUnitContext';
+import { fixedPreset, fromDisplay, roundDisplay, stepperStepFor, toDisplay, toStoredLitres } from '../../utils/units';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'AddRefill'>;
@@ -37,6 +37,8 @@ export default function AddRefillScreen({ navigation, route }: Props) {
   const { gt } = useAppTheme();
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
+  const ff = useFuelFormat();
+  const unit = ff.unit;
   const snackbar = useSnackbar();
   const { generatorId, refillId } = route.params;
   const isEditing = !!refillId;
@@ -47,7 +49,15 @@ export default function AddRefillScreen({ navigation, route }: Props) {
   const [existing, setExisting] = useState<Refill | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  // The amount field is in the user's fuel unit. `pinned` remembers the exact litres behind a text we
+  // filled in ourselves (stored refill, default, preset), so an untouched value never drifts by rounding.
   const [amountText, setAmountText] = useState('');
+  const [pinned, setPinned] = useState<{ text: string; litres: number } | null>(null);
+  const showLitres = (litres: number) => {
+    const text = String(roundDisplay(toDisplay(Math.max(0, litres), unit)));
+    setAmountText(text);
+    setPinned({ text, litres });
+  };
   const [markedFull, setMarkedFull] = useState(false);
   const [date, setDate] = useState(toLocalDateString());
   const [time, setTime] = useState<string | undefined>(undefined);
@@ -72,7 +82,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
           const refill = r.find(x => x.id === refillId);
           if (refill) {
             setExisting(refill);
-            setAmountText(String(refill.amount));
+            showLitres(refill.amount);
             setMarkedFull(!!refill.isFull);
             setDate(refill.date);
             setTime(refill.time);
@@ -84,7 +94,8 @@ export default function AddRefillScreen({ navigation, route }: Props) {
           const est = estimateFuel(gen, s, others, running ? sessionElapsedMs(running) / 3_600_000 : 0);
           const last = [...others].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]?.amount;
           const def = defaultRefill(est, gen.tankCapacity, last);
-          setAmountText(def.litres ? String(def.litres) : '');
+          if (def.litres) showLitres(def.litres);
+          else setAmountText('');
           setMarkedFull(def.full);
         }
         setLoaded(true);
@@ -102,18 +113,21 @@ export default function AddRefillScreen({ navigation, route }: Props) {
     [generator, sessions, otherRefills, running],
   );
   const lastRefill = useMemo(() => [...otherRefills].sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0]?.amount, [otherRefills]);
-  const amount = parseAmount(amountText);
+  const amount = parseAmount(amountText); // in the user's unit
   const amountValid = !isNaN(amount) && amount > 0;
-  const preview = estimate && tank && amountValid ? previewRefill(estimate, tank, amount, markedFull) : null;
-  const presets: RefillPreset[] = estimate && tank ? refillPresets(estimate, tank, lastRefill) : [];
-  const step = stepperStep(tank);
+  const amountLitres = pinned && pinned.text === amountText ? pinned.litres : toStoredLitres(amount, unit);
+  const preview = estimate && tank && amountValid ? previewRefill(estimate, tank, amountLitres, markedFull) : null;
+  const presets: RefillPreset[] =
+    estimate && tank ? refillPresets(estimate, tank, lastRefill, fromDisplay(fixedPreset(tank, unit), unit)) : [];
+  const step = stepperStepFor(tank, unit);
   const disabled = !!running;
   const tankFull = !isEditing && !!estimate?.known && estimate.free < 0.05;
 
-  const setAmount = (value: number) => setAmountText(String(roundLitres(Math.max(0, value))));
+  /** Stepper: a value in the user's unit. */
+  const setAmount = (value: number) => setAmountText(String(roundDisplay(Math.max(0, value))));
   const applyPreset = (p: RefillPreset) => {
     Haptics.selectionAsync?.();
-    if (p.litres !== undefined) setAmount(p.litres);
+    if (p.litres !== undefined) showLitres(p.litres);
     if (p.key === 'toFull') setMarkedFull(true);
   };
 
@@ -142,7 +156,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
       await recordRefill({
         id: existing?.id,
         generatorId,
-        amount: roundLitres(amount),
+        amount: amountLitres,
         date,
         time: time ?? (isEditing ? existing?.time : getCurrentTime()),
         isFull: markedFull || !!preview?.over,
@@ -197,8 +211,8 @@ export default function AddRefillScreen({ navigation, route }: Props) {
   const subtitle =
     tank && estimate
       ? estimate.known
-        ? t('refill.sheetSubtitle', { tank: fmtNumber(tank, lang), level: fmtLitresValue(estimate.level, lang), free: fmtLitresValue(estimate.free, lang) })
-        : t('refill.levelUnknown', { tank: fmtNumber(tank, lang) })
+        ? t('refill.sheetSubtitle', { tank: ff.value(tank), level: ff.value(estimate.level), free: ff.value(estimate.free), unit: ff.unitLabel })
+        : t('refill.levelUnknown', { tank: ff.value(tank), unit: ff.unitLabel })
       : null;
 
   const isToday = date === toLocalDateString();
@@ -264,7 +278,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
                 placeholderTextColor={gt.textFaint}
               />
               <GtText variant="body" color={disabled && gt.dark ? gt.disabledText : gt.textMuted}>
-                {litreUnit(lang)}
+                {ff.unitLabel}
               </GtText>
             </View>
             <Pressable
@@ -290,7 +304,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
             <View style={styles.presets}>
               {presets.map(p => {
                 const label =
-                  p.key === 'toFull' ? t('refill.presetToFull') : p.key === 'asLastTime' ? t('refill.presetAsLastTime') : t('refill.fixedPreset', { litres: p.litres });
+                  p.key === 'toFull' ? t('refill.presetToFull') : p.key === 'asLastTime' ? t('refill.presetAsLastTime') : t('refill.fixedPreset', { litres: ff.value(p.litres ?? 0), unit: ff.unitLabel });
                 return (
                   <Pressable
                     key={p.key}
@@ -312,7 +326,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
                     {p.enabled ? (
                       p.litres !== undefined && (
                         <GtText variant="meta" mono color={gt.textMuted}>
-                          {fmtLitresValue(p.litres, lang)}{NBSP}{litreUnit(lang)}
+                          {ff.value(p.litres)}{NBSP}{ff.unitLabel}
                         </GtText>
                       )
                     ) : (
@@ -343,7 +357,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
                   {t('refill.markedFull')}
                 </GtText>
                 <GtText variant="caption" color={gt.textMuted}>
-                  {t('refill.markedFullHint', { tank: fmtNumber(tank, lang) })}
+                  {t('refill.markedFullHint', { tank: ff.value(tank), unit: ff.unitLabel })}
                 </GtText>
               </View>
             </Pressable>
@@ -353,8 +367,8 @@ export default function AddRefillScreen({ navigation, route }: Props) {
             <View style={[styles.message, { backgroundColor: gt.warnBg }]} testID="refill-calibration">
               <GtText variant="caption" color={gt.warnText}>
                 {preview.calibrate
-                  ? t('refill.calibrate', { diff: `${preview.correction > 0 ? '+' : '−'}${fmtLitresValue(Math.abs(preview.correction), lang)}` })
-                  : t('refill.overFree', { free: fmtLitresValue(estimate!.free, lang) })}
+                  ? t('refill.calibrate', { diff: `${preview.correction > 0 ? '+' : '−'}${ff.value(Math.abs(preview.correction))}`, unit: ff.unitLabel })
+                  : t('refill.overFree', { free: ff.value(estimate!.free), unit: ff.unitLabel })}
               </GtText>
             </View>
           )}
@@ -363,7 +377,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
             <Pressable onPress={() => setShowDatePicker(v => !v)} accessibilityRole="button" testID="refill-date">
               <GtText variant="meta" color={gt.textMuted}>
                 {preview && preview.after !== null && tank
-                  ? `${t('refill.after', { after: fmtLitresValue(preview.after, lang), tank: fmtNumber(tank, lang) })} · `
+                  ? `${t('refill.after', { after: ff.value(preview.after), tank: ff.value(tank), unit: ff.unitLabel })} · `
                   : null}
                 <GtText variant="meta" weight="500" color={gt.text} style={styles.underline}>
                   {whenLabel}
@@ -401,7 +415,7 @@ export default function AddRefillScreen({ navigation, route }: Props) {
               <SquareButton
                 kind="primary"
                 height={56}
-                label={amountValid ? t('refill.saveAmount', { litres: fmtLitresValue(amount, lang) }) : t('common.save')}
+                label={amountValid ? t('refill.saveAmount', { litres: fmtNumber(amount, lang), unit: ff.unitLabel }) : t('common.save')}
                 onPress={handleSave}
                 disabled={!loaded || saving}
                 testID="save-refill"

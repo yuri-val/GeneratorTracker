@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isFuelUnit, type FuelUnit } from './units';
 import {
   Generator,
   WorkSession,
@@ -240,6 +241,28 @@ export const saveThemePreference = async (preference: ThemePreference): Promise<
     await AsyncStorage.setItem(THEME_KEY, preference);
   } catch (error) {
     console.error('Error saving theme preference:', error);
+  }
+};
+
+// ============= Fuel units =============
+
+const FUEL_UNIT_KEY = '@fuel_unit';
+
+/** The saved fuel unit, or null when the user never chose one (the region default applies). */
+export const getFuelUnit = async (): Promise<FuelUnit | null> => {
+  try {
+    const value = await AsyncStorage.getItem(FUEL_UNIT_KEY);
+    return isFuelUnit(value) ? value : null;
+  } catch {
+    return null;
+  }
+};
+
+export const saveFuelUnit = async (unit: FuelUnit): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(FUEL_UNIT_KEY, unit);
+  } catch (error) {
+    console.error('Error saving fuel unit:', error);
   }
 };
 
