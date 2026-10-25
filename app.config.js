@@ -24,6 +24,17 @@ module.exports = ({ config }) => {
     android: {
       ...config.android,
       package: lite ? `${config.android.package}Lite` : config.android.package,
+      // Lite gets the light ("paper") icon so the two Android apps are easy to tell apart on one phone.
+      // Sources: assets/icon-source/lite/. iOS has a single app and keeps the dark icon.
+      ...(lite && {
+        icon: './assets/lite/icon.png',
+        adaptiveIcon: {
+          ...config.android.adaptiveIcon,
+          foregroundImage: './assets/lite/adaptive-icon.png',
+          backgroundImage: './assets/lite/adaptive-icon-background.png',
+          backgroundColor: '#F4F0E7',
+        },
+      }),
       // The paid app never talks to Google Play Billing (src/monetization only connects in the lite edition),
       // so expo-iap's BILLING permission is removed: Play would otherwise label it "Contains in-app purchases".
       blockedPermissions: lite

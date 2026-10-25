@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1] - 2026-10-26
+
+### Changed
+- Generator Tracker Lite (Android) gets its own light icon — paper background, orange ring, dark bolt — so the paid
+  app and Lite are easy to tell apart on one phone and in Play Console. Sources in `assets/icon-source/lite/`,
+  PNGs in `assets/lite/`, wired in `app.config.js` for `APP_VARIANT=lite` only. The paid Android app and the iOS app
+  keep the dark icon.
+
 ## [3.2.0] - 2026-10-25
 
 ### Added
