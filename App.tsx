@@ -20,6 +20,7 @@ import { darkTheme, lightTheme } from './src/theme';
 import { useAppFonts } from './src/theme/fonts';
 import { nativeHeaderStyle } from './src/theme/navigation';
 import { ThemePreferenceProvider } from './src/contexts/ThemePreferenceContext';
+import { FuelUnitProvider } from './src/contexts/FuelUnitContext';
 import { SnackbarProvider } from './src/components/gt';
 import { getSavedLanguage } from './src/utils/storage';
 import i18n from './src/i18n';
@@ -37,7 +38,9 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <ThemePreferenceProvider>
-        <AppContent />
+        <FuelUnitProvider>
+          <AppContent />
+        </FuelUnitProvider>
       </ThemePreferenceProvider>
     </SafeAreaProvider>
   );

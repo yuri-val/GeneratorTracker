@@ -30,7 +30,8 @@ export default defineConfig({
     actionTimeout: 15_000,
     navigationTimeout: 120_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // en-GB: an en-US browser would default the fuel unit to US gallons (region US); the specs expect litres.
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], locale: 'en-GB' } }],
   webServer: {
     // --clear: the app config (edition) is baked into the web bundle and Metro's cache does not key on it.
     command: 'CI=1 BROWSER=none npx expo start --web --port 8081 --clear',

@@ -46,7 +46,7 @@ name: Android core flows
     id: input-refill-amount
 - inputText: "4.5"
 - tapOn:
-    id: save-refill # 3.0 refill sheet: "Save 4.5 L" at the bottom
+    id: save-refill # 3.0 refill sheet: "Save 4.5 L" (gal on US-region devices) at the bottom
 - assertVisible: "Refills \\(1\\)"
 
 # Add a maintenance task

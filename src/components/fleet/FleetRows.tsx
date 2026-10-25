@@ -5,7 +5,8 @@ import { AccentRule, GtText, Num, SquareButton } from '../gt';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { size } from '../../theme/tokens';
 import type { FleetItem } from '../../hooks/useFleet';
-import { fmtClockTime, fmtDurationWords, fmtLitresValue, fmtNumber, fmtShortDate, litreUnit, NBSP, splitAround } from '../../utils/format';
+import { fmtClockTime, fmtDurationWords, fmtNumber, fmtShortDate, NBSP, splitAround } from '../../utils/format';
+import { useFuelFormat } from '../../contexts/FuelUnitContext';
 import { shortStatusText } from '../../utils/maintenanceView';
 import { sessionElapsedMs } from '../../services/sessions';
 
@@ -36,6 +37,7 @@ function MaintenanceLine({ item, onRunning }: { item: FleetItem; onRunning: bool
 /** Running generator: inverted ink card (light) / raised surface with a colour strip (dark). */
 export function RunningCard({ item, now, onOpen, onStop }: RowProps) {
   const { t, i18n } = useTranslation();
+  const fuel = useFuelFormat();
   const { gt } = useAppTheme();
   const lang = i18n.language;
   const running = item.running!;
@@ -65,8 +67,8 @@ export function RunningCard({ item, now, onOpen, onStop }: RowProps) {
               {t('home.fuelLabel')}{' '}
               {item.fuel.known ? (
                 <>
-                  ≈{NBSP}<Num color={gt.runText}>{fmtLitresValue(item.fuel.level, lang)}</Num>
-                  {NBSP}{litreUnit(lang)} · ~{fmtNumber(item.fuel.hoursLeft, lang)}{NBSP}{t('common.hoursAbbr')}
+                  ≈{NBSP}<Num color={gt.runText}>{fuel.value(item.fuel.level)}</Num>
+                  {NBSP}{fuel.unitLabel} · ~{fmtNumber(item.fuel.hoursLeft, lang)}{NBSP}{t('common.hoursAbbr')}
                 </>
               ) : (
                 '—'
@@ -102,6 +104,7 @@ export function RunningCard({ item, now, onOpen, onStop }: RowProps) {
 /** Idle generator: a flat row with an outlined Start button. */
 export function IdleRow({ item, onOpen, onStart }: RowProps) {
   const { t, i18n } = useTranslation();
+  const fuel = useFuelFormat();
   const { gt } = useAppTheme();
   const lang = i18n.language;
   const last = item.lastSession;
@@ -124,8 +127,8 @@ export function IdleRow({ item, onOpen, onStart }: RowProps) {
           {last ? (
             <GtText variant="meta" color={gt.dark ? gt.textFaint : gt.textMuted} numberOfLines={1}>
               {t('home.lastSession', { date: fmtShortDate(last.date, lang) })} · ≈{NBSP}
-              <Num color={gt.dark ? gt.textFaint : gt.text}>{fmtLitresValue(last.hours * item.lph, lang)}</Num>
-              {NBSP}{litreUnit(lang)}
+              <Num color={gt.dark ? gt.textFaint : gt.text}>{fuel.value(last.hours * item.lph)}</Num>
+              {NBSP}{fuel.unitLabel}
             </GtText>
           ) : item.generator.model ? (
             <GtText variant="meta" color={gt.dark ? gt.textFaint : gt.textMuted} numberOfLines={1}>

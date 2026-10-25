@@ -16,7 +16,7 @@ Generator Tracker: Run Hours
 Start a generator in one tap, see fuel left and never miss an oil change.
 ```
 
-## Full description (2122/4000 characters)
+## Full description (2199/4000 characters)
 
 ```text
 Generator Tracker is built around what you do during a power cut: start the generator in one tap, keep an eye on it and never miss maintenance — for one backup unit at home, a job site or a rental fleet.
@@ -31,7 +31,8 @@ Fuel left, estimated
 • Add your tank size and see roughly how much fuel and how many hours are left
 • Refills in a few taps: to full, same as last time or a stepper
 • Refuelling a running engine is blocked — "Stop and refill" ends the session and fills in the refill time for you
-• A full tank calibrates the estimate; litres per hour are worked out for you
+• A full tank calibrates the estimate; consumption per hour is worked out for you
+• Litres or US gallons — set by your region, switchable in Settings
 
 Maintenance on time
 • Oil, filters, spark plugs — intervals by engine hours, by days, or both
@@ -40,7 +41,7 @@ Maintenance on time
 
 Clear analytics
 • Run hours and fuel by month as bars split by generator colour — petrol and diesel are never summed together
-• All-time totals and litres per hour for every generator
+• All-time totals and consumption per hour for every generator
 
 Readable day and night
 • Large, high-contrast controls that are easy to hit in the dark or with gloves
@@ -56,6 +57,15 @@ Private by design
 • Open source (MIT) — anyone can check what the app does
 
 Available in English and Ukrainian. Also on iPhone and iPad.
+```
+
+## What's new in 3.2.0 (264/500 characters)
+
+```text
+Litres or US gallons:
+• Choose the fuel unit in Settings → Fuel units; in the US the app starts in gallons
+• Tank size, refills, fuel left, consumption per hour and analytics all follow it
+• Records you already have are converted on screen, nothing in them changes
 ```
 
 ## What's new in 3.1.0 (387/500 characters)

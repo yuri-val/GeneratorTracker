@@ -15,6 +15,8 @@ import { ScreenHeader } from '../../components/ScreenHeader';
 import { NativeForm } from '../../components/form/NativeForm';
 import { isIOS } from '../../theme/platform';
 import { contentColumn } from '../../theme/layout';
+import { useFuelFormat } from '../../contexts/FuelUnitContext';
+import { roundDisplay, toDisplay, toStoredLitres } from '../../utils/units';
 import { canAddGenerator, useEntitlements } from '../../monetization';
 
 type AddGeneratorScreenProps = {
@@ -25,6 +27,7 @@ type AddGeneratorScreenProps = {
 export default function AddGeneratorScreen({ navigation, route }: AddGeneratorScreenProps) {
   const theme = useAppTheme();
   const { t, i18n } = useTranslation();
+  const fuel = useFuelFormat();
   const { generatorId } = route.params || {};
   const isEdit = !!generatorId;
   const { lite, entitlements } = useEntitlements();
@@ -33,6 +36,8 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   const [model, setModel] = useState('');
   const [purchaseDate, setPurchaseDate] = useState(toLocalDateString());
   const [tankText, setTankText] = useState('');
+  // The tank as loaded (text shown + stored litres): an untouched field keeps the stored litres exactly.
+  const [loadedTank, setLoadedTank] = useState<{ text: string; litres: number } | null>(null);
   const [existingGenerator, setExistingGenerator] = useState<Generator | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -59,7 +64,13 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
         setName(gen.name);
         setModel(gen.model || '');
         setPurchaseDate(gen.purchaseDate);
-        setTankText(gen.tankCapacity ? String(gen.tankCapacity) : '');
+        if (gen.tankCapacity) {
+          const text = String(fuel.unit === 'gal' ? roundDisplay(toDisplay(gen.tankCapacity, 'gal')) : gen.tankCapacity);
+          setTankText(text);
+          setLoadedTank({ text, litres: gen.tankCapacity });
+        } else {
+          setTankText('');
+        }
       }
     } catch (error) {
       console.error('Error loading generator:', error);
@@ -68,9 +79,12 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
   };
 
   // Tank capacity (3.0) is optional; without it the fuel estimate is hidden.
+  // Typed in the user's fuel unit, stored in litres.
   const tankValue = parseFloat(tankText.replace(',', '.'));
-  const tankInvalid = tankText.trim() !== '' && (isNaN(tankValue) || tankValue <= 0 || tankValue > 10000);
-  const tankCapacity = tankText.trim() && !tankInvalid ? Math.round(tankValue * 10) / 10 : undefined;
+  const tankLitres = isNaN(tankValue) ? NaN : toStoredLitres(tankValue, fuel.unit);
+  const tankInvalid = tankText.trim() !== '' && (isNaN(tankValue) || tankValue <= 0 || tankLitres > 10000);
+  const tankCapacity =
+    tankText.trim() && !tankInvalid ? (loadedTank && loadedTank.text === tankText ? loadedTank.litres : tankLitres) : undefined;
 
   const handleSave = async () => {
     setSubmitted(true);
@@ -157,12 +171,12 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
                 {
                   kind: 'text',
                   key: 'tank',
-                  label: t('generator.tankLabel'),
+                  label: t('generator.tankLabel', { unit: fuel.unitLabel }),
                   value: tankText,
                   onChange: setTankText,
                   placeholder: t('form.optional'),
                   keyboard: 'decimal',
-                  suffix: t('common.litersAbbr'),
+                  suffix: fuel.unitLabel,
                   testID: 'input-generator-tank',
                 },
               ],
@@ -220,12 +234,12 @@ export default function AddGeneratorScreen({ navigation, route }: AddGeneratorSc
 
         <TextInput
           mode="outlined"
-          label={t('generator.tankLabel')}
+          label={t('generator.tankLabel', { unit: fuel.unitLabel })}
           value={tankText}
           onChangeText={setTankText}
           keyboardType="decimal-pad"
           left={<TextInput.Icon icon="fuel" />}
-          right={<TextInput.Affix text={t('common.litersAbbr')} />}
+          right={<TextInput.Affix text={fuel.unitLabel} />}
           error={submitted && tankInvalid}
           style={[styles.input, { marginTop: 4 }]}
           testID="input-generator-tank"

@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-10-25
+
+### Added
+- Fuel units: Settings → Fuel units switches between litres and US gallons (Android/web: segmented buttons, iOS:
+  picker in the native form). The choice is per device (`@fuel_unit` in AsyncStorage, not synced); until the user
+  picks one, the device region decides (`expo-localization`: US, LR and MM → gallons, everywhere else litres).
+  Requested by users on Reddit and the DIY Solar Forum.
+- `src/utils/units.ts` (conversion, presets and stepper steps per unit), `src/contexts/FuelUnitContext.tsx`
+  (`useFuelUnitPreference`, `useFuelFormat`), unit-aware formatters in `src/utils/format.ts`.
+
+### Changed
+- Home, the generator screen, the refill sheet, the generator form and Analytics show fuel, tank size and
+  consumption in the chosen unit. In gallons the refill presets are ½ gal / 5 gal and the stepper moves by
+  0.1 / 1 gal.
+- Data stays in litres (`Generator.tankCapacity`, `Refill.amount`): gallons exist only on screen and in inputs,
+  so there is no migration and synced devices with different units stay consistent. A value the user did not touch
+  is saved back with its exact litres, so opening and saving a form never drifts.
+- Web e2e runs with the `en-GB` locale so the existing specs keep litres; a new spec covers gallons.
+
 ## [3.1.1] - 2026-10-24
 
 Android maintenance release for both Google Play apps (the paid Generator Tracker and Generator Tracker Lite).

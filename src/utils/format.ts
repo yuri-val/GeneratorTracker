@@ -2,6 +2,8 @@
 // Digits are set in the mono font by the caller; NBSP ( ) keeps "≈" with its number and a
 // number with its unit, so they never wrap apart.
 
+import { toDisplay, type FuelUnit } from './units';
+
 export const NBSP = ' ';
 
 const locale = (lang: string) => (lang === 'uk' ? 'uk-UA' : 'en-US');
@@ -19,6 +21,23 @@ export const hourUnit = (lang: string) => (isUk(lang) ? 'год' : 'h');
 /** "≈ 2,4 л" / "≈ 2.4 L". */
 export const fmtLitres = (value: number, lang: string, approx = true) =>
   `${approx ? `≈${NBSP}` : ''}${fmtLitresValue(value, lang)}${NBSP}${litreUnit(lang)}`;
+
+/** Fuel unit label: "л" / "L", "гал" / "gal". */
+export const fuelUnitLabel = (lang: string, unit: FuelUnit) => (unit === 'gal' ? (isUk(lang) ? 'гал' : 'gal') : litreUnit(lang));
+
+/** Consumption unit label: "л/год" / "L/h", "гал/год" / "gal/h". */
+export const rateUnitLabel = (lang: string, unit: FuelUnit) => `${fuelUnitLabel(lang, unit)}/${hourUnit(lang)}`;
+
+/** Stored litres in the user's unit, without the unit: "2,4" / "0.6". */
+export const fmtFuelValue = (litres: number, lang: string, unit: FuelUnit, digits = 1) =>
+  fmtNumber(toDisplay(litres, unit), lang, digits);
+
+/** "≈ 2,4 л" / "≈ 0.6 gal". */
+export const fmtFuel = (litres: number, lang: string, unit: FuelUnit, approx = true) =>
+  `${approx ? `≈${NBSP}` : ''}${fmtFuelValue(litres, lang, unit)}${NBSP}${fuelUnitLabel(lang, unit)}`;
+
+/** Litres per hour in the user's unit, two decimals: "0,51" / "0.13". */
+export const fmtRateValue = (lph: number, lang: string, unit: FuelUnit) => fmtNumber(toDisplay(lph, unit), lang, 2);
 
 /** "4,6 год" / "4.6 h". */
 export const fmtHours = (value: number, lang: string, digits = 1) => `${fmtNumber(value, lang, digits)}${NBSP}${hourUnit(lang)}`;
