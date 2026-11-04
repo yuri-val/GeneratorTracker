@@ -11,6 +11,8 @@ on:
       - 'privacy_policy/en.md'
       - 'privacy_policy/uk.md'
       - 'privacy_policy/template.html'
+      - 'terms_of_use/en.md'
+      - 'terms_of_use/uk.md'
       - '.github/workflows/deploy-gh-pages.yml'
   workflow_dispatch:
 
@@ -43,13 +45,15 @@ jobs:
           pandoc privacy_policy/en.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
             --template=privacy_policy/template.html \
             --metadata title="Privacy Policy" --metadata lang="en" \
-            --metadata home="../" --metadata file="privacy-policy.html" \
+            --metadata home="../" --metadata dir="privacy_policy" --metadata file="privacy-policy.html" \
+            --metadata file_en="privacy-policy.html" --metadata file_uk="privacy-policy-uk.html" \
             --metadata description="How Generator Tracker handles your data: local-first storage, optional cloud sync, no ads and no tracking." \
             --output=landing/_site/privacy_policy/privacy-policy.html
           pandoc privacy_policy/uk.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
             --template=privacy_policy/template.html \
             --metadata title="Політика конфіденційності" --metadata lang="uk" \
-            --metadata home="../uk/" --metadata file="privacy-policy-uk.html" \
+            --metadata home="../uk/" --metadata dir="privacy_policy" --metadata file="privacy-policy-uk.html" \
+            --metadata file_en="privacy-policy.html" --metadata file_uk="privacy-policy-uk.html" \
             --metadata description="Як Generator Tracker поводиться з вашими даними: локальне зберігання, синхронізація за бажанням, без реклами й стеження." \
             --output=landing/_site/privacy_policy/privacy-policy-uk.html
           cat > landing/_site/privacy_policy/index.html << 'EOF'
@@ -62,6 +66,36 @@ jobs:
             <title>Privacy Policy — Generator Tracker</title>
           </head>
           <body><p><a href="privacy-policy.html">Privacy Policy</a></p></body>
+          </html>
+          EOF
+
+      - name: Build terms of use pages
+        run: |
+          mkdir -p landing/_site/terms_of_use
+          pandoc terms_of_use/en.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
+            --template=privacy_policy/template.html \
+            --metadata title="Terms of Use" --metadata lang="en" \
+            --metadata home="../" --metadata dir="terms_of_use" --metadata file="terms-of-use.html" \
+            --metadata file_en="terms-of-use.html" --metadata file_uk="terms-of-use-uk.html" \
+            --metadata description="Terms of use of Generator Tracker: estimates not guarantees, one-time purchases, optional account, open source." \
+            --output=landing/_site/terms_of_use/terms-of-use.html
+          pandoc terms_of_use/uk.md --from markdown+lists_without_preceding_blankline --to html5 --standalone \
+            --template=privacy_policy/template.html \
+            --metadata title="Умови використання" --metadata lang="uk" \
+            --metadata home="../uk/" --metadata dir="terms_of_use" --metadata file="terms-of-use-uk.html" \
+            --metadata file_en="terms-of-use.html" --metadata file_uk="terms-of-use-uk.html" \
+            --metadata description="Умови використання Generator Tracker: оцінки, а не гарантії, разові покупки, необов'язковий обліковий запис, відкритий код." \
+            --output=landing/_site/terms_of_use/terms-of-use-uk.html
+          cat > landing/_site/terms_of_use/index.html << 'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta http-equiv="refresh" content="0; url=terms-of-use.html">
+            <link rel="canonical" href="https://generatortracker.yuri-val.dev/terms_of_use/terms-of-use.html">
+            <title>Terms of Use — Generator Tracker</title>
+          </head>
+          <body><p><a href="terms-of-use.html">Terms of Use</a></p></body>
           </html>
           EOF
 
