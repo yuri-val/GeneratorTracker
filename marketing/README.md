@@ -1,10 +1,9 @@
 # Marketing: article, channels, short posts
 
 - `article/uk.md`, `article/en.md` — the main article (images in `article/images/`, from the landing and store creatives).
-- Links: App Store (free since 3.1, 2026-10-21) https://apps.apple.com/app/id6819560707 · TestFlight public beta https://testflight.apple.com/join/wZcGdJar (group "Public beta", up to 1000 testers; works
-  once Apple's beta review approves build 3.1.0 (3)), Lite closed test: group https://groups.google.com/g/generator-tracker-lite
-  → opt-in https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite, paid Android
-  https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker.
+- Links: App Store (free since 3.1, 2026-10-21) https://apps.apple.com/app/id6819560707 · Android: free Generator Tracker Lite (on Google Play since
+  2026-11-05) https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite · paid https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker · TestFlight public beta https://testflight.apple.com/join/wZcGdJar.
+  The Lite closed test (Google group + opt-in link) is over — don't use those links in new posts.
 
 ## Stats
 
@@ -52,7 +51,7 @@ comment; never the same text in several subs on the same day; no TestFlight link
 
 ## Short posts
 
-### Tester request (r/AndroidClosedTesting / r/TestersCommunity)
+### Tester request (r/AndroidClosedTesting / r/TestersCommunity) — obsolete since Lite went public (2026-11-05)
 
 > **[Test for test] Generator Tracker Lite — generator run hours, fuel and maintenance log**
 >
@@ -64,12 +63,12 @@ comment; never the same text in several subs on the same day; no TestFlight link
 >
 > Drop your link below — I'll test yours back.
 
-### Коротко українською (Telegram, r/Ukraine_UA)
+### Коротко українською (Telegram, r/Ukraine_UA) — оновлено після публічного релізу Lite
 
 > Зробив безкоштовний застосунок для тих, хто живе з генератором: мотогодини одним дотиком, залишок пального й витрата л/год, нагадування про ТО (мастило, фільтри, свічки), графіки. Працює без інтернету.
 >
-> Шукаю тестувальників:
-> • iPhone — https://testflight.apple.com/join/wZcGdJar
-> • Android — вступіть у https://groups.google.com/g/generator-tracker-lite, потім https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite
+> Безкоштовно:
+> • iPhone — https://apps.apple.com/app/id6819560707
+> • Android — Generator Tracker Lite https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite
 >
 > Буду вдячний за відгуки 🙏

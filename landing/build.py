@@ -23,6 +23,7 @@ OUT = ROOT / '_site'
 SITE_URL = 'https://generatortracker.yuri-val.dev/'
 GITHUB_URL = 'https://github.com/yuri-val/GeneratorTracker'
 PLAY_URL = 'https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker&hl={hl}'
+LITE_PLAY_URL = 'https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite&hl={hl}'
 # Country-less form: the App Store opens the visitor's own storefront.
 APP_STORE_URL = 'https://apps.apple.com/app/id6819560707'
 APP_STORE_ID = '6819560707'
@@ -162,7 +163,7 @@ def llms_txt(en: dict, uk: dict) -> str:
 
 Mobile app for Android (7.0+) and iPhone/iPad (iOS 16.4+) that tracks generator run hours, fuel refills
 and maintenance intervals. Offline-first: data lives on the device, an account is optional and used only
-for syncing between the owner's devices. No analytics SDKs; the paid Android app has no ads, the free editions (the iOS app; Generator Tracker Lite on Android, in testing) show ads removable with a one-time purchase. Open source under the MIT license.
+for syncing between the owner's devices. No analytics SDKs; the paid Android app has no ads, the free editions (the iOS app and Generator Tracker Lite on Android) show ads removable with a one-time purchase. Open source under the MIT license.
 Current version: {en['app_version']} (released {en['notes_date']}). Languages: English, Ukrainian.
 Author: Yuri Valigursky.
 
@@ -174,6 +175,7 @@ Author: Yuri Valigursky.
 
 ## Install
 - [Google Play]({en['play_url']})
+- [Google Play, free Lite edition]({LITE_PLAY_URL.format(hl='en')})
 - [App Store]({APP_STORE_URL})
 - [Smart link that opens the right store for the device]({SITE_URL}get/)
 

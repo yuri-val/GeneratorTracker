@@ -24,7 +24,7 @@ Subreddit list and rules: see the research table in `marketing/publications.loca
 > Not trying to spam — genuinely curious how you all do it: notebook, sticker on the generator, an aftermarket hour meter, spreadsheet? And what would you want such an app to track that I'm missing?
 
 **First comment (only where links are allowed):**
-> Links for anyone curious: iPhone (free) https://apps.apple.com/app/id6819560707 · Android: free Lite in testing https://groups.google.com/g/generator-tracker-lite · code https://github.com/yuri-val/GeneratorTracker
+> Links for anyone curious: iPhone (free) https://apps.apple.com/app/id6819560707 · Android (free Lite): https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite · code https://github.com/yuri-val/GeneratorTracker
 
 ## Load shedding (South Africa / Nigeria / Pakistan / Lebanon / Philippines) — English
 
@@ -101,7 +101,7 @@ Subreddit list and rules: see the research table in `marketing/publications.loca
 >
 > How do you keep track today — a notebook in the shed, a sticker on the generator, an aftermarket hour meter? What would you want logged that I'm missing (exercise runs, storage stabilizer, load)?
 
-**First comment:** iPhone (free): https://apps.apple.com/app/id6819560707 · Android Lite (free, closed testing): https://groups.google.com/g/generator-tracker-lite · source: https://github.com/yuri-val/GeneratorTracker
+**First comment:** iPhone (free): https://apps.apple.com/app/id6819560707 · Android (free Lite): https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite · source: https://github.com/yuri-val/GeneratorTracker
 
 ### r/SideProject — "[Project] - [desc]" (only approved users can post; if the button is greyed out, message the mods)
 
@@ -115,7 +115,7 @@ Subreddit list and rules: see the research table in `marketing/publications.loca
 >
 > Launch so far: ~1.6k views across a dozen sites, almost all from one Ukrainian Threads post — developer sites gave ~0. Now trying to reach actual generator owners (RV, off-grid, outages abroad). Where would you look? Any feedback on the app is welcome.
 
-**First comment:** iPhone (free): https://apps.apple.com/app/id6819560707 · Android Lite testers: https://groups.google.com/g/generator-tracker-lite · code: https://github.com/yuri-val/GeneratorTracker
+**First comment:** iPhone (free): https://apps.apple.com/app/id6819560707 · Android (free Lite): https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite · code: https://github.com/yuri-val/GeneratorTracker
 
 ## Images (`marketing/reddit/cover-*.png`, 2400×1600; regenerate: `node marketing/reddit/render.mjs`)
 

@@ -32,5 +32,5 @@ So I built **Generator Tracker**: tap Start when the generator runs, Stop when i
 
 Links if you want to try it:
 - iPhone/iPad (free): https://apps.apple.com/app/id6819560707
-- Android Lite closed test: join https://groups.google.com/g/generator-tracker-lite, then opt in at https://play.google.com/apps/testing/com.yurival.GeneratorTrackerLite
+- Android: free Generator Tracker Lite https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite (paid, no ads: https://play.google.com/store/apps/details?id=com.yurival.GeneratorTracker)
 - Site: https://generatortracker.yuri-val.dev · Code: https://github.com/yuri-val/GeneratorTracker

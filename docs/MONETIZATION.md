@@ -80,6 +80,8 @@ Device ID, Coarse location, Advertising data, App interactions.
    `com.yurival.GeneratorTrackerLite` зарезервовано). Особистий акаунт: перед робочою версією потрібне
    закрите тестування — щонайменше 12 тестувальників протягом 14 днів. Опис: `description/lite/{en,uk}.md`, скріншоти ті самі, що
    для платної (`store/play/`), іконка `store/icon/play-store-512.png`.
+   ✅ Закритий тест пройдено (12+ тестувальників × 14 днів), доступ до робочої версії отримано 2026-11-04,
+   3.2.1 (8) у робочій версії (178 країн) — Lite публічна в Google Play з 2026-11-05.
 2. Monetize → In-app products: ті самі три Product ID з цінами.
 3. Перша збірка: `eas build -p android --profile production-lite`, потім `eas submit … --profile
    production-lite` (трек internal). In-app products стають активними лише після того, як

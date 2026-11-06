@@ -36,7 +36,7 @@ Generator Tracker answers those with as few taps as possible:
 🌙 Big buttons for the dark and a true black theme that saves battery during outages
 🔒 Offline-first: everything stays on the phone; an account is optional and only syncs your own devices. Open source (MIT).
 
-Editions: on iPhone/iPad it's free, with a small banner on two screens that a one-time purchase removes (no subscriptions). On Android there's the full paid app with no ads, and a free Lite version in closed testing — testers welcome: https://groups.google.com/g/generator-tracker-lite
+Editions: on iPhone/iPad it's free, with a small banner on two screens that a one-time purchase removes (no subscriptions). On Android there's a free Lite edition (https://play.google.com/store/apps/details?id=com.yurival.GeneratorTrackerLite) and the full paid app with no ads
 
 Built with React Native/Expo and Firebase. I'd love your feedback: what would make it useful for your generator — at home, on a site or in a rental fleet?
 
