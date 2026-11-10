@@ -386,6 +386,25 @@ address { font-style: normal; }
 .cta-qr p { display: flex; flex-direction: column; gap: 4px; max-width: 260px; font-size: 14px; color: var(--run-muted); }
 .cta-qr strong { font-size: 16px; color: var(--run-text); }
 
+/* Download page: free editions first, the visitor's own store leads */
+.dl-req { display: grid; gap: 4px; margin-top: 20px; font-size: 14.5px; color: var(--text-2); }
+.dl-req strong { color: var(--text); font-weight: 600; }
+.is-ios .hero .store-badge[data-store="play"], .is-android .hero .store-badge[data-store="ios"] { order: 2; background: transparent; color: var(--text); box-shadow: inset 0 0 0 1.5px var(--text); }
+.is-ios .hero .store-badge[data-store="play"]:hover, .is-android .hero .store-badge[data-store="ios"]:hover { background: var(--raised); }
+.is-ios .cta .store-badge[data-store="play"], .is-android .cta .store-badge[data-store="ios"] { order: 2; }
+.dl-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.dl-card { padding: 26px 24px; }
+.dl-card h3 { font-size: 19px; margin-bottom: 10px; letter-spacing: -0.015em; }
+.dl-card p { color: var(--text-2); font-size: 15.5px; }
+.editions { min-width: 560px; }
+.editions thead th small { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 500; color: var(--text-3); }
+.editions thead th { font-size: 16px; font-weight: 700; color: var(--text); }
+.editions thead td { position: sticky; left: 0; background: var(--bg); }
+.dl-paid { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 28px; margin-top: 28px; padding: clamp(24px, 4vw, 40px); }
+.dl-paid h3 { font-size: clamp(21px, 2.4vw, 27px); margin-bottom: 10px; }
+.dl-paid p { color: var(--text-2); max-width: 680px; }
+.cta .text-link { margin-top: 2px; }
+
 /* Footer */
 .site-footer { padding: 56px 0 40px; border-top: 1.5px solid var(--line-strong); color: var(--text-2); font-size: 15px; }
 .footer-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px; }
@@ -429,6 +448,8 @@ address { font-style: normal; }
   .platform-grid { grid-template-columns: 1fr; }
   .privacy, .news { grid-template-columns: 1fr; }
   .cta { grid-template-columns: 1fr; text-align: center; }
+  .dl-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dl-req { justify-items: center; }
   .cta-copy { align-items: center; }
 }
 @media (max-width: 1000px) {
@@ -458,6 +479,7 @@ address { font-style: normal; }
 }
 @media (max-width: 760px) {
   .cta-qr { display: none; } /* a phone cannot scan its own screen; the badges are right above */
+  .dl-paid { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {
   body { font-size: 16px; }
@@ -481,6 +503,14 @@ address { font-style: normal; }
   .proof { justify-content: flex-start; flex-direction: column; align-items: flex-start; gap: 10px; }
   .store-badge { flex: 1 1 220px; justify-content: center; }
   .footer-grid { grid-template-columns: 1fr; }
+  .dl-cards { grid-template-columns: 1fr; }
+  .dl-paid .btn { width: 100%; }
+  /* Three columns fit a phone without sideways scrolling */
+  .editions { min-width: 0; font-size: 14px; table-layout: fixed; }
+  .editions th, .editions td { padding: 12px 8px; overflow-wrap: anywhere; }
+  .editions th[scope="row"], .editions thead td { position: static; width: 31%; box-shadow: none; }
+  .editions thead th { font-size: 13px; overflow-wrap: normal; }
+  .editions thead th small { font-size: 11.5px; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

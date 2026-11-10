@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{dl_meta_title}}</title>
+  <meta name="description" content="{{dl_meta_description}}">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="{{site_url}}{{canonical_path}}">
+  <link rel="alternate" hreflang="en" href="{{site_url}}download/">
+  <link rel="alternate" hreflang="uk" href="{{site_url}}uk/download/">
+  <link rel="alternate" hreflang="x-default" href="{{site_url}}download/">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f1ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <meta name="application-name" content="Generator Tracker">
+  <meta name="apple-mobile-web-app-title" content="Generator Tracker">
+  <meta name="apple-itunes-app" content="app-id=6819560707">
+  <meta name="google-play-app" content="app-id=com.yurival.GeneratorTrackerLite">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Generator Tracker">
+  <meta property="og:locale" content="{{locale}}">
+  <meta property="og:locale:alternate" content="{{alt_locale}}">
+  <meta property="og:title" content="{{dl_meta_title}}">
+  <meta property="og:description" content="{{dl_meta_description}}">
+  <meta property="og:url" content="{{site_url}}{{canonical_path}}">
+  <meta property="og:image" content="{{site_url}}assets/og-{{lang}}.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="{{dl_og_alt}}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{dl_meta_title}}">
+  <meta name="twitter:description" content="{{dl_meta_description}}">
+  <meta name="twitter:image" content="{{site_url}}assets/og-{{lang}}.png">
+  <meta name="twitter:image:alt" content="{{dl_og_alt}}">
+  <link rel="icon" href="{{dir_root}}favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="{{dir_root}}favicon.png" type="image/png" sizes="64x64">
+  <link rel="apple-touch-icon" href="{{dir_root}}apple-touch-icon.png">
+  <link rel="manifest" href="{{dir_root}}site.webmanifest">
+  <link rel="preload" href="{{dir_root}}fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{dir_root}}fonts/plex-sans-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{{dir_root}}assets/screens/android-{{lang}}-active.jpg" as="image" fetchpriority="high">
+  <link rel="stylesheet" href="{{dir_root}}styles.css?v={{build_id}}">
+  <script>
+    // Apply the saved theme before the first paint and mark that scripts run (enables scroll-reveal styles).
+    (function () {
+      try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
+      document.documentElement.classList.add('js');
+      // Put the visitor's own store first (the page shows both stores without JavaScript).
+      var ua = navigator.userAgent || '';
+      if (/android/i.test(ua)) document.documentElement.classList.add('is-android');
+      else if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.documentElement.classList.add('is-ios');
+    })();
+  </script>
+  <script type="application/ld+json">{{json_ld}}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">{{skip_link}}</a>
+
+  <header class="site-header" data-header>
+    <div class="container header-inner">
+      <a class="brand" href="{{home_href}}">
+        <img src="{{dir_root}}assets/app-icon.png" width="36" height="36" alt="">
+        <span>Generator Tracker</span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="{{nav_label}}" data-nav>
+        <ul role="list">
+          <li><a href="#free">{{dl_nav_free}}</a></li>
+          <li><a href="#editions">{{dl_nav_editions}}</a></li>
+          <li><a href="#faq">{{nav_faq}}</a></li>
+          <li><a href="{{home_href}}">{{dl_nav_home}}</a></li>
+          <li class="nav-cta"><a class="btn" href="#get">{{nav_cta}}</a></li>
+        </ul>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" type="button" aria-label="{{theme_toggle}}" data-theme-toggle data-label-light="{{theme_to_light}}" data-label-dark="{{theme_to_dark}}">
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        </button>
+        <a class="lang-switch" href="{{alt_lang_href}}" hreflang="{{alt_lang}}" lang="{{alt_lang}}" aria-label="{{lang_switch_label}}: {{alt_lang_label}}" title="{{alt_lang_label}}">{{alt_lang_short}}</a>
+        <a class="btn btn-small header-cta" href="#get">{{nav_cta}}</a>
+        <button class="icon-btn menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-toggle>
+          <span class="sr-only">{{nav_menu}}</span>
+          <span class="menu-bar"></span><span class="menu-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+    <main id="main">
+    <section class="hero dl-hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="eyebrow">{{dl_eyebrow}}</p>
+          <h1 id="hero-title">{{dl_title}}</h1>
+          <p class="lead">{{dl_lead}}</p>
+          <div class="store-badges">
+            <a class="store-badge" data-store="ios" href="{{app_store_url}}" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>{{dl_badge_ios_small}}</small><strong>App Store</strong></span>
+            </a>
+            <a class="store-badge" data-store="play" href="{{lite_play_url}}" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>{{dl_badge_play_small}}</small><strong>Google Play</strong></span>
+            </a>
+          </div>
+          <ul class="dl-req" role="list">
+            <li>{{dl_req_ios}}</li>
+            <li>{{dl_req_android}}</li>
+          </ul>
+          <p class="hero-note">{{dl_note}}</p>
+        </div>
+
+        <div class="hero-visual">
+          <figure class="device device-android device-main">
+            <img src="{{dir_root}}assets/screens/android-{{lang}}-active.jpg" width="540" height="1200" alt="{{hero_shot_main_alt}}" fetchpriority="high" decoding="async">
+          </figure>
+          <figure class="device device-ios device-second">
+            <img src="{{dir_root}}assets/screens/ios-{{lang}}-home-dark.jpg" width="540" height="1174" alt="{{hero_shot_second_alt}}" fetchpriority="low" decoding="async">
+          </figure>
+        </div>
+      </div>
+
+      <div class="container">
+        <ul class="proof" role="list">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_offline}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_privacy}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_sync}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_open}}</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17l9-10"/></svg>{{proof_langs}}</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="free" aria-labelledby="free-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">{{dl_free_eyebrow}}</p>
+          <h2 id="free-title">{{dl_free_title}}</h2>
+          <p class="lead">{{dl_free_lead}}</p>
+        </header>
+        <div class="dl-cards">
+          <article class="card dl-card reveal"><h3>{{dl_c1_t}}</h3><p>{{dl_c1_d}}</p></article>
+          <article class="card dl-card reveal"><h3>{{dl_c2_t}}</h3><p>{{dl_c2_d}}</p></article>
+          <article class="card dl-card reveal"><h3>{{dl_c3_t}}</h3><p>{{dl_c3_d}}</p></article>
+          <article class="card dl-card reveal"><h3>{{dl_c4_t}}</h3><p>{{dl_c4_d}}</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="editions" aria-labelledby="editions-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">{{dl_ed_eyebrow}}</p>
+          <h2 id="editions-title">{{dl_ed_title}}</h2>
+          <p class="lead">{{dl_ed_lead}}</p>
+        </header>
+        <div class="table-wrap reveal">
+          <table class="compare editions">
+            <caption class="sr-only">{{dl_ed_caption}}</caption>
+            <thead>
+              <tr>
+                <td></td>
+                <th scope="col" class="is-app">{{dl_ed_col_free}}</th>
+                <th scope="col">{{dl_ed_col_paid}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">{{dl_ed_r1}}</th><td class="is-app"><strong>{{dl_ed_r1_free}}</strong></td><td>{{dl_ed_r1_paid}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r2}}</th><td class="is-app">{{mark_yes}}</td><td>{{mark_yes}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r3}}</th><td class="is-app">{{mark_yes}}</td><td>{{mark_yes}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r4}}</th><td class="is-app">{{mark_yes}}</td><td>{{mark_yes}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r5}}</th><td class="is-app">{{dl_ed_r5_free}}</td><td>{{dl_ed_r5_paid}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r6}}</th><td class="is-app">{{dl_ed_r6_free}}</td><td>{{dl_ed_r6_paid}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r7}}</th><td class="is-app">{{dl_ed_r7_free}}</td><td>{{dl_ed_r7_paid}}</td></tr>
+              <tr><th scope="row">{{dl_ed_r8}}</th><td class="is-app">{{dl_ed_r8_free}}</td><td>{{dl_ed_r8_paid}}</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card dl-paid reveal">
+          <div>
+            <h3>{{dl_paid_title}}</h3>
+            <p>{{dl_paid_text}}</p>
+          </div>
+          <a class="btn btn-ghost" href="{{play_url}}" rel="noopener">{{dl_paid_btn}}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section how" id="install" aria-labelledby="install-title">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">{{dl_how_eyebrow}}</p>
+          <h2 id="install-title">{{dl_how_title}}</h2>
+          <p class="lead">{{dl_how_lead}}</p>
+        </header>
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">1</span><span class="sr-only">{{step_label}} 1.</span>
+            <h3>{{dl_s1_t}}</h3><p>{{dl_s1_d}}</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">2</span><span class="sr-only">{{step_label}} 2.</span>
+            <h3>{{dl_s2_t}}</h3><p>{{dl_s2_d}}</p>
+          </li>
+          <li class="step reveal">
+            <span class="step-num" aria-hidden="true">3</span><span class="sr-only">{{step_label}} 3.</span>
+            <h3>{{dl_s3_t}}</h3><p>{{dl_s3_d}}</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container faq">
+        <header class="section-head reveal">
+          <p class="eyebrow">{{faq_eyebrow}}</p>
+          <h2 id="faq-title">{{dl_faq_title}}</h2>
+        </header>
+        <div class="faq-list reveal">
+          <details open><summary>{{dl_q1}}</summary><p>{{dl_a1}}</p></details>
+          <details><summary>{{dl_q2}}</summary><p>{{dl_a2}}</p></details>
+          <details><summary>{{dl_q3}}</summary><p>{{dl_a3}}</p></details>
+          <details><summary>{{dl_q4}}</summary><p>{{dl_a4}}</p></details>
+          <details><summary>{{dl_q5}}</summary><p>{{dl_a5}}</p></details>
+          <details><summary>{{dl_q6}}</summary><p>{{dl_a6}}</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section" id="get" aria-labelledby="cta-title">
+      <div class="container card cta reveal">
+        <div class="cta-copy">
+          <img src="{{dir_root}}assets/app-icon.png" width="72" height="72" alt="" loading="lazy">
+          <h2 id="cta-title">{{dl_cta_title}}</h2>
+          <p class="lead">{{dl_cta_text}}</p>
+          <div class="store-badges">
+            <a class="store-badge" data-store="ios" href="{{app_store_url}}" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 384 512" aria-hidden="true"><path fill="currentColor" d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
+              <span><small>{{dl_badge_ios_small}}</small><strong>App Store</strong></span>
+            </a>
+            <a class="store-badge" data-store="play" href="{{lite_play_url}}" rel="noopener">
+              <svg class="store-icon" viewBox="0 0 512 512" aria-hidden="true"><path fill="#00d7fe" d="M48 59.5v393c0 8.5 4.6 15.9 11.5 19.8L285 256 59.5 39.7C52.6 43.6 48 51 48 59.5z"/><path fill="#00f076" d="M352.9 188.3 107.7 46.4c-10-5.8-21.6-6.3-32-1.9L285 256l67.9-67.7z"/><path fill="#ff3a44" d="M285 256 75.7 467.5c10.4 4.4 22 3.9 32-1.9l245.2-141.9L285 256z"/><path fill="#ffd500" d="M440.9 225.6 352.9 175 285 256l67.9 67.7 88-50.3c19.7-11.3 19.7-36.5 0-47.8z"/></svg>
+              <span><small>{{dl_badge_play_small}}</small><strong>Google Play</strong></span>
+            </a>
+          </div>
+        </div>
+        <div class="cta-qr">
+          <a class="qr-tile" href="{{dir_root}}get/"><img src="{{dir_root}}assets/qr-get.svg" width="148" height="148" alt="{{cta_qr_alt}}" loading="lazy"></a>
+          <p><strong>{{cta_qr_t}}</strong><span>{{cta_qr_d}}</span></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="{{home_href}}">
+          <img src="{{dir_root}}assets/app-icon.png" width="32" height="32" alt="" loading="lazy">
+          <span>Generator Tracker</span>
+        </a>
+        <p>{{footer_tagline}}</p>
+        <a class="lang-link" href="{{alt_lang_href}}" hreflang="{{alt_lang}}" lang="{{alt_lang}}">{{alt_lang_label}}</a>
+      </div>
+      <nav aria-labelledby="footer-product">
+        <h2 class="footer-title" id="footer-product">{{footer_product}}</h2>
+        <ul role="list">
+          <li><a href="{{app_store_url}}" rel="noopener">App Store</a></li>
+          <li><a href="{{lite_play_url}}" rel="noopener">Google Play — Lite</a></li>
+          <li><a href="{{play_url}}" rel="noopener">Google Play</a></li>
+          <li><a href="{{home_href}}#whats-new">{{footer_whats_new}}</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker" rel="noopener">{{footer_source}}</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="footer-resources">
+        <h2 class="footer-title" id="footer-resources">{{footer_resources}}</h2>
+        <ul role="list">
+          <li><a href="{{privacy_href}}">{{footer_privacy}}</a></li>
+          <li><a href="{{footer_privacy_alt_href}}">{{footer_privacy_alt}}</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/tree/main/release_notes" rel="noopener">{{footer_releases}}</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/CHANGELOG.md" rel="noopener">{{footer_changelog}}</a></li>
+          <li><a href="https://github.com/yuri-val/GeneratorTracker/blob/main/LICENSE" rel="noopener">{{footer_license}}</a></li>
+        </ul>
+      </nav>
+      <div>
+        <h2 class="footer-title" id="footer-contact">{{footer_contact}}</h2>
+        <address aria-labelledby="footer-contact">
+          <ul role="list">
+            <li><a href="mailto:yuri.valigursky@gmail.com">yuri.valigursky@gmail.com</a></li>
+            <li><a href="https://github.com/yuri-val/GeneratorTracker/issues" rel="noopener">GitHub Issues</a></li>
+          </ul>
+        </address>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>{{footer_version}}</p>
+      <p>{{footer_copy}}</p>
+    </div>
+  </footer>
+  <script>
+    // Pass campaign tags from this page's URL to Google Play (they show up in Play Console acquisition reports).
+    (function () {
+      var q = new URLSearchParams(location.search), tags = [];
+      ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (k) {
+        var v = q.get(k); if (v) tags.push(k + '=' + v);
+      });
+      if (!tags.length) return;
+      document.querySelectorAll('a[data-store="play"]').forEach(function (a) {
+        var u = new URL(a.href); u.searchParams.set('referrer', tags.join('&')); a.href = u.toString();
+      });
+    })();
+  </script>
+  <script src="{{dir_root}}main.js?v={{build_id}}" defer></script>
+</body>
+</html>

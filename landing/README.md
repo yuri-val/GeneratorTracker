@@ -1,13 +1,15 @@
 # Landing page
 
 Static product site published to GitHub Pages: <https://generatortracker.yuri-val.dev/>
-(English at `/`, Ukrainian at `/uk/`, privacy policy at `/privacy_policy/`, smart download link at `/get/`).
+(English at `/`, Ukrainian at `/uk/`, download pages at `/download/` and `/uk/download/`, privacy policy at
+`/privacy_policy/`, smart download link at `/get/`).
 
 ## Structure
 
 | Path | What |
 |---|---|
 | `template.html` | The page markup with `{{key}}` placeholders |
+| `download.html` | The download page (`/download/`, `/uk/download/`): free editions first, the paid Android app below; strings are the `dl_*` keys |
 | `i18n/en.json`, `i18n/uk.json` | All texts per language (strings may contain HTML and other `{{keys}}`) |
 | `styles.css` | Shared styles — light and dark themes, also used by the privacy-policy pages |
 | `main.js` | Theme toggle, mobile menu, section highlighting, scroll-reveal (the page works without it) |
@@ -19,7 +21,10 @@ Static product site published to GitHub Pages: <https://generatortracker.yuri-va
 | `build.py` | Renders everything into `_site/` (git-ignored) |
 
 `build.py` writes, per language, `index.html` with JSON-LD (`WebSite`, `MobileApplication`, `FAQPage`),
-plus `get/index.html` (opens Google Play or the App Store for the visitor's platform), `404.html`,
+`download/index.html` (indexable landing page for ads and search: its own JSON-LD with zero-price offers for the
+free apps, `BreadcrumbList` and `FAQPage`; the visitor's own store button comes first, and `utm_*` tags from the page URL
+are passed to Google Play as `referrer`), plus `get/index.html` (opens the free app in Google Play or the App Store
+for the visitor's platform; `noindex`, so never use it as an ad destination), `404.html`,
 `llms.txt`, `site.webmanifest`, `robots.txt` and `sitemap.xml` with hreflang alternates. The app version
 comes from `../app.json` and the "What's new" section from `../release_notes/<version>/<lang>.md`, so a
 release bump updates the site without touching this directory.

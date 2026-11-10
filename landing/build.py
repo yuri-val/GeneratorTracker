@@ -4,7 +4,8 @@
   python3 landing/build.py            # writes landing/_site
   python3 -m http.server -d landing/_site 8765
 
-Besides the two pages the build writes the smart download link (/get/), 404.html, llms.txt,
+Besides the two home pages the build writes the download pages (/download/, /uk/download/: the free
+editions first, the paid Android app below), the smart download link (/get/), 404.html, llms.txt,
 site.webmanifest, robots.txt and a sitemap with hreflang alternates. The app version comes from
 app.json and the "What's new" section from release_notes/<version>/<lang>.md, so a release updates
 the site without touching landing/. The deploy workflow runs this and adds the privacy-policy pages.
@@ -153,6 +154,54 @@ def json_ld(s: dict) -> str:
     return json.dumps({'@context': 'https://schema.org', '@graph': graph}, ensure_ascii=False, indent=2)
 
 
+def json_ld_download(s: dict) -> str:
+    """Structured data for the download page: the two free apps with a zero-price offer, the paid one, FAQ."""
+    home = SITE_URL + s['home_path']
+    page = SITE_URL + s['canonical_path']
+    free = {'@type': 'Offer', 'price': '0', 'priceCurrency': 'USD', 'availability': 'https://schema.org/InStock'}
+    common = {'applicationCategory': 'UtilitiesApplication', 'softwareVersion': s['app_version'],
+              'dateModified': s['notes_date'], 'inLanguage': ['en', 'uk'],
+              'image': SITE_URL + 'assets/app-icon.png', 'description': plain(s['dl_meta_description']),
+              'author': {'@id': SITE_URL + '#author'}, 'license': GITHUB_URL + '/blob/main/LICENSE'}
+    questions = [{'@type': 'Question', 'name': plain(s[f'dl_q{i}']),
+                  'acceptedAnswer': {'@type': 'Answer', 'text': plain(s[f'dl_a{i}'])}} for i in range(1, 7)]
+    graph = [
+        {'@type': 'WebPage', '@id': page + '#webpage', 'url': page, 'name': plain(s['dl_meta_title']),
+         'description': plain(s['dl_meta_description']), 'inLanguage': s['lang'],
+         'isPartOf': {'@id': SITE_URL + '#website'}, 'about': {'@id': SITE_URL + '#app'},
+         'dateModified': s['today'], 'breadcrumb': {'@id': page + '#breadcrumb'},
+         'primaryImageOfPage': {'@type': 'ImageObject', 'url': f'{SITE_URL}assets/og-{s["lang"]}.png',
+                                'width': 1200, 'height': 630}},
+        {'@type': 'BreadcrumbList', '@id': page + '#breadcrumb', 'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': 'Generator Tracker', 'item': home},
+            {'@type': 'ListItem', 'position': 2, 'name': plain(s['dl_crumb']), 'item': page}]},
+        {'@type': 'Person', '@id': SITE_URL + '#author', 'name': 'Yuri Valigursky',
+         'url': 'https://github.com/yuri-val'},
+        {'@type': 'MobileApplication', '@id': SITE_URL + '#app-ios', 'name': 'Generator Tracker',
+         'operatingSystem': 'iOS 16.4+, iPadOS 16.4+', 'url': APP_STORE_URL, 'installUrl': APP_STORE_URL,
+         'downloadUrl': APP_STORE_URL, 'offers': free, **common},
+        {'@type': 'MobileApplication', '@id': SITE_URL + '#app-android-lite', 'name': 'Generator Tracker Lite',
+         'operatingSystem': 'Android 7.0+', 'url': s['lite_play_url'], 'installUrl': s['lite_play_url'],
+         'downloadUrl': s['lite_play_url'], 'offers': free, **common},
+        {'@type': 'MobileApplication', '@id': SITE_URL + '#app-android', 'name': 'Generator Tracker',
+         'operatingSystem': 'Android 7.0+', 'url': s['play_url'], 'installUrl': s['play_url'], **common},
+        {'@type': 'FAQPage', '@id': page + '#faq', 'mainEntity': questions},
+    ]
+    return json.dumps({'@context': 'https://schema.org', '@graph': graph}, ensure_ascii=False, indent=2)
+
+
+def download_strings(s: dict) -> dict:
+    """The home page's strings re-based one directory deeper (/download/ and /uk/download/)."""
+    d = dict(s)
+    d.update(home_path=s['canonical_path'], home_href='../', canonical_path=s['canonical_path'] + 'download/',
+             dir_root='../' + s['dir_root'],
+             alt_lang_href='../uk/download/' if s['lang'] == 'en' else '../../download/',
+             privacy_href='../' + s['privacy_href'],
+             footer_privacy_alt_href='../' + s['footer_privacy_alt_href'])
+    d['json_ld'] = json_ld_download(d)
+    return d
+
+
 def llms_txt(en: dict, uk: dict) -> str:
     features = '\n'.join(f'- {plain(en[f"{k}_t"])}: {plain(en[f"{k}_d"])}'
                          for k in ('f_session', 'f_fuel', 'f_service', 'f_analytics', 'f_fleet', 'f_sync', 'f_theme'))
@@ -170,14 +219,23 @@ Author: Yuri Valigursky.
 ## Pages
 - [Home, English]({SITE_URL})
 - [Головна, українською]({SITE_URL}uk/): {plain(uk['meta_description'])}
+- [Download, English]({SITE_URL}download/): {plain(en['dl_meta_description'])}
+- [Завантажити, українською]({SITE_URL}uk/download/): {plain(uk['dl_meta_description'])}
 - [Privacy policy]({SITE_URL}privacy_policy/privacy-policy.html)
 - [Політика конфіденційності]({SITE_URL}privacy_policy/privacy-policy-uk.html)
 
 ## Install
-- [Google Play]({en['play_url']})
-- [Google Play, free Lite edition]({LITE_PLAY_URL.format(hl='en')})
-- [App Store]({APP_STORE_URL})
-- [Smart link that opens the right store for the device]({SITE_URL}get/)
+- [App Store, free (iPhone and iPad)]({APP_STORE_URL})
+- [Google Play, free Generator Tracker Lite (Android)]({LITE_PLAY_URL.format(hl='en')})
+- [Google Play, paid Generator Tracker without ads or limits (Android)]({en['play_url']})
+- [Smart link that opens the free app in the right store for the device]({SITE_URL}get/)
+
+## Editions and prices
+- Free: Generator Tracker for iPhone and iPad (App Store) and Generator Tracker Lite for Android (Google Play).
+  Ads on the Analytics and Settings screens only; up to 3 generators and 2 maintenance tasks per generator.
+- One-time purchases in the free editions: "Remove ads" $0.99, "Unlimited" $0.99, "Everything" $1.49. No subscriptions.
+- Paid: Generator Tracker for Android (Google Play), one payment, no ads, no limits, no in-app purchases.
+- All editions track the same things, work offline and need no account.
 
 ## Features
 {features}
@@ -194,7 +252,8 @@ Author: Yuri Valigursky.
 
 
 def get_page(en: dict, uk: dict) -> str:
-    """/get/: opens the store for the visitor's platform; shows both links where it cannot tell."""
+    """/get/: opens the free app in the visitor's store; shows both links where it cannot tell."""
+    lite = LITE_PLAY_URL.format(hl='en')
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -211,7 +270,7 @@ def get_page(en: dict, uk: dict) -> str:
       try {{ var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; }} catch (e) {{}}
       var ua = navigator.userAgent || '';
       var ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      var url = /android/i.test(ua) ? '{PLAY_URL.format(hl='en')}' : ios ? '{APP_STORE_URL}' : null;
+      var url = /android/i.test(ua) ? '{lite}' : ios ? '{APP_STORE_URL}' : null;
       if (url) location.replace(url);
     }})();
   </script>
@@ -222,9 +281,10 @@ def get_page(en: dict, uk: dict) -> str:
     <h1>{en['get_title']}</h1>
     <p class="lead">{en['get_text']} <span lang="uk">{uk['get_text']}</span></p>
     <div class="store-badges is-centered">
-      <a class="store-badge" href="{PLAY_URL.format(hl='en')}" rel="noopener">{PLAY_ICON}<span><small>{en['badge_play_small']}</small><strong>Google Play</strong></span></a>
-      <a class="store-badge" href="{APP_STORE_URL}" rel="noopener">{APPLE_ICON}<span><small>{en['badge_ios_small']}</small><strong>App Store</strong></span></a>
+      <a class="store-badge" href="{APP_STORE_URL}" rel="noopener">{APPLE_ICON}<span><small>{en['dl_badge_ios_small']}</small><strong>App Store</strong></span></a>
+      <a class="store-badge" href="{lite}" rel="noopener">{PLAY_ICON}<span><small>{en['dl_badge_play_small']}</small><strong>Google Play</strong></span></a>
     </div>
+    <p class="utility-links"><a href="../download/">{en['get_free_more']}</a> · <a href="../uk/download/" lang="uk" hreflang="uk">{uk['get_free_more']}</a></p>
     <p class="utility-links"><a href="../">{en['get_site']}</a> · <a href="../uk/" lang="uk" hreflang="uk">{uk['get_site']}</a></p>
   </main>
 </body>
@@ -274,10 +334,12 @@ def sitemap(today: str) -> str:
     xhtml = 'xmlns:xhtml="http://www.w3.org/1999/xhtml"'
     alternates = {
         '': 'uk/', 'uk/': '',
+        'download/': 'uk/download/', 'uk/download/': 'download/',
         'privacy_policy/privacy-policy.html': 'privacy_policy/privacy-policy-uk.html',
         'privacy_policy/privacy-policy-uk.html': 'privacy_policy/privacy-policy.html',
     }
-    langs = {'': 'en', 'uk/': 'uk', 'privacy_policy/privacy-policy.html': 'en',
+    langs = {'': 'en', 'uk/': 'uk', 'download/': 'en', 'uk/download/': 'uk',
+             'privacy_policy/privacy-policy.html': 'en',
              'privacy_policy/privacy-policy-uk.html': 'uk'}
     entries = []
     for page, alt in alternates.items():
@@ -294,6 +356,7 @@ def main():
         shutil.rmtree(OUT)
     OUT.mkdir()
     template = (ROOT / 'template.html').read_text()
+    download_template = (ROOT / 'download.html').read_text()
     build_id = str(int(time.time()))
     today = date.today().isoformat()
     app_version = json.loads((REPO / 'app.json').read_text())['expo']['version']
@@ -302,7 +365,8 @@ def main():
     for lang_file in sorted((ROOT / 'i18n').glob('*.json')):
         s = json.loads(lang_file.read_text())
         s.update(site_url=SITE_URL, build_id=build_id, today=today, app_version=app_version,
-                 play_url=PLAY_URL.format(hl=s['play_hl']), app_store_url=APP_STORE_URL)
+                 play_url=PLAY_URL.format(hl=s['play_hl']), app_store_url=APP_STORE_URL,
+                 lite_play_url=LITE_PLAY_URL.format(hl=s['play_hl']))
         s.update(read_release_notes(app_version, s['lang']))
         s['notes_date_human'] = human_date(s['notes_date'], s['lang'])
         for kind in MARK_PATHS:
@@ -311,6 +375,8 @@ def main():
         target = OUT / s['canonical_path'] / 'index.html'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(render(template, s))
+        (target.parent / 'download').mkdir()
+        (target.parent / 'download' / 'index.html').write_text(render(download_template, download_strings(s)))
         rendered[s['lang']] = s
 
     en, uk = rendered['en'], rendered['uk']
