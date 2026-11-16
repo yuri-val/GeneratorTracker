@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-11-17
+
+### Added
+- Store rating prompt: after the third stopped work session (counted on the device, an undone stop does not count) the
+  app asks the system for the native rating dialog — StoreKit on iOS, Google Play In-App Review on Android
+  (`expo-store-review`). It is requested 6 s after Stop, once the Undo window is over, at most once per app version
+  and not again within 120 days; Apple and Google apply their own quotas and may show nothing. Never on web, never at
+  launch, no own rating UI. Logic in `src/services/reviewPrompt.ts` (pure gate `shouldRequestReview`, unit-tested),
+  local state `@review_prompt` in `src/utils/storage.ts` (not synced). A deliberate exception to the stabilization
+  phase: the Lite app had no ratings at all, which hurts both store search and the paid campaigns.
+
+### Changed
+- Store listings (outside the app): Google Play pages for Lite and the paid app in 10 more languages (Spanish ×2,
+  Portuguese (Brazil), French, Arabic, Hindi, Bengali, Indonesian, Vietnamese, Turkish); Lite's default listing
+  language is now English instead of Ukrainian; titles and short descriptions carry "hours"/"мотогодини". App Store:
+  new localizations en-GB, ru (keywords only), es-MX, pt-BR, fr-FR, ar-SA, hi, id, vi, tr and reworked keywords for
+  en-US/uk without words that already sit in the name or subtitle. Every new language says the app interface is
+  English and Ukrainian. Source and scripts: `store/listings/` (local, not in git).
+
 ## [3.2.1] - 2026-10-26
 
 ### Changed

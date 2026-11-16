@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 import type { WorkSession } from '../models/types';
 import { startSession, stopSession, undoStop } from '../services/sessions';
+import { recordStopAndMaybeRequestReview, REVIEW_DELAY_AFTER_STOP_MS } from '../services/reviewPrompt';
 import { useSnackbar } from '../components/gt';
 import { fmtNumber } from '../utils/format';
 
@@ -36,12 +37,18 @@ export function useSessionActions(onChange: () => void | Promise<void>) {
         const { stopped } = await stopSession(running);
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         await onChange();
+        let undone = false;
+        // A moment of success: after the Undo window, maybe ask for a store rating (see reviewPrompt).
+        setTimeout(() => {
+          recordStopAndMaybeRequestReview(() => undone).catch(() => undefined);
+        }, REVIEW_DELAY_AFTER_STOP_MS);
         snackbar.show({
           message: t('detail.sessionStoppedUndo', { hours: fmtNumber(stopped.hours, i18n.language), name: generatorName }),
           actionLabel: t('common.cancel'),
           duration: 5000,
           testID: 'snackbar-stopped',
           onAction: async () => {
+            undone = true;
             await undoStop(running);
             await onChange();
           },
