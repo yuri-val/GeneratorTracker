@@ -59,6 +59,13 @@ Private by design
 Available in English and Ukrainian. Also on iPhone and iPad.
 ```
 
+## What's new in 3.3.0 (130/500 characters)
+
+```text
+• After you have used the app for a while, it may ask once for a rating — it helps others find it.
+• Store page in more languages.
+```
+
 ## What's new in 3.2.0 (264/500 characters)
 
 ```text

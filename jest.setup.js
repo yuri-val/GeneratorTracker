@@ -44,3 +44,11 @@ jest.mock('expo-iap', () => ({
   purchaseUpdatedListener: jest.fn(() => ({ remove: jest.fn() })),
   purchaseErrorListener: jest.fn(() => ({ remove: jest.fn() })),
 }));
+
+// The store review prompt is native-only; tests drive the gate around it.
+jest.mock('expo-store-review', () => ({
+  isAvailableAsync: jest.fn().mockResolvedValue(true),
+  requestReview: jest.fn().mockResolvedValue(undefined),
+  hasAction: jest.fn().mockResolvedValue(true),
+  storeUrl: jest.fn(() => null),
+}));

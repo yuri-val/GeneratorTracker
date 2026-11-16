@@ -266,6 +266,41 @@ export const saveFuelUnit = async (unit: FuelUnit): Promise<void> => {
   }
 };
 
+// ============= Store review prompt =============
+
+/** Local-only bookkeeping for the system "rate this app" prompt (never synced). */
+export interface ReviewPromptState {
+  /** Sessions stopped (and not undone) on this device. */
+  stops: number;
+  /** ISO timestamp of the last time the system prompt was requested. */
+  askedAt?: string;
+  /** App version that last requested it. */
+  askedVersion?: string;
+}
+
+const REVIEW_PROMPT_KEY = '@review_prompt';
+
+export const getReviewPromptState = async (): Promise<ReviewPromptState> => {
+  try {
+    const parsed = JSON.parse((await AsyncStorage.getItem(REVIEW_PROMPT_KEY)) ?? '{}');
+    return {
+      stops: Number.isFinite(parsed?.stops) ? parsed.stops : 0,
+      askedAt: typeof parsed?.askedAt === 'string' ? parsed.askedAt : undefined,
+      askedVersion: typeof parsed?.askedVersion === 'string' ? parsed.askedVersion : undefined,
+    };
+  } catch {
+    return { stops: 0 };
+  }
+};
+
+export const saveReviewPromptState = async (state: ReviewPromptState): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(REVIEW_PROMPT_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Error saving review prompt state:', error);
+  }
+};
+
 // ============= Generic entity writes =============
 
 /**
